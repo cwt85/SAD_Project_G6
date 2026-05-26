@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent TT — Unit Tests</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', monospace, sans-serif; background: #0f172a; color: #e2e8f0; padding: 24px; }
+    h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; color: #38bdf8; }
+    .subtitle { color: #64748b; font-size: .85rem; margin-bottom: 24px; }
+    #summary {
+      display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .stat { padding: 12px 20px; border-radius: 8px; font-weight: 700; }
+    .stat-total   { background: #1e293b; color: #94a3b8; }
+    .stat-passed  { background: #064e3b; color: #34d399; }
+    .stat-failed  { background: #7f1d1d; color: #fca5a5; }
+    .suite-title { font-size: .9rem; font-weight: 700; color: #94a3b8; margin: 16px 0 6px;
+                   padding: 6px 12px; background: #1e293b; border-radius: 6px; }
+    .test-row { display: flex; align-items: flex-start; gap: 8px; padding: 5px 12px; font-size: .8rem; }
+    .test-row.pass { color: #34d399; }
+    .test-row.fail { color: #f87171; }
+    .test-icon { flex-shrink: 0; }
+    .test-err { font-size: .75rem; color: #fb923c; margin-left: 20px; padding: 2px 0; }
+    #run-btn {
+      padding: 10px 24px; background: #38bdf8; color: #0f172a; border: none; border-radius: 8px;
+      font-weight: 700; font-size: .9rem; cursor: pointer; margin-bottom: 24px;
+    }
+    #run-btn:hover { background: #7dd3fc; }
+    .progress { height: 6px; border-radius: 3px; background: #1e293b; margin-bottom: 20px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 3px; background: #34d399; transition: width .5s; }
+    .progress-fill.has-fail { background: #f87171; }
+  </style>
+</head>
+<body>
+  <h1>🧪 Agent TT — Unit Tests</h1>
+  <p class="subtitle">測試涵蓋：Repository Pattern · Observer Pattern · TripService · BookingService · TrainService</p>
+  <button id="run-btn" onclick="runAllTests()">▶ 執行所有測試</button>
+  <div id="summary"></div>
+  <div class="progress"><div class="progress-fill" id="progress-fill" style="width:0"></div></div>
+  <div id="results"></div>
+
+  <!-- ── Core（與主站相同的依賴） ── -->
+  <script src="js/core/EventBus.js"></script>
+  <script src="js/core/Repository.js"></script>
+  <script src="js/core/Router.js"></script>
+  <script src="js/core/Store.js"></script>
+
+  <!-- ── Models ── -->
+  <script src="js/models/UserModel.js"></script>
+  <script src="js/models/TripModel.js"></script>
+  <script src="js/models/AccommodationModel.js"></script>
+  <script src="js/models/TrainModel.js"></script>
+
+  <!-- ── Repositories ── -->
+  <script src="js/repositories/UserRepository.js"></script>
+  <script src="js/repositories/TripRepository.js"></script>
+  <script src="js/repositories/AccommodationRepository.js"></script>
+  <script src="js/repositories/TrainRepository.js"></script>
+
+  <!-- ── Services ── -->
+  <script src="js/services/AuthService.js"></script>
+  <script src="js/services/TripService.js"></script>
+  <script src="js/services/BookingService.js"></script>
+  <script src="js/services/TrainService.js"></script>
+
+  <!-- ── Seed demo data 供測試使用 ── -->
+  <script src="js/app.js"></script>
+
+  <!-- ── Test Framework ── -->
+  <script src="tests/TestRunner.js"></script>
+
+  <!-- ── Test Files ── -->
+  <script src="tests/EventBus.test.js"></script>
+  <script src="tests/Repository.test.js"></script>
+  <script src="tests/AuthService.test.js"></script>
+  <script src="tests/TripService.test.js"></script>
+  <script src="tests/BookingService.test.js"></script>
+  <script src="tests/TrainService.test.js"></script>
+
+  <script>
+    // app.js 的 DOMContentLoaded 會 seed demo data，這裡補充確認
+    function runAllTests() {
+      // 測試在 <script> 載入時已執行，直接讀取結果
+      const { results, total, passed, failed } = TestRunner.run();
+
+      // Summary
+      const pct = total ? Math.round(passed / total * 100) : 0;
+      document.getElementById('summary').innerHTML = `
+        <div class="stat stat-total">📊 總計 ${total}</div>
+        <div class="stat stat-passed">✅ 通過 ${passed}</div>
+        <div class="stat stat-failed">❌ 失敗 ${failed}</div>
+        <div class="stat stat-total">📈 通過率 ${pct}%</div>
+      `;
+
+      // Progress bar
+      const fill = document.getElementById('progress-fill');
+      fill.style.width = pct + '%';
+      if (failed > 0) fill.classList.add('has-fail');
+      else fill.classList.remove('has-fail');
+
+      // Results grouped by suite
+      const suites = {};
+      results.forEach(r => {
+        if (!suites[r.suite]) suites[r.suite] = [];
+        suites[r.suite].push(r);
+      });
+
+      const html = Object.entries(suites).map(([suite, tests]) => {
+        const rows = tests.map(t => `
+          <div class="test-row ${t.passed ? 'pass' : 'fail'}">
+            <span class="test-icon">${t.passed ? '✓' : '✗'}</span>
+            <span>${t.desc}</span>
+          </div>
+          ${!t.passed ? `<div class="test-err">→ ${t.error}</div>` : ''}
+        `).join('');
+        const suitePass = tests.every(t => t.passed);
+        return `
+          <div class="suite-title">${suitePass ? '✅' : '❌'} ${suite}</div>
+          ${rows}
+        `;
+      }).join('');
+
+      document.getElementById('results').innerHTML = html;
+    }
+
+    // 頁面載入後自動執行
+    window.addEventListener('load', () => setTimeout(runAllTests, 300));
+  </script>
+</body>
+</html>
