@@ -54,7 +54,7 @@ const ModuleAView = {
               <button class="btn btn-sm btn-success" onclick="ModuleAView.setStatus('${t.id}','completed')">完成</button>
               <button class="btn btn-sm btn-danger" onclick="ModuleAView.setStatus('${t.id}','cancelled')">取消</button>
             ` : `<span class="text-sm text-muted">旅伴</span>`}
-            <span class="text-sm text-muted" style="margin-left:auto;">📎 <a href="#" onclick="ModuleAView.copyShareLink('${t.id}')">分享連結</a></span>
+            <span class="text-sm text-muted" style="margin-left:auto;">📎 <a href="javascript:void(0)" onclick="ModuleAView.copyShareLink('${t.id}')">分享連結</a></span>
           </div>
         </div>
       `).join('')}
@@ -112,6 +112,60 @@ const ModuleAView = {
     const link = tripService.getShareLink(tripId);
     navigator.clipboard?.writeText(link).catch(() => {});
     UI.toast('分享連結已複製！');
+  },
+
+  /* ─── 分享連結檢視（不需登入，唯讀） ─── */
+  renderSharedTrip(token) {
+    UI.setActiveTab('');
+    const trip = tripRepo.findByShareToken(token);
+    if (!trip) {
+      UI.render(`<div class="empty-state"><div class="empty-icon">🔗</div><p>找不到此分享連結，可能已失效。</p></div>`);
+      return;
+    }
+    const days = tripDayRepo.findByTripId(trip.id);
+    const members = tripMemberRepo.findByTripId(trip.id);
+    const expenses = expenseRepo.findByTripId(trip.id);
+    const totalExpense = expenses.reduce((s, e) => s + e.amount, 0);
+
+    const daysHtml = days.map(day => {
+      const spots = tripSpotItemRepo.findByDayId(day.id);
+      return `
+        <div class="card" style="margin-bottom:12px">
+          <div style="font-weight:700;margin-bottom:8px">Day ${day.dayNumber}　<span class="text-muted text-sm">${UI.formatDate(day.date)}</span></div>
+          ${spots.length === 0 ? `<p class="text-muted text-sm">尚無景點</p>` : spots.map(s => `
+            <div class="list-item">
+              <span>${s.customName || s.spotId}</span>
+              ${s.isMustGoCandidate ? `<span class="badge badge-warning">必去</span>` : ''}
+            </div>
+          `).join('')}
+        </div>`;
+    }).join('');
+
+    UI.render(`
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">🔗 ${trip.title}</h1>
+          <div class="text-muted text-sm">${trip.destination}　${UI.formatDate(trip.startDate)} ~ ${UI.formatDate(trip.endDate)}　${trip.totalDays} 天</div>
+        </div>
+        ${UI.badge(trip.status)}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+        <div class="card">
+          <div class="text-sm text-muted">旅伴（${members.length} 人）</div>
+          ${members.map(m => `<div class="list-item text-sm">${UI.avatar(userRepo.getById(m.userId)?.name || '?')} ${userRepo.getById(m.userId)?.name || '未知'}</div>`).join('')}
+        </div>
+        <div class="card">
+          <div class="text-sm text-muted">總花費</div>
+          <div style="font-size:1.4rem;font-weight:700;color:var(--primary)">$${totalExpense.toLocaleString()}</div>
+          ${trip.budgetLimit ? `<div class="text-sm text-muted">預算上限 $${trip.budgetLimit.toLocaleString()}</div>` : ''}
+        </div>
+      </div>
+      <h2 style="font-size:1rem;font-weight:700;margin-bottom:12px">每日行程</h2>
+      ${daysHtml}
+      <div style="text-align:center;margin-top:24px">
+        <a href="#/" class="btn btn-outline">登入 Agent TT</a>
+      </div>
+    `);
   },
 
   /* ─── 行程詳細頁 ─── */

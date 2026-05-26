@@ -17,7 +17,8 @@ function setupRoutes() {
     .register('/admin/pricing/:id', ({ id }) => ModuleBView.renderPricingHistory(id))
     .register('/trains',        () => ModuleCView.renderSearch())
     .register('/my-tickets',    () => ModuleCView.renderMyTickets())
-    .register('/manager/c',     () => ModuleCView.renderManagerPanel());
+    .register('/manager/c',     () => ModuleCView.renderManagerPanel())
+    .register('/share/:token',  ({ token }) => ModuleAView.renderSharedTrip(token));
 }
 
 /* ─── 導覽列點擊事件 ─── */
