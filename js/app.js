@@ -46,7 +46,7 @@ function setupNavbar() {
 
   // 預算警告 Toast
   EventBus.on('budget:warning', ({ total, limit }) => {
-    UI.toast(`⚠️ 預算警告！已花費 $${total.toLocaleString()}，超過上限 $${limit.toLocaleString()}`, 'warning');
+    UI.toast(`預算警告！已花費 $${total.toLocaleString()}，超過上限 $${limit.toLocaleString()}`, 'warning');
   });
 }
 
@@ -154,7 +154,7 @@ function seedDemoData() {
   scheduleRepo.create(TrainScheduleModel.create({ trainId: 't6', trainNumber: '0501', trainType: 'high_speed', departureStationId: s4.id, arrivalStationId: s1.id, departureTime: mkTime(14,0), arrivalTime: mkTime(16,15), operatingDate: today, availableSeats: 30 }));
 
   localStorage.setItem('agenttt_seeded', '1');
-  console.log('✅ Demo data seeded');
+  console.log('Demo data seeded');
 }
 
 /* ─── App 啟動 ─── */

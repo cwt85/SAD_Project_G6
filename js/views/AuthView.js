@@ -4,7 +4,7 @@ const AuthView = {
     UI.render(`
       <div class="auth-container">
         <div class="auth-card">
-          <h1 class="auth-title">🌐 Agent TT</h1>
+          <h1 class="auth-title">Agent TT</h1>
           <p class="auth-subtitle">智慧旅遊平台 — 登入帳號</p>
           <div class="form-group">
             <label>Email</label>
@@ -32,7 +32,7 @@ const AuthView = {
     UI.render(`
       <div class="auth-container">
         <div class="auth-card">
-          <h1 class="auth-title">🌐 Agent TT</h1>
+          <h1 class="auth-title">Agent TT</h1>
           <p class="auth-subtitle">建立新帳號</p>
           <div class="form-group">
             <label>姓名</label>

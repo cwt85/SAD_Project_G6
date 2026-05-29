@@ -34,7 +34,7 @@
   </style>
 </head>
 <body>
-  <h1>🧪 Agent TT — Unit Tests</h1>
+  <h1>Agent TT — Unit Tests</h1>
   <p class="subtitle">測試涵蓋：Repository Pattern · Observer Pattern · TripService · BookingService · TrainService</p>
   <button id="run-btn" onclick="runAllTests()">▶ 執行所有測試</button>
   <div id="summary"></div>
@@ -88,10 +88,10 @@
       // Summary
       const pct = total ? Math.round(passed / total * 100) : 0;
       document.getElementById('summary').innerHTML = `
-        <div class="stat stat-total">📊 總計 ${total}</div>
-        <div class="stat stat-passed">✅ 通過 ${passed}</div>
-        <div class="stat stat-failed">❌ 失敗 ${failed}</div>
-        <div class="stat stat-total">📈 通過率 ${pct}%</div>
+        <div class="stat stat-total">總計 ${total}</div>
+        <div class="stat stat-passed">通過 ${passed}</div>
+        <div class="stat stat-failed">失敗 ${failed}</div>
+        <div class="stat stat-total">通過率 ${pct}%</div>
       `;
 
       // Progress bar
@@ -110,14 +110,14 @@
       const html = Object.entries(suites).map(([suite, tests]) => {
         const rows = tests.map(t => `
           <div class="test-row ${t.passed ? 'pass' : 'fail'}">
-            <span class="test-icon">${t.passed ? '✓' : '✗'}</span>
+            <span class="test-icon">${t.passed ? 'PASS' : 'FAIL'}</span>
             <span>${t.desc}</span>
           </div>
           ${!t.passed ? `<div class="test-err">→ ${t.error}</div>` : ''}
         `).join('');
         const suitePass = tests.every(t => t.passed);
         return `
-          <div class="suite-title">${suitePass ? '✅' : '❌'} ${suite}</div>
+          <div class="suite-title">${suite}</div>
           ${rows}
         `;
       }).join('');

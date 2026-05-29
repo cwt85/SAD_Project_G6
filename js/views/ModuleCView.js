@@ -10,8 +10,8 @@ const ModuleCView = {
 
     UI.render(`
       <div class="page-header">
-        <h1 class="page-title">🚄 車票預訂</h1>
-        <button class="btn btn-outline" onclick="Router.navigate('/my-tickets')">🎫 我的票券</button>
+        <h1 class="page-title">車票預訂</h1>
+        <button class="btn btn-outline" onclick="Router.navigate('/my-tickets')">我的票券</button>
       </div>
       <div class="card">
         <div class="form-row-3">
@@ -49,7 +49,7 @@ const ModuleCView = {
     const typeLabels = { high_speed: '高鐵', express: '自強號', local: '區間車' };
 
     const html = results.length === 0
-      ? '<div class="empty-state"><div class="empty-icon">🚄</div><p>無符合條件的班次</p></div>'
+      ? '<div class="empty-state"><div class="empty-icon"></div><p>無符合條件的班次</p></div>'
       : results.map(s => {
           const fare = trainService.calculateFare(s.id, ticketTypes[0]?.id);
           return `
@@ -87,7 +87,7 @@ const ModuleCView = {
     const fare = trainService.calculateFare(scheduleId, ticketTypes[0]?.id);
 
     UI.showModal(`
-      <div class="modal-header"><h3>訂票 — ${schedule?.trainNumber}</h3><button class="close-btn" onclick="UI.closeModal()">✕</button></div>
+      <div class="modal-header"><h3>訂票 — ${schedule?.trainNumber}</h3><button class="close-btn" onclick="UI.closeModal()">X</button></div>
       <div class="modal-body">
         <div class="form-group">
           <label>票種</label>
@@ -151,10 +151,10 @@ const ModuleCView = {
 
     UI.render(`
       <div class="page-header">
-        <h1 class="page-title">🎫 我的票券</h1>
+        <h1 class="page-title">我的票券</h1>
         <button class="btn btn-outline" onclick="Router.navigate('/trains')">← 返回查詢</button>
       </div>
-      ${orders.length === 0 ? '<div class="empty-state"><div class="empty-icon">🎫</div><p>尚無票券</p></div>' :
+      ${orders.length === 0 ? '<div class="empty-state"><div class="empty-icon"></div><p>尚無票券</p></div>' :
         orders.map(o => {
           const sch = scheduleRepo.getById(o.scheduleId);
           const dep = sch ? stationRepo.getById(sch.departureStationId) : null;
@@ -191,7 +191,7 @@ const ModuleCView = {
 
   showTransferModal(orderId) {
     UI.showModal(`
-      <div class="modal-header"><h3>分票給其他使用者</h3><button class="close-btn" onclick="UI.closeModal()">✕</button></div>
+      <div class="modal-header"><h3>分票給其他使用者</h3><button class="close-btn" onclick="UI.closeModal()">X</button></div>
       <div class="modal-body">
         <div class="form-group">
           <label>接收者 Email</label>
@@ -225,7 +225,7 @@ const ModuleCView = {
     }).filter(s => s.id !== sch.id && s.availableSeats > 0);
 
     UI.showModal(`
-      <div class="modal-header"><h3>改票</h3><button class="close-btn" onclick="UI.closeModal()">✕</button></div>
+      <div class="modal-header"><h3>改票</h3><button class="close-btn" onclick="UI.closeModal()">X</button></div>
       <div class="modal-body">
         <p class="text-sm text-muted mb-16">原班次：${dep?.name} → ${arr?.name} ${UI.formatDateTime(sch.departureTime)}</p>
         ${alternatives.length === 0 ? '<p class="text-sm text-muted">同日期無其他可用班次</p>' :
@@ -271,7 +271,7 @@ const ModuleCView = {
 
     UI.render(`
       <div class="page-header">
-        <h1 class="page-title">🚆 班次管理</h1>
+        <h1 class="page-title">班次管理</h1>
       </div>
       <div class="card mb-16">
         <div class="card-header"><span class="card-title">票種折扣設定</span></div>
@@ -286,7 +286,7 @@ const ModuleCView = {
         `).join('')}
       </div>
       <div class="card-header mb-8"><span class="card-title">今日班次 (${today})</span></div>
-      ${schedules.length === 0 ? '<div class="empty-state"><div class="empty-icon">🚄</div><p>今日無班次</p></div>' :
+      ${schedules.length === 0 ? '<div class="empty-state"><div class="empty-icon"></div><p>今日無班次</p></div>' :
         schedules.map(s => {
           const dep = stationRepo.getById(s.departureStationId);
           const arr = stationRepo.getById(s.arrivalStationId);
@@ -318,7 +318,7 @@ const ModuleCView = {
   showEditTicketTypeModal(typeId) {
     const tt = ticketTypeRepo.getById(typeId);
     UI.showModal(`
-      <div class="modal-header"><h3>編輯票種：${tt.name}</h3><button class="close-btn" onclick="UI.closeModal()">✕</button></div>
+      <div class="modal-header"><h3>編輯票種：${tt.name}</h3><button class="close-btn" onclick="UI.closeModal()">X</button></div>
       <div class="modal-body">
         <div class="form-group"><label>折扣率（0.0~1.0）</label><input id="tt-rate" class="form-control" type="number" step="0.1" min="0" max="1" value="${tt.discountRate}"></div>
       </div>
@@ -340,7 +340,7 @@ const ModuleCView = {
 
   showNotifModal(scheduleId) {
     UI.showModal(`
-      <div class="modal-header"><h3>發送異常通知</h3><button class="close-btn" onclick="UI.closeModal()">✕</button></div>
+      <div class="modal-header"><h3>發送異常通知</h3><button class="close-btn" onclick="UI.closeModal()">X</button></div>
       <div class="modal-body">
         <div class="form-group">
           <label>通知類型</label>

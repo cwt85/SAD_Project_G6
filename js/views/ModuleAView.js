@@ -18,7 +18,7 @@ const ModuleAView = {
 
     UI.render(`
       <div class="page-header">
-        <h1 class="page-title">🗺️ 我的行程</h1>
+        <h1 class="page-title">我的行程</h1>
         <button class="btn btn-primary" onclick="ModuleAView.showCreateTripModal()">＋ 建立行程</button>
       </div>
       <div class="filter-bar">
@@ -31,7 +31,7 @@ const ModuleAView = {
       </div>
       ${trips.length === 0 ? `
         <div class="empty-state">
-          <div class="empty-icon">🗺️</div>
+          <div class="empty-icon"></div>
           <p>還沒有行程，馬上建立第一個吧！</p>
         </div>
       ` : trips.map(t => `
@@ -54,7 +54,7 @@ const ModuleAView = {
               <button class="btn btn-sm btn-success" onclick="ModuleAView.setStatus('${t.id}','completed')">完成</button>
               <button class="btn btn-sm btn-danger" onclick="ModuleAView.setStatus('${t.id}','cancelled')">取消</button>
             ` : `<span class="text-sm text-muted">旅伴</span>`}
-            <span class="text-sm text-muted" style="margin-left:auto;">📎 <a href="javascript:void(0)" onclick="ModuleAView.copyShareLink('${t.id}')">分享連結</a></span>
+            <span class="text-sm text-muted" style="margin-left:auto;"><a href="javascript:void(0)" onclick="ModuleAView.copyShareLink('${t.id}')">分享連結</a></span>
           </div>
         </div>
       `).join('')}
@@ -67,7 +67,7 @@ const ModuleAView = {
   showCreateTripModal() {
     const today = new Date().toISOString().split('T')[0];
     UI.showModal(`
-      <div class="modal-header"><h3>建立新行程</h3><button class="close-btn" onclick="UI.closeModal()">✕</button></div>
+      <div class="modal-header"><h3>建立新行程</h3><button class="close-btn" onclick="UI.closeModal()">X</button></div>
       <div class="modal-body">
         <div class="form-group"><label>行程名稱</label><input id="c-title" class="form-control" placeholder="台東三日遊"></div>
         <div class="form-group"><label>目的地</label><input id="c-dest" class="form-control" placeholder="台東縣"></div>
@@ -119,7 +119,7 @@ const ModuleAView = {
     UI.setActiveTab('');
     const trip = tripRepo.findByShareToken(token);
     if (!trip) {
-      UI.render(`<div class="empty-state"><div class="empty-icon">🔗</div><p>找不到此分享連結，可能已失效。</p></div>`);
+      UI.render(`<div class="empty-state"><div class="empty-icon"></div><p>找不到此分享連結，可能已失效。</p></div>`);
       return;
     }
     const days = tripDayRepo.findByTripId(trip.id);
@@ -144,7 +144,7 @@ const ModuleAView = {
     UI.render(`
       <div class="page-header">
         <div>
-          <h1 class="page-title">🔗 ${trip.title}</h1>
+          <h1 class="page-title">${trip.title}</h1>
           <div class="text-muted text-sm">${trip.destination}　${UI.formatDate(trip.startDate)} ~ ${UI.formatDate(trip.endDate)}　${trip.totalDays} 天</div>
         </div>
         ${UI.badge(trip.status)}
@@ -193,10 +193,10 @@ const ModuleAView = {
       </div>
 
       <div class="tabs">
-        <button class="tab-btn active" onclick="ModuleAView.switchTab('tab-days','${tripId}',this)">📅 每日行程</button>
-        <button class="tab-btn" onclick="ModuleAView.switchTab('tab-collab','${tripId}',this)">👥 協作</button>
-        <button class="tab-btn" onclick="ModuleAView.switchTab('tab-budget','${tripId}',this)">💰 預算</button>
-        <button class="tab-btn" onclick="ModuleAView.switchTab('tab-vote','${tripId}',this)">🗳️ 投票</button>
+        <button class="tab-btn active" onclick="ModuleAView.switchTab('tab-days','${tripId}',this)">每日行程</button>
+        <button class="tab-btn" onclick="ModuleAView.switchTab('tab-collab','${tripId}',this)">協作</button>
+        <button class="tab-btn" onclick="ModuleAView.switchTab('tab-budget','${tripId}',this)">預算</button>
+        <button class="tab-btn" onclick="ModuleAView.switchTab('tab-vote','${tripId}',this)">投票</button>
       </div>
 
       <!-- 每日行程 -->
@@ -223,18 +223,18 @@ const ModuleAView = {
                     <div class="spot-item-content">
                       <div class="spot-item-name">
                         ${item.customName || (item.spotId ? spotRepo.getById(item.spotId)?.name || '' : '')}
-                        ${item.isMustGoCandidate ? ' ⭐' : ''}
+                        ${item.isMustGoCandidate ? ' [必去]' : ''}
                       </div>
                       <div class="spot-item-meta">
-                        ${item.departureTime ? `🕒 ${item.departureTime}` : ''}
+                        ${item.departureTime ? `出發：${item.departureTime}` : ''}
                         ${item.durationMinutes ? `· ${item.durationMinutes}分鐘` : ''}
-                        ${item.notes ? `· 📝 ${item.notes}` : ''}
+                        ${item.notes ? `· ${item.notes}` : ''}
                       </div>
                     </div>
                     <div class="spot-item-actions">
-                      <button class="btn-icon" title="標記必去" onclick="ModuleAView.toggleMustGo('${item.id}','${tripId}')">⭐</button>
-                      <button class="btn-icon" title="備註" onclick="ModuleAView.showNoteModal('${item.id}','${tripId}')">📝</button>
-                      <button class="btn-icon" title="刪除" onclick="ModuleAView.deleteSpot('${item.id}','${tripId}')">🗑️</button>
+                      <button class="btn-icon" title="標記必去" onclick="ModuleAView.toggleMustGo('${item.id}','${tripId}')">必去</button>
+                      <button class="btn-icon" title="備註" onclick="ModuleAView.showNoteModal('${item.id}','${tripId}')">備註</button>
+                      <button class="btn-icon" title="刪除" onclick="ModuleAView.deleteSpot('${item.id}','${tripId}')">刪除</button>
                     </div>
                   </div>
                 `).join('')
@@ -262,7 +262,7 @@ const ModuleAView = {
           `).join('')}
         </div>
         <div class="card">
-          <div class="card-header"><span class="card-title">💬 留言討論</span></div>
+          <div class="card-header"><span class="card-title">留言討論</span></div>
           <div class="chat-container">
             <div class="chat-messages" id="chat-msgs">
               ${tripCommentRepo.findByTripId(tripId).map(c => {
@@ -333,11 +333,11 @@ const ModuleAView = {
                 const pct = totalVotes ? Math.round(votes / totalVotes * 100) : 0;
                 return `
                   <div class="poll-option">
-                    <button class="btn btn-sm ${voted ? 'btn-primary' : 'btn-outline'}" onclick="ModuleAView.doVote('${opt.id}','${tripId}')">${voted ? '✓' : '○'}</button>
+                    <button class="btn btn-sm ${voted ? 'btn-primary' : 'btn-outline'}" onclick="ModuleAView.doVote('${opt.id}','${tripId}')">${voted ? '已投' : '投票'}</button>
                     <span style="flex:1">${opt.label}</span>
                     <div class="poll-bar"><div class="poll-bar-fill" style="width:${pct}%"></div></div>
                     <span class="poll-count">${votes} 票</span>
-                    ${isHost ? `<button class="btn-icon" onclick="ModuleAView.deletePollOption('${opt.id}','${tripId}')">🗑️</button>` : ''}
+                    ${isHost ? `<button class="btn-icon" onclick="ModuleAView.deletePollOption('${opt.id}','${tripId}')">刪除</button>` : ''}
                   </div>
                 `;
               }).join('')}
@@ -345,7 +345,7 @@ const ModuleAView = {
             </div>
           `;
         }).join('')}
-        ${pollRepo.findByTripId(tripId).length === 0 ? '<div class="empty-state"><div class="empty-icon">🗳️</div><p>尚未建立投票</p></div>' : ''}
+        ${pollRepo.findByTripId(tripId).length === 0 ? '<div class="empty-state"><div class="empty-icon"></div><p>尚未建立投票</p></div>' : ''}
       </div>
     `);
 
@@ -365,7 +365,7 @@ const ModuleAView = {
   showAddSpotModal(dayId, tripId) {
     const recommended = spotRepo.findRecommended();
     UI.showModal(`
-      <div class="modal-header"><h3>新增景點</h3><button class="close-btn" onclick="UI.closeModal()">✕</button></div>
+      <div class="modal-header"><h3>新增景點</h3><button class="close-btn" onclick="UI.closeModal()">X</button></div>
       <div class="modal-body">
         <div class="form-group">
           <label>搜尋景點</label>
@@ -450,7 +450,7 @@ const ModuleAView = {
   showNoteModal(itemId, tripId) {
     const item = tripSpotItemRepo.getById(itemId);
     UI.showModal(`
-      <div class="modal-header"><h3>景點備註</h3><button class="close-btn" onclick="UI.closeModal()">✕</button></div>
+      <div class="modal-header"><h3>景點備註</h3><button class="close-btn" onclick="UI.closeModal()">X</button></div>
       <div class="modal-body">
         <div class="form-group">
           <label>${item.customName || '景點'}</label>
@@ -479,7 +479,7 @@ const ModuleAView = {
 
   showInviteModal(tripId) {
     UI.showModal(`
-      <div class="modal-header"><h3>邀請旅伴</h3><button class="close-btn" onclick="UI.closeModal()">✕</button></div>
+      <div class="modal-header"><h3>邀請旅伴</h3><button class="close-btn" onclick="UI.closeModal()">X</button></div>
       <div class="modal-body">
         <div class="form-group">
           <label>旅伴 Email</label>
@@ -521,7 +521,7 @@ const ModuleAView = {
     }).join('');
 
     UI.showModal(`
-      <div class="modal-header"><h3>新增費用</h3><button class="close-btn" onclick="UI.closeModal()">✕</button></div>
+      <div class="modal-header"><h3>新增費用</h3><button class="close-btn" onclick="UI.closeModal()">X</button></div>
       <div class="modal-body">
         <div class="form-row">
           <div class="form-group"><label>金額</label><input id="exp-amount" class="form-control" type="number" placeholder="0"></div>
@@ -563,7 +563,7 @@ const ModuleAView = {
 
   showCreatePollModal(tripId) {
     UI.showModal(`
-      <div class="modal-header"><h3>建立投票</h3><button class="close-btn" onclick="UI.closeModal()">✕</button></div>
+      <div class="modal-header"><h3>建立投票</h3><button class="close-btn" onclick="UI.closeModal()">X</button></div>
       <div class="modal-body">
         <div class="form-group"><label>投票主題</label><input id="poll-title" class="form-control" placeholder="下午去哪裡？"></div>
       </div>
@@ -586,7 +586,7 @@ const ModuleAView = {
 
   showAddOptionModal(pollId, tripId) {
     UI.showModal(`
-      <div class="modal-header"><h3>新增投票選項</h3><button class="close-btn" onclick="UI.closeModal()">✕</button></div>
+      <div class="modal-header"><h3>新增投票選項</h3><button class="close-btn" onclick="UI.closeModal()">X</button></div>
       <div class="modal-body">
         <div class="form-group"><label>選項名稱</label><input id="opt-label" class="form-control" placeholder="知本溫泉"></div>
       </div>

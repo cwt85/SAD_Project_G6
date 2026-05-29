@@ -36,7 +36,7 @@ const UI = {
   confirm(msg) {
     return new Promise(resolve => {
       UI.showModal(`
-        <div class="modal-header"><h3>確認操作</h3><button class="close-btn" onclick="UI.closeModal()">✕</button></div>
+        <div class="modal-header"><h3>確認操作</h3><button class="close-btn" onclick="UI.closeModal()">X</button></div>
         <div class="modal-body"><p>${msg}</p></div>
         <div class="modal-footer">
           <button class="btn btn-outline" onclick="UI.closeModal()">取消</button>
@@ -70,7 +70,7 @@ const UI = {
   /** 星星評分 */
   stars(rating, max = 5) {
     const full = Math.round(rating);
-    return '★'.repeat(full) + '☆'.repeat(max - full);
+    return `${full}/${max} 分`;
   },
 
   /** 取得使用者頭像顏色（依姓名第一字） */
@@ -103,7 +103,7 @@ const UI = {
     const logoutBtn = document.getElementById('nav-logout-btn');
     if (!userInfo) return;
     if (user) {
-      userInfo.textContent = `👤 ${user.name}`;
+      userInfo.textContent = `${user.name}`;
       if (logoutBtn) logoutBtn.style.display = 'inline-block';
     } else {
       userInfo.textContent = '';
