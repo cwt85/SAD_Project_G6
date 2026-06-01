@@ -2724,6 +2724,27 @@ td small {
   display: grid;
 }
 
+.must-go-toggle {
+  justify-self: start;
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(236, 72, 153, 0.35);
+  background: transparent;
+  color: #be123c;
+  font-size: 13px;
+  font-weight: 800;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.must-go-toggle:hover:not(:disabled) {
+  background: rgba(255, 228, 230, 0.55);
+}
+
+.must-go-toggle.is-must-go {
+  background: rgba(255, 228, 230, 0.72);
+  border-color: rgba(236, 72, 153, 0.6);
+}
+
 .member-list {
   display: flex;
   flex-wrap: wrap;

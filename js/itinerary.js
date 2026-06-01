@@ -848,10 +848,10 @@ function renderItineraryItemCard(itinerary, day, item) {
         </div>
       </div>
       <div class="itinerary-note-panel ${expanded ? "open" : ""}">
-        <label>
-          <input${d} type="checkbox" ${item.mustGo ? "checked" : ""} onchange="updateItineraryItemField(${day.day}, '${item.id}', 'mustGo', this.checked)" />
-          標記為必去候選
-        </label>
+        <button${d} class="must-go-toggle ${item.mustGo ? "is-must-go" : ""}"
+          onclick="updateItineraryItemField(${day.day}, '${item.id}', 'mustGo', ${!item.mustGo})">
+          ${item.mustGo ? "★ 已標記為必去候選" : "☆ 標記為必去候選"}
+        </button>
         <label>預估費用</label>
         <input${d} type="number" min="0" value="${Number(item.estimatedCost || 0)}" onchange="updateItineraryItemField(${day.day}, '${item.id}', 'estimatedCost', this.value)" />
         <label>備註</label>
