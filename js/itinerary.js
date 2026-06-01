@@ -395,6 +395,9 @@ function addRecommendedPlaceToItinerary(placeId) {
     desc: place.desc,
     estimatedCost: Number(getValue("manualAttractionCost")) || 0
   });
+
+  const dayNumber = Number(getValue("attractionTargetDay")) || activeItineraryDay;
+  showToast(`「${place.name}」已加入第 ${dayNumber} 天`);
 }
 
 function addManualItineraryPlace() {
