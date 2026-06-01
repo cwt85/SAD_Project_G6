@@ -131,6 +131,10 @@ textarea:disabled {
   transform: translateY(0) scale(1);
 }
 
+.toast.toast-error {
+  background: rgba(185, 28, 28, 0.90);
+}
+
 img {
   max-width: 100%;
 }
@@ -2239,8 +2243,10 @@ td small {
   display: none;
 }
 
-.readonly-mode .itinerary-workspace {
-  display: none;
+.readonly-mode .itinerary-workspace,
+.readonly-mode .itinerary-list-view,
+.readonly-mode .itinerary-detail-view {
+  display: none !important;
 }
 
 .itinerary-command-panel {
@@ -2911,6 +2917,36 @@ td small {
   background:
     linear-gradient(135deg, rgba(255, 228, 230, 0.52), rgba(243, 232, 255, 0.44)),
     rgba(255, 255, 255, 0.50);
+}
+
+/* 拖曳視覺狀態 */
+.itinerary-item-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease, border-color 0.15s ease;
+  cursor: grab;
+}
+
+/* 被拿起的瞬間（ghost image 截圖用） */
+.itinerary-item-card.is-lifting {
+  transform: scale(1.04) rotate(1deg);
+  box-shadow: 0 28px 60px rgba(15, 23, 42, 0.30);
+  opacity: 0.92;
+  cursor: grabbing;
+}
+
+/* 拖曳中的實際卡片（ghost 已接管，原位半透明） */
+.itinerary-item-card.is-dragging {
+  opacity: 0.30;
+  transform: scale(0.97);
+}
+
+/* 準備交換的目標卡片 */
+.itinerary-item-card.drag-target {
+  border-color: rgba(79, 124, 255, 0.55);
+  background:
+    linear-gradient(135deg, rgba(219, 234, 254, 0.65), rgba(243, 232, 255, 0.50)),
+    rgba(255, 255, 255, 0.50);
+  transform: scale(1.02);
+  box-shadow: 0 16px 40px rgba(79, 124, 255, 0.20);
 }
 
 .itinerary-item-controls {

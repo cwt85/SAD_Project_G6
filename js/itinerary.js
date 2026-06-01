@@ -57,8 +57,8 @@ function redistributeDayTimes(day) {
   });
 }
 
-// 右下角 Toast 提示
-function showToast(message, duration = 2500) {
+// 右下角 Toast 提示（type: "success" | "error"）
+function showToast(message, type = "success", duration = 2500) {
   let container = document.getElementById("toastContainer");
   if (!container) {
     container = document.createElement("div");
@@ -67,7 +67,7 @@ function showToast(message, duration = 2500) {
   }
 
   const toast = document.createElement("div");
-  toast.className = "toast";
+  toast.className = `toast toast-${type}`;
   toast.textContent = message;
   container.appendChild(toast);
 
@@ -606,7 +606,15 @@ function addPlaceToItinerary(place) {
     name: place.name,
     type: place.type || "景點",
     distance: Number(place.distance) || 0,
-    time: getValue("attractionTargetTime") || "09:00",
+    time: (() => {
+      const requested = getValue("attractionTargetTime") || "09:00";
+      const startTime = day ? (day.startTime || "00:00") : "00:00";
+      if (compareTime(requested, startTime) < 0) {
+        showToast(`時間早於集合出發時間，已自動調整為 ${startTime}`, "error");
+        return startTime;
+      }
+      return requested;
+    })(),
     estimatedCost: Number(place.estimatedCost) || 0,
     notes: place.desc || "",
     mustGo: false,
@@ -920,10 +928,13 @@ function renderItineraryItemCard(itinerary, day, item) {
 
   return `
     <article class="itinerary-item-card ${item.mustGo ? "must-go" : ""}"
+      data-item-id="${escapeAttribute(item.id)}"
       draggable="${cancelled ? "false" : "true"}"
       onclick="toggleItineraryItemNotesFromCard(event, '${item.id}')"
-      ondragstart="${cancelled ? "" : `startItineraryDrag(${day.day}, '${item.id}')`}"
-      ondragover="event.preventDefault()"
+      ondragstart="${cancelled ? "" : `startItineraryDrag(${day.day}, '${item.id}', this, event)`}"
+      ondragover="${cancelled ? "event.preventDefault()" : `event.preventDefault(); dragOverItineraryItem('${item.id}')`}"
+      ondragleave="${cancelled ? "" : `dragLeaveItineraryItem('${item.id}')`}"
+      ondragend="${cancelled ? "" : "endItineraryDrag(this)"}"
       ondrop="${cancelled ? "" : `dropItineraryItem(${day.day}, '${item.id}')`}">
       <div class="itinerary-item-main">
         <div>
@@ -977,8 +988,9 @@ function renderCollaborationPanel(itinerary) {
     <div class="readonly-share-box">
       <input readonly value="${escapeAttribute(shareLink || "尚未產生分享連結")}" />
       <div class="actions">
-        <button class="secondary-btn" onclick="generateReadonlyShareLink('${itinerary.id}')">產生連結</button>
-        <button class="secondary-btn" onclick="copyReadonlyShareLink('${itinerary.id}')">複製連結</button>
+        <button class="primary-btn" onclick="generateReadonlyShareLink('${itinerary.id}')">
+          ${shareLink ? "重新產生並複製" : "產生並複製連結"}
+        </button>
       </div>
     </div>
 
@@ -1302,6 +1314,21 @@ function updateItineraryDayStart(itineraryId, dayNumber, value) {
 
   const oldValue = day.startTime;
   day.startTime = value || "09:00";
+
+  // 將早於新集合時間的項目自動推後到集合時間
+  let adjustedCount = 0;
+  day.items.forEach(item => {
+    if (compareTime(item.time || "00:00", day.startTime) < 0) {
+      item.time = day.startTime;
+      item.updatedAt = nowText();
+      adjustedCount++;
+    }
+  });
+  if (adjustedCount > 0) {
+    sortDayItemsByTime(day);
+    showToast(`已自動調整 ${adjustedCount} 個項目至集合時間（${day.startTime}）`);
+  }
+
   const conflict = recordCompanionUpdate(itinerary, {
     type: "update-day",
     action: "更新集合時間",
@@ -1330,12 +1357,20 @@ function updateItineraryItemField(dayNumber, itemId, field, value) {
   if (field === "estimatedCost") nextValue = Number(value) || 0;
   if (field === "mustGo") nextValue = Boolean(value);
 
-  item[field] = nextValue;
-  item.updatedAt = nowText();
-
   if (field === "time") {
     const day = getItineraryDay(itinerary, dayNumber);
-    if (day) sortDayItemsByTime(day);
+    const startTime = day ? (day.startTime || "00:00") : "00:00";
+    if (compareTime(String(nextValue), startTime) < 0) {
+      showToast(`⚠ 項目時間不能早於集合出發時間（${startTime}）`, "error");
+      renderItineraryDetail(); // 還原 UI 輸入框
+      return;
+    }
+    item[field] = nextValue;
+    item.updatedAt = nowText();
+    sortDayItemsByTime(day);
+  } else {
+    item[field] = nextValue;
+    item.updatedAt = nowText();
   }
 
   const conflict = recordCompanionUpdate(itinerary, {
@@ -1393,9 +1428,39 @@ function toggleItineraryItemNotesFromCard(event, itemId) {
   toggleItineraryItemNotes(itemId);
 }
 
-function startItineraryDrag(dayNumber, itemId) {
+function startItineraryDrag(dayNumber, itemId, el, event) {
   draggedItineraryDay = dayNumber;
   draggedItineraryItemId = itemId;
+
+  if (!el) return;
+  // 立即套用「被拿起」樣式 → 瀏覽器以此截圖作為 ghost image
+  el.classList.add("is-lifting");
+  // ghost 截圖後，讓實際卡片變半透明
+  requestAnimationFrame(() => {
+    el.classList.remove("is-lifting");
+    el.classList.add("is-dragging");
+  });
+}
+
+function dragOverItineraryItem(targetItemId) {
+  if (!draggedItineraryItemId || targetItemId === draggedItineraryItemId) return;
+  document.querySelectorAll(".itinerary-item-card.drag-target").forEach(card => {
+    card.classList.remove("drag-target");
+  });
+  const card = document.querySelector(`.itinerary-item-card[data-item-id="${targetItemId}"]`);
+  if (card) card.classList.add("drag-target");
+}
+
+function dragLeaveItineraryItem(targetItemId) {
+  const card = document.querySelector(`.itinerary-item-card[data-item-id="${targetItemId}"]`);
+  if (card) card.classList.remove("drag-target");
+}
+
+function endItineraryDrag(el) {
+  if (el) el.classList.remove("is-dragging", "is-lifting");
+  document.querySelectorAll(".itinerary-item-card.drag-target, .itinerary-item-card.is-dragging").forEach(card => {
+    card.classList.remove("drag-target", "is-dragging");
+  });
 }
 
 function dropItineraryItem(dayNumber, targetItemId) {
@@ -1411,11 +1476,16 @@ function dropItineraryItem(dayNumber, targetItemId) {
 
   if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return;
 
-  const [moving] = day.items.splice(fromIndex, 1);
-  day.items.splice(toIndex, 0, moving);
+  // 交換兩個項目的時間槽（A↔B 時間互換，排序後位置自然跟著調整）
+  const fromItem = day.items[fromIndex];
+  const toItem = day.items[toIndex];
+  const tempTime = fromItem.time;
+  fromItem.time = toItem.time;
+  toItem.time = tempTime;
+  fromItem.updatedAt = nowText();
+  toItem.updatedAt = nowText();
 
-  // 拖曳後依集合出發時間自動重排每項時間（間隔 1 小時）
-  redistributeDayTimes(day);
+  sortDayItemsByTime(day);
 
   draggedItineraryDay = null;
   draggedItineraryItemId = null;
@@ -1424,10 +1494,10 @@ function dropItineraryItem(dayNumber, targetItemId) {
     type: "reorder-day",
     action: "調整行程排序",
     dayNumber,
-    details: `調整第 ${dayNumber} 天景點順序。`
+    details: `調整第 ${dayNumber} 天景點順序（時間互換）。`
   });
 
-  addItineraryLog(itinerary, "調整行程排序", `拖曳調整第 ${dayNumber} 天景點順序，時間已自動重排。`);
+  addItineraryLog(itinerary, "調整行程排序", `拖曳交換第 ${dayNumber} 天「${fromItem.name}」與「${toItem.name}」的時間。`);
   touchItinerary(itinerary);
   saveAppData();
   renderAll();
@@ -1736,6 +1806,7 @@ function addItineraryExpense(itineraryId) {
   ItineraryEventBus.emit("expense:added", { itinerary, expense });
 }
 
+// 產生唯讀連結並直接複製（不觸發 renderAll 避免頁面跳動）
 function generateReadonlyShareLink(itineraryId) {
   const itinerary = findItinerary(itineraryId);
   if (!itinerary || !isItineraryOwner(itinerary)) {
@@ -1750,28 +1821,26 @@ function generateReadonlyShareLink(itineraryId) {
   addItineraryLog(itinerary, "產生唯讀連結", "已產生外部唯讀分享連結。");
   touchItinerary(itinerary);
   saveAppData();
-  renderAll();
-}
-
-function copyReadonlyShareLink(itineraryId) {
-  const itinerary = findItinerary(itineraryId);
-  if (!itinerary || !isItineraryOwner(itinerary)) {
-    alert("只有主邀約人可以複製唯讀分享連結。");
-    return;
-  }
-
-  if (!itinerary.shareToken) {
-    generateReadonlyShareLink(itineraryId);
-  }
 
   const link = getReadonlyShareLink(itinerary);
-  const done = () => alert("唯讀連結已複製。");
 
+  // 直接更新頁面上的 input 欄位，不觸發 renderAll
+  const shareInput = document.querySelector(".readonly-share-box input");
+  if (shareInput) shareInput.value = link;
+
+  // 同時複製到剪貼簿
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(link).then(done).catch(() => prompt("請複製唯讀連結：", link));
+    navigator.clipboard.writeText(link)
+      .then(() => showToast("唯讀連結已產生並複製"))
+      .catch(() => prompt("請複製唯讀連結：", link));
   } else {
     prompt("請複製唯讀連結：", link);
   }
+}
+
+// 保留舊函式供其他地方呼叫
+function copyReadonlyShareLink(itineraryId) {
+  generateReadonlyShareLink(itineraryId);
 }
 
 function revokeItineraryConflict(itineraryId, conflictId) {
