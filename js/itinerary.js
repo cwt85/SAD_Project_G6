@@ -1273,6 +1273,24 @@ function renderBudgetPanel(itinerary) {
       }).join("")}
     </div>
 
+    <h3>結算建議</h3>
+    ${(() => {
+      const txns = calcSettlement(itinerary);
+      if (txns.length === 0) {
+        return `<div class="notice info">帳目已平衡，無需結算。</div>`;
+      }
+      return `<div class="settlement-list">
+        ${txns.map(t => `
+          <div class="settlement-item">
+            <span class="settlement-from">${escapeHtml(t.from)}</span>
+            <span class="settlement-arrow">→</span>
+            <span class="settlement-to">${escapeHtml(t.to)}</span>
+            <strong class="settlement-amount">NT$ ${t.amount.toLocaleString()}</strong>
+          </div>
+        `).join("")}
+      </div>`;
+    })()}
+
     <h3>費用紀錄</h3>
     <div class="expense-list">
       ${(itinerary.expenses || []).length === 0 ? `<div class="notice warning">尚無費用紀錄。</div>` : (itinerary.expenses || []).map(expense => `
@@ -2448,6 +2466,42 @@ function getExpenseSplitMap(itinerary) {
     });
     return map;
   }, {});
+}
+
+// 貪婪結算演算法：最少交易筆數讓所有人帳目平衡，N 人皆適用
+function calcSettlement(itinerary) {
+  const members = getItineraryMembers(itinerary);
+  const paidMap = getExpensePaidMap(itinerary);
+  const splitMap = getExpenseSplitMap(itinerary);
+
+  // 淨餘額：正 = 別人欠他（債主），負 = 他欠別人（欠款人）
+  const balances = members.map(member => ({
+    name: member.displayName || member.account,
+    balance: Number(paidMap[String(member.id)] || 0) - Number(splitMap[String(member.id)] || 0)
+  }));
+
+  const creditors = balances.filter(b => b.balance > 0.5).map(b => ({ ...b }));
+  const debtors   = balances.filter(b => b.balance < -0.5).map(b => ({ ...b, balance: -b.balance }));
+
+  // 雙指標貪婪：每次讓負債最大的人還給債主最多的人
+  creditors.sort((a, b) => b.balance - a.balance);
+  debtors.sort((a, b) => b.balance - a.balance);
+
+  const transactions = [];
+  let i = 0, j = 0;
+
+  while (i < debtors.length && j < creditors.length) {
+    const amount = Math.min(debtors[i].balance, creditors[j].balance);
+    if (amount >= 1) {
+      transactions.push({ from: debtors[i].name, to: creditors[j].name, amount: Math.round(amount) });
+    }
+    debtors[i].balance -= amount;
+    creditors[j].balance -= amount;
+    if (debtors[i].balance < 0.5) i++;
+    if (creditors[j].balance < 0.5) j++;
+  }
+
+  return transactions;
 }
 
 function splitExpenseEqually(amount, userIds) {

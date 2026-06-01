@@ -3588,6 +3588,48 @@ td small {
 }
 
 /* =========================================================
+   結算建議
+========================================================= */
+
+.settlement-list {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.settlement-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background: rgba(79, 124, 255, 0.07);
+  border: 1px solid rgba(79, 124, 255, 0.18);
+  flex-wrap: wrap;
+}
+
+.settlement-from {
+  font-weight: 600;
+  color: var(--red);
+}
+
+.settlement-arrow {
+  color: var(--text-muted);
+  font-size: 18px;
+}
+
+.settlement-to {
+  font-weight: 600;
+  color: var(--green);
+}
+
+.settlement-amount {
+  margin-left: auto;
+  font-size: 15px;
+  color: var(--blue);
+}
+
+/* =========================================================
    投票結果與加入行程
 ========================================================= */
 
