@@ -216,7 +216,7 @@
           <div id="itineraryLodgingPanel"></div>
 
           <details class="itinerary-search-drawer">
-            <summary>搜尋台東推薦景點</summary>
+            <summary>搜尋台東景點</summary>
             <div class="itinerary-search-row">
               <div>
                 <label for="attractionSearchInput">關鍵字</label>
@@ -234,11 +234,45 @@
                   <option value="交通">交通</option>
                 </select>
               </div>
+              <div>
+                <label for="attractionDistanceFilter">距離上限 (km)</label>
+                <input id="attractionDistanceFilter" type="number" min="1" max="50" value="50" placeholder="50" />
+              </div>
               <button class="secondary-btn" onclick="searchItineraryAttractions()">搜尋</button>
             </div>
             <div id="attractionResults"></div>
           </details>
         </div>
+
+        <!-- 系統推薦景點（預設收合） -->
+        <details class="panel itinerary-rec-panel">
+          <summary class="itinerary-rec-summary">
+            <div>
+              <h2>系統推薦景點</h2>
+              <p>依距離台東車站自動推薦，直接加入行程。</p>
+            </div>
+          </summary>
+          <div class="rec-controls">
+            <div class="rec-slider-row">
+              <label>距離上限：<strong id="recDistanceLabel">20</strong> km</label>
+              <input type="range" id="recDistanceSlider" min="1" max="50" value="20"
+                oninput="renderRecommendations()" />
+            </div>
+            <div class="rec-filter-row">
+              <input id="recKeyword" placeholder="關鍵字篩選..." oninput="renderRecommendations()" />
+              <select id="recCategory" onchange="renderRecommendations()">
+                <option value="">全部分類</option>
+                <option value="景點">景點</option>
+                <option value="餐廳">餐廳</option>
+                <option value="活動">活動</option>
+                <option value="住宿">住宿</option>
+                <option value="交通">交通</option>
+                <option value="車站">車站</option>
+              </select>
+            </div>
+          </div>
+          <div id="recommendationResults"></div>
+        </details>
 
         <!-- 行程詳情編輯區 -->
         <div id="itineraryDetailPanel"></div>

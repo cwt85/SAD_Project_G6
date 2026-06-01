@@ -3081,6 +3081,85 @@ td small {
   margin-top: 12px;
 }
 
+/* --- 系統推薦面板 --- */
+.itinerary-rec-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.rec-controls {
+  display: grid;
+  gap: 12px;
+}
+
+.rec-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.rec-slider-row label {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-soft);
+  white-space: nowrap;
+  min-width: 140px;
+}
+
+.rec-slider-row label strong {
+  color: var(--blue);
+  font-size: 16px;
+}
+
+#recDistanceSlider {
+  flex: 1;
+  min-width: 160px;
+  height: 6px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 999px;
+  outline: none;
+  background: rgba(148, 163, 184, 0.28);
+  transition: background 0.1s linear;
+}
+
+#recDistanceSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--blue);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(79, 124, 255, 0.40);
+}
+
+#recDistanceSlider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--blue);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 8px rgba(79, 124, 255, 0.40);
+}
+
+.rec-filter-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.rec-filter-row input {
+  flex: 1;
+  min-width: 140px;
+}
+
+.rec-filter-row select {
+  min-width: 120px;
+}
+
 /* --- 景點推薦卡片縮圖 --- */
 .attraction-card {
   grid-template-columns: 1fr auto;
@@ -3506,4 +3585,82 @@ td small {
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid rgba(148, 163, 184, 0.35);
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+/* =========================================================
+   投票結果與加入行程
+========================================================= */
+
+.vote-card-ended {
+  opacity: 0.88;
+}
+
+.vote-status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--text-muted);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+.vote-option-winner {
+  background: rgba(251, 191, 36, 0.18) !important;
+  border: 1.5px solid rgba(251, 191, 36, 0.55);
+}
+
+.vote-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.vote-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--blue);
+  transition: width 0.4s ease;
+}
+
+.vote-bar-fill.vote-bar-winner {
+  background: #f59e0b;
+}
+
+.vote-add-itinerary-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  margin-top: 10px;
+  background: rgba(79, 124, 255, 0.08);
+  border: 1.5px solid rgba(79, 124, 255, 0.25);
+  border-radius: var(--radius-sm);
+}
+
+.vote-add-itinerary-row span {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.vote-add-itinerary-row select,
+.vote-add-itinerary-row input[type="time"] {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .vote-add-itinerary-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

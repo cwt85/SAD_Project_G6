@@ -108,6 +108,67 @@ function showItineraryDetailView() {
   if (listView) listView.style.display = "none";
   if (detailView) detailView.style.display = "";
   window.scrollTo({ top: 0, behavior: "smooth" });
+  // 進入編輯頁時自動載入推薦景點
+  setTimeout(renderRecommendations, 50);
+}
+
+// 依距離與篩選條件渲染系統推薦景點
+function renderRecommendations() {
+  const container = document.getElementById("recommendationResults");
+  if (!container) return;
+
+  const slider = document.getElementById("recDistanceSlider");
+  const label = document.getElementById("recDistanceLabel");
+  const keywordInput = document.getElementById("recKeyword");
+  const categorySelect = document.getElementById("recCategory");
+
+  const maxDist = Number(slider ? slider.value : 20);
+  if (label) label.textContent = maxDist;
+
+  // 依目前數值更新 track 填色（從左到 thumb 顯示藍色）
+  if (slider) {
+    const min = Number(slider.min || 1);
+    const max = Number(slider.max || 50);
+    const pct = ((maxDist - min) / (max - min)) * 100;
+    slider.style.background =
+      `linear-gradient(to right, var(--blue) ${pct}%, rgba(148,163,184,0.28) ${pct}%)`;
+  }
+
+  const keyword = ((keywordInput && keywordInput.value) || "").trim().toLowerCase();
+  const category = (categorySelect && categorySelect.value) || "";
+
+  const results = TAITUNG_STATION_PLACES
+    .filter(p => Number(p.distance) <= maxDist)
+    .filter(p => !category || p.type === category)
+    .filter(p => {
+      if (!keyword) return true;
+      return `${p.name} ${p.type} ${p.desc}`.toLowerCase().includes(keyword);
+    })
+    .sort((a, b) => Number(a.distance) - Number(b.distance));
+
+  if (results.length === 0) {
+    container.innerHTML = `<div class="notice warning">此距離範圍內無符合條件的景點，請調整篩選條件。</div>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="attraction-grid">
+      ${results.map(place => `
+        <article class="attraction-card">
+          <div class="attraction-card-info">
+            <img class="attraction-thumb" src="${escapeAttribute(place.img || "")}" alt="${escapeAttribute(place.name)}"
+              onerror="this.src='https://picsum.photos/seed/taitung/400/200'" />
+            <div>
+              <strong>${escapeHtml(place.name)}</strong>
+              <span>${escapeHtml(place.type)}｜車站車程 ${formatTravelTime(place.distance)}</span>
+              <p>${escapeHtml(place.desc)}</p>
+            </div>
+          </div>
+          <button class="secondary-btn" onclick="addRecommendedPlaceToItinerary('${place.id}')">加入</button>
+        </article>
+      `).join("")}
+    </div>
+  `;
 }
 
 // 舊函式保留相容（現已由 view 切換取代）
@@ -381,8 +442,10 @@ function searchItineraryAttractions() {
 
   const keyword = getValue("attractionSearchInput").trim().toLowerCase();
   const category = getValue("attractionCategoryFilter");
+  const maxDist = Number(getValue("attractionDistanceFilter")) || 50;
 
   lastItinerarySearchResults = TAITUNG_STATION_PLACES
+    .filter(place => Number(place.distance) <= maxDist)
     .filter(place => !category || place.type === category)
     .filter(place => {
       if (!keyword) return true;
@@ -790,6 +853,12 @@ function renderItineraryDetail() {
   const container = document.getElementById("itineraryDetailPanel");
   if (!container) return;
 
+  // 重繪前記住哪些 details 是展開的，重繪後還原（避免操作後 details 自動收合）
+  const openSections = new Set();
+  container.querySelectorAll("details.itinerary-subsection").forEach((el, i) => {
+    if (el.open) openSections.add(i);
+  });
+
   const itinerary = getActiveItinerary();
   if (!itinerary) {
     container.innerHTML = `<div class="panel"><div class="notice warning">請先建立或選擇行程。</div></div>`;
@@ -855,6 +924,11 @@ function renderItineraryDetail() {
       </details>
     </div>
   `;
+
+  // 還原展開狀態
+  container.querySelectorAll("details.itinerary-subsection").forEach((el, i) => {
+    if (openSections.has(i)) el.open = true;
+  });
 }
 
 function renderItineraryBasicEditor(itinerary) {
@@ -1009,6 +1083,9 @@ function renderCollaborationPanel(itinerary) {
 }
 
 function renderVotingPanel(itinerary) {
+  const days = normalizeItineraryDays(itinerary);
+  const isOwner = isItineraryOwner(itinerary);
+
   return `
     <div class="grid">
       <div>
@@ -1019,42 +1096,80 @@ function renderVotingPanel(itinerary) {
         <label for="voteOptionInput">第一個選項</label>
         <input id="voteOptionInput" placeholder="例如 藍蜻蜓" />
       </div>
+      <div>
+        <label for="voteDeadlineInput">截止時間（選填）</label>
+        <input id="voteDeadlineInput" type="datetime-local" />
+      </div>
     </div>
     <div class="actions">
       <button class="primary-btn" onclick="createItineraryVote('${itinerary.id}')">建立投票</button>
     </div>
 
     <div class="vote-list">
-      ${(itinerary.votes || []).length === 0 ? `<div class="notice warning">尚未建立投票。</div>` : (itinerary.votes || []).map(vote => `
-        <article class="vote-card">
-          <div class="vote-header">
-            <div>
-              <h3>${escapeHtml(vote.title)}</h3>
-              <small>${escapeHtml(vote.createdAt || "")}</small>
-            </div>
-            <div class="inline-control compact">
-              <input id="voteNewOption-${vote.id}" placeholder="新增選項" />
-              <button class="secondary-btn" onclick="addVoteOption('${itinerary.id}', '${vote.id}')">加入</button>
-            </div>
-          </div>
-          ${(vote.options || []).length === 0 ? `<div class="notice warning">此投票尚無選項。</div>` : (vote.options || []).map(option => {
-            const voters = getVoterNames(option.voterIds || []);
-            const hasVoted = (option.voterIds || []).some(id => String(id) === String(currentUser.id));
-            return `
-              <div class="vote-option">
+      ${(itinerary.votes || []).length === 0
+        ? `<div class="notice warning">尚未建立投票。</div>`
+        : (itinerary.votes || []).map(vote => {
+          const ended = isVoteEnded(vote);
+          const winner = ended ? getVoteWinner(vote) : null;
+          const maxVoteCount = (vote.options || []).reduce((max, opt) => Math.max(max, (opt.voterIds || []).length), 0);
+
+          return `
+            <article class="vote-card${ended ? " vote-card-ended" : ""}">
+              <div class="vote-header">
                 <div>
-                  <strong>${escapeHtml(option.name)}</strong>
-                  <span>${(option.voterIds || []).length} 票${voters.length ? `｜${escapeHtml(voters.join("、"))}` : ""}</span>
+                  <h3>${escapeHtml(vote.title)}${ended ? ' <span class="vote-status-badge">已結束</span>' : ""}</h3>
+                  <small>${escapeHtml(vote.createdAt || "")}${vote.deadline ? `　截止：${escapeHtml(vote.deadline.replace("T", " "))}` : ""}</small>
                 </div>
-                <div class="actions">
-                  <button class="${hasVoted ? "danger-btn" : "secondary-btn"}" onclick="toggleVoteOption('${itinerary.id}', '${vote.id}', '${option.id}')">${hasVoted ? "取消" : "投票"}</button>
-                  ${isItineraryOwner(itinerary) ? `<button class="danger-btn" onclick="deleteVoteOption('${itinerary.id}', '${vote.id}', '${option.id}')">刪除</button>` : ""}
-                </div>
+                ${!ended ? `
+                  <div class="inline-control compact">
+                    <input id="voteNewOption-${vote.id}" placeholder="新增選項" />
+                    <button class="secondary-btn" onclick="addVoteOption('${itinerary.id}', '${vote.id}')">加入</button>
+                    ${isOwner ? `<button class="danger-btn" onclick="closeItineraryVote('${itinerary.id}', '${vote.id}')">結束投票</button>` : ""}
+                  </div>
+                ` : ""}
               </div>
-            `;
-          }).join("")}
-        </article>
-      `).join("")}
+              ${(vote.options || []).length === 0
+                ? `<div class="notice warning">此投票尚無選項。</div>`
+                : (vote.options || []).map(option => {
+                  const voters = getVoterNames(option.voterIds || []);
+                  const hasVoted = (option.voterIds || []).some(id => String(id) === String(currentUser.id));
+                  const voteCount = (option.voterIds || []).length;
+                  const isWinner = ended && winner && option.id === winner.id;
+                  const pct = maxVoteCount > 0 ? Math.round(voteCount / maxVoteCount * 100) : 0;
+                  return `
+                    <div class="vote-option${isWinner ? " vote-option-winner" : ""}">
+                      <div>
+                        <strong>${isWinner ? "🏆 " : ""}${escapeHtml(option.name)}</strong>
+                        <span>${voteCount} 票${voters.length ? `｜${escapeHtml(voters.join("、"))}` : ""}${ended && maxVoteCount > 0 ? ` (${pct}%)` : ""}</span>
+                        ${ended && maxVoteCount > 0 ? `
+                          <div class="vote-bar">
+                            <div class="vote-bar-fill${isWinner ? " vote-bar-winner" : ""}" style="width:${pct}%"></div>
+                          </div>
+                        ` : ""}
+                      </div>
+                      ${!ended ? `
+                        <div class="actions">
+                          <button class="${hasVoted ? "danger-btn" : "secondary-btn"}" onclick="toggleVoteOption('${itinerary.id}', '${vote.id}', '${option.id}')">${hasVoted ? "取消" : "投票"}</button>
+                          ${isOwner ? `<button class="danger-btn" onclick="deleteVoteOption('${itinerary.id}', '${vote.id}', '${option.id}')">刪除</button>` : ""}
+                        </div>
+                      ` : ""}
+                    </div>
+                  `;
+                }).join("")}
+              ${ended && isOwner && winner && !vote.addedToItinerary ? `
+                <div class="vote-add-itinerary-row">
+                  <span>將「${escapeHtml(winner.name)}」加入行程：</span>
+                  <select id="voteAddDay-${vote.id}">
+                    ${days.map(day => `<option value="${day.day}">第 ${day.day} 天</option>`).join("")}
+                  </select>
+                  <input id="voteAddTime-${vote.id}" type="time" value="09:00" />
+                  <button class="primary-btn" onclick="addVoteWinnerToItinerary('${itinerary.id}', '${vote.id}')">加入行程</button>
+                </div>
+              ` : ""}
+              ${ended && vote.addedToItinerary ? `<div class="notice success">已加入行程。</div>` : ""}
+            </article>
+          `;
+        }).join("")}
     </div>
   `;
 }
@@ -1617,6 +1732,7 @@ function createItineraryVote(itineraryId) {
 
   const title = getValue("voteTitleInput").trim();
   const optionName = getValue("voteOptionInput").trim();
+  const deadline = getValue("voteDeadlineInput").trim();
 
   if (!title || !optionName) {
     alert("請輸入投票主題與至少一個選項。");
@@ -1628,7 +1744,8 @@ function createItineraryVote(itineraryId) {
     title,
     options: [{ id: createItineraryId("opt"), name: optionName, voterIds: [] }],
     createdById: currentUser.id,
-    createdAt: nowText()
+    createdAt: nowText(),
+    ...(deadline ? { deadline } : {})
   };
 
   itinerary.votes.unshift(vote);
@@ -1711,6 +1828,99 @@ function deleteVoteOption(itineraryId, voteId, optionId) {
   saveAppData();
   renderAll();
   ItineraryEventBus.emit("poll:optionDeleted", { itinerary, vote, option });
+}
+
+// 判斷投票是否已結束（手動關閉 or 截止時間已過）
+function isVoteEnded(vote) {
+  if (vote.closed) return true;
+  if (vote.deadline) return new Date() >= new Date(vote.deadline);
+  return false;
+}
+
+// 取得票數最多的勝出選項，平手時回傳第一個，無人投票回傳 null
+function getVoteWinner(vote) {
+  const options = vote.options || [];
+  if (options.length === 0) return null;
+  const maxVotes = options.reduce((max, opt) => Math.max(max, (opt.voterIds || []).length), 0);
+  if (maxVotes === 0) return null;
+  return options.find(opt => (opt.voterIds || []).length === maxVotes) || null;
+}
+
+// 發起人手動結束投票
+function closeItineraryVote(itineraryId, voteId) {
+  const itinerary = findItinerary(itineraryId);
+  if (!itinerary || !isItineraryOwner(itinerary)) {
+    alert("只有發起人可以結束投票。");
+    return;
+  }
+  const vote = findVote(itinerary, voteId);
+  if (!vote) return;
+
+  if (!confirm(`確定要結束投票「${vote.title}」嗎？結束後將無法繼續投票。`)) return;
+
+  vote.closed = true;
+  vote.closedAt = nowText();
+  addItineraryLog(itinerary, "結束投票", `「${vote.title}」投票已結束。`);
+  touchItinerary(itinerary);
+  saveAppData();
+  renderAll();
+  ItineraryEventBus.emit("poll:closed", { itinerary, vote });
+}
+
+// 將勝出選項加入指定日的行程
+function addVoteWinnerToItinerary(itineraryId, voteId) {
+  const itinerary = findItinerary(itineraryId);
+  if (!itinerary || !isItineraryOwner(itinerary)) {
+    alert("只有發起人可以將結果加入行程。");
+    return;
+  }
+
+  const vote = findVote(itinerary, voteId);
+  if (!vote || !isVoteEnded(vote)) {
+    alert("投票尚未結束。");
+    return;
+  }
+
+  const winner = getVoteWinner(vote);
+  if (!winner) {
+    alert("目前沒有有效的勝出選項（尚無人投票）。");
+    return;
+  }
+
+  const dayNumber = Number(document.getElementById(`voteAddDay-${voteId}`)?.value || 1);
+  const time = document.getElementById(`voteAddTime-${voteId}`)?.value || "09:00";
+
+  const day = getItineraryDay(itinerary, dayNumber);
+  if (!day) return;
+
+  const startTime = day.startTime || "09:00";
+  if (compareTime(time, startTime) < 0) {
+    alert(`所選時間 ${time} 早於第 ${dayNumber} 天的集合時間 ${startTime}，請重新選擇。`);
+    return;
+  }
+
+  const item = {
+    id: createItineraryId("item"),
+    name: winner.name,
+    type: "景點",
+    time,
+    estimatedCost: 0,
+    notes: `由投票「${vote.title}」決定`,
+    addedById: currentUser.id,
+    addedByName: currentUser.displayName || currentUser.account,
+    updatedAt: nowText()
+  };
+
+  day.items.push(item);
+  sortDayItemsByTime(day);
+  vote.addedToItinerary = true;
+
+  addItineraryLog(itinerary, "投票結果加入行程", `「${winner.name}」已加入第 ${dayNumber} 天。`);
+  touchItinerary(itinerary);
+  saveAppData();
+  renderAll();
+  showToast(`「${winner.name}」已加入第 ${dayNumber} 天行程！`, "success");
+  ItineraryEventBus.emit("poll:addedToItinerary", { itinerary, vote, winner, dayNumber });
 }
 
 function sendItineraryComment(itineraryId) {
