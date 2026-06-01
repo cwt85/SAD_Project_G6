@@ -1,73 +1,77 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agent TT — 智慧旅遊平台</title>
-  <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent TT — 智慧旅遊平台</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<!-- 導覽列 -->
-<nav id="navbar">
-  <div class="brand">Agent TT 智慧旅遊平台</div>
-  <div class="nav-tabs" id="module-nav" style="display:none">
-    <button class="nav-tab" id="nav-a">行程規劃</button>
-    <button class="nav-tab" id="nav-b">住宿訂房</button>
-    <button class="nav-tab" id="nav-c">車票預訂</button>
-  </div>
-  <div class="nav-right">
-    <span id="nav-user-info"></span>
-    <button id="nav-logout-btn" style="display:none">登出</button>
-  </div>
-</nav>
+    <nav id="navbar">
+        <div class="brand">Agent TT 智慧旅遊平台</div>
+        <div class="nav-tabs" id="module-nav" style="display:none">
+            <button class="nav-tab" id="nav-a">行程規劃</button>
+            <button class="nav-tab" id="nav-b">住宿訂房</button>
+            <button class="nav-tab" id="nav-c">車票預訂</button>
+        </div>
+        <div class="nav-right">
+            <span id="nav-user-info"></span>
+            <button id="nav-logout-btn" style="display:none">登出</button>
+        </div>
+    </nav>
 
-<!-- 主要內容 -->
-<main id="app">
-  <div id="view-container">
-    <div class="empty-state" style="margin-top:80px">
-      <div class="empty-icon"></div>
-      <p>載入中…</p>
+    <main id="app">
+        <div id="view-container">
+            <div class="empty-state" style="margin-top:80px">
+                <div class="empty-icon"></div>
+                <p>載入中…</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="action-modal" class="modal-overlay">
+        <div class="modal-card">
+            <h3 id="modal-title">確認操作</h3>
+            <div id="modal-body"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">取消操作</button>
+                <button class="btn btn-danger" id="modal-confirm-btn" onclick="executeModalAction()">確認執行</button>
+            </div>
+        </div>
     </div>
-  </div>
-</main>
 
-<!-- Toast 通知容器 -->
-<div id="toast-container"></div>
+    <div id="toast-container"></div>
 
-<!-- ── Core ── -->
-<script src="js/core/EventBus.js"></script>
-<script src="js/core/Repository.js"></script>
-<script src="js/core/Router.js"></script>
-<script src="js/core/Store.js"></script>
+    <script src="js/core/EventBus.js"></script>
+    <script src="js/core/Repository.js"></script>
+    <script src="js/core/Router.js"></script>
+    <script src="js/core/Store.js"></script>
 
-<!-- ── Models ── -->
-<script src="js/models/UserModel.js"></script>
-<script src="js/models/TripModel.js"></script>
-<script src="js/models/AccommodationModel.js"></script>
-<script src="js/models/TrainModel.js"></script>
+    <script src="js/models/UserModel.js"></script>
+    <script src="js/models/TripModel.js"></script>
+    <script src="js/models/AccommodationModel.js"></script>
+    <script src="js/models/TrainModel.js"></script>
 
-<!-- ── Repositories ── -->
-<script src="js/repositories/UserRepository.js"></script>
-<script src="js/repositories/TripRepository.js"></script>
-<script src="js/repositories/AccommodationRepository.js"></script>
-<script src="js/repositories/TrainRepository.js"></script>
+    <script src="js/repositories/UserRepository.js"></script>
+    <script src="js/repositories/TripRepository.js"></script>
+    <script src="js/repositories/AccommodationRepository.js"></script>
+    <script src="js/repositories/TrainRepository.js"></script>
 
-<!-- ── Services ── -->
-<script src="js/services/AuthService.js"></script>
-<script src="js/services/TripService.js"></script>
-<script src="js/services/BookingService.js"></script>
-<script src="js/services/TrainService.js"></script>
+    <script src="js/services/AuthService.js"></script>
+    <script src="js/services/TripService.js"></script>
+    <script src="js/services/BookingService.js"></script>
+    <script src="js/services/TrainService.js"></script>
 
-<!-- ── Views ── -->
-<script src="js/views/UIHelpers.js"></script>
-<script src="js/views/AuthView.js"></script>
-<script src="js/views/ModuleAView.js"></script>
-<script src="js/views/ModuleBView.js"></script>
-<script src="js/views/ModuleCView.js"></script>
+    <script src="js/views/UIHelpers.js"></script>
+    <script src="js/views/AuthView.js"></script>
+    <script src="js/views/ModuleAView.js"></script>
+    <script src="js/views/ModuleBView.js"></script>
+    <script src="js/views/ModuleCView.js"></script>
 
-<!-- ── App 啟動 ── -->
-<script src="js/app.js"></script>
+    <script src="js/app.js"></script>
+
+    <script src="js/ticket.js"></script>
 
 </body>
 </html>
