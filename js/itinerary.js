@@ -16,24 +16,92 @@ const ItineraryEventBus = window.ItineraryEventBus || {
 window.ItineraryEventBus = ItineraryEventBus;
 
 const TAITUNG_STATION_PLACES = [
-  { id: "station-main", name: "台東車站", type: "車站", distance: 0, desc: "集合、轉乘與租車最方便的起點。" },
-  { id: "forest-park", name: "台東森林公園", type: "景點", distance: 5.4, desc: "湖景、自行車道與大片綠地，適合上午慢遊。" },
-  { id: "tiehua", name: "鐵花村音樂聚落", type: "活動", distance: 5.8, desc: "市區夜間表演、市集與文創店鋪。" },
-  { id: "railway-art", name: "台東舊鐵道藝術村", type: "景點", distance: 5.6, desc: "散步、拍照與文創展覽都很方便。" },
-  { id: "seashore-park", name: "台東海濱公園", type: "景點", distance: 7.2, desc: "海景步道與國際地標，適合傍晚安排。" },
-  { id: "beinan", name: "卑南遺址公園", type: "景點", distance: 2.1, desc: "距離車站近，適合第一站文化行程。" },
-  { id: "peinandazun", name: "卑南豬血湯", type: "餐廳", distance: 2.9, desc: "在地小吃，適合早餐或午餐。" },
-  { id: "blue-dragonfly", name: "藍蜻蜓速食專賣店", type: "餐廳", distance: 5.9, desc: "台東經典炸雞小吃，市區補給方便。" },
-  { id: "brown-avenue", name: "伯朗大道", type: "景點", distance: 38, desc: "池上經典田園景觀，適合安排半日行程。" },
-  { id: "chulu", name: "初鹿牧場", type: "活動", distance: 17, desc: "親子活動、草地與乳製品體驗。" },
-  { id: "luming", name: "鹿鳴溫泉酒店", type: "住宿", distance: 22, desc: "適合作為台東縱谷行程的住宿備選。" },
-  { id: "duoliang", name: "多良車站", type: "交通", distance: 44, desc: "海景鐵道景點，適合搭配南迴路線。" }
+  { id: "station-main", name: "台東車站", type: "車站", distance: 0, img: "https://picsum.photos/seed/trainstation/400/200", desc: "集合、轉乘與租車最方便的起點。" },
+  { id: "forest-park", name: "台東森林公園", type: "景點", distance: 5.4, img: "https://picsum.photos/seed/forestpark/400/200", desc: "湖景、自行車道與大片綠地，適合上午慢遊。" },
+  { id: "tiehua", name: "鐵花村音樂聚落", type: "活動", distance: 5.8, img: "https://picsum.photos/seed/village/400/200", desc: "市區夜間表演、市集與文創店鋪。" },
+  { id: "railway-art", name: "台東舊鐵道藝術村", type: "景點", distance: 5.6, img: "https://picsum.photos/seed/railwayart/400/200", desc: "散步、拍照與文創展覽都很方便。" },
+  { id: "seashore-park", name: "台東海濱公園", type: "景點", distance: 7.2, img: "https://picsum.photos/seed/seashore/400/200", desc: "海景步道與國際地標，適合傍晚安排。" },
+  { id: "beinan", name: "卑南遺址公園", type: "景點", distance: 2.1, img: "https://picsum.photos/seed/ruins/400/200", desc: "距離車站近，適合第一站文化行程。" },
+  { id: "peinandazun", name: "卑南豬血湯", type: "餐廳", distance: 2.9, img: "https://picsum.photos/seed/localfood/400/200", desc: "在地小吃，適合早餐或午餐。" },
+  { id: "blue-dragonfly", name: "藍蜻蜓速食專賣店", type: "餐廳", distance: 5.9, img: "https://picsum.photos/seed/fastfood/400/200", desc: "台東經典炸雞小吃，市區補給方便。" },
+  { id: "brown-avenue", name: "伯朗大道", type: "景點", distance: 38, img: "https://picsum.photos/seed/ricefield/400/200", desc: "池上經典田園景觀，適合安排半日行程。" },
+  { id: "chulu", name: "初鹿牧場", type: "活動", distance: 17, img: "https://picsum.photos/seed/pasture/400/200", desc: "親子活動、草地與乳製品體驗。" },
+  { id: "luming", name: "鹿鳴溫泉酒店", type: "住宿", distance: 22, img: "https://picsum.photos/seed/hotspring/400/200", desc: "適合作為台東縱谷行程的住宿備選。" },
+  { id: "duoliang", name: "多良車站", type: "交通", distance: 44, img: "https://picsum.photos/seed/coastalrail/400/200", desc: "海景鐵道景點，適合搭配南迴路線。" }
 ];
 
 let lastItinerarySearchResults = [];
 let expandedItineraryItemIds = {};
 let draggedItineraryItemId = null;
 let draggedItineraryDay = null;
+
+// 將公里數轉換為從台東車站出發的預估車程時間（市區 ~35 km/h）
+function formatTravelTime(km) {
+  const min = Math.round(Number(km || 0) / 35 * 60);
+  if (min === 0) return "起點";
+  if (min < 60) return `約 ${min} 分`;
+  return `約 ${Math.floor(min / 60)} 時 ${min % 60} 分`;
+}
+
+// 拖曳後依 day.startTime 為基準，每項間隔 1 小時重新分配時間
+function redistributeDayTimes(day) {
+  if (!day || !day.items.length) return;
+  const [startH, startM] = (day.startTime || "09:00").split(":").map(Number);
+  const startTotal = startH * 60 + startM;
+  day.items.forEach((item, index) => {
+    const total = startTotal + index * 60;
+    const h = Math.floor(total / 60) % 24;
+    const m = total % 60;
+    item.time = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+    item.updatedAt = nowText();
+  });
+}
+
+// 右下角 Toast 提示
+function showToast(message, duration = 2500) {
+  let container = document.getElementById("toastContainer");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "toastContainer";
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
+  container.appendChild(toast);
+
+  requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add("toast-show")));
+
+  setTimeout(() => {
+    toast.classList.remove("toast-show");
+    toast.addEventListener("transitionend", () => toast.remove(), { once: true });
+  }, duration);
+}
+
+// 行程已取消時，將快速加入面板所有輸入框 disable
+function updateQuickAddPanelState() {
+  const panel = document.querySelector(".itinerary-quick-add");
+  if (!panel) return;
+  const itinerary = getActiveItinerary();
+  const cancelled = itinerary && itinerary.status === "已取消";
+  panel.classList.toggle("is-cancelled", cancelled);
+}
+
+// 行程結束日期已過且狀態為「規劃中」→ 自動更新為「已完成」
+function autoUpdateItineraryStatus() {
+  if (!Array.isArray(itineraries)) return;
+  const today = new Date().toISOString().slice(0, 10);
+  let changed = false;
+  itineraries.forEach(itinerary => {
+    if (itinerary.status === "規劃中" && itinerary.endDate && itinerary.endDate < today) {
+      itinerary.status = "已完成";
+      addItineraryLog(itinerary, "自動完成", `行程結束日期 ${itinerary.endDate} 已過，由系統自動更新為已完成。`);
+      changed = true;
+    }
+  });
+  if (changed) saveAppData();
+}
 
 ItineraryEventBus.on("budget:warning", payload => {
   const notice = document.getElementById("itineraryNotice");
@@ -61,12 +129,15 @@ function renderItineraryModule() {
     return;
   }
 
+  autoUpdateItineraryStatus();
   ensureActiveItinerary();
   renderItinerarySelects();
   renderAttractionDayOptions();
   renderItineraryLodgingOptions();
   renderItineraryOverview();
+  renderItineraryCandidatePanel();
   renderItineraryDetail();
+  updateQuickAddPanelState();
 }
 
 function renderLoggedOutItineraryState(readonlyItinerary) {
@@ -80,10 +151,12 @@ function renderLoggedOutItineraryState(readonlyItinerary) {
     showNotice(notice, "warning", "請先登入後建立、編輯或協作行程。若你有分享連結，也可以直接用連結唯讀查看。");
   }
 
+  const candidate = document.getElementById("itineraryCandidatePanel");
   if (overview) overview.innerHTML = "";
   if (detail) detail.innerHTML = "";
   if (results) results.innerHTML = "";
   if (lodging) lodging.innerHTML = "";
+  if (candidate) candidate.innerHTML = "";
 }
 
 function renderReadonlyItineraryShare(itinerary) {
@@ -205,8 +278,8 @@ function copyItinerary() {
   const sourceId = getValue("itineraryCopySelect");
   const source = findItinerary(sourceId);
 
-  if (!source || !isItineraryOwner(source)) {
-    showNotice(notice, "error", "請選擇你建立的既有行程再複製。");
+  if (!source || !canAccessItinerary(source)) {
+    showNotice(notice, "error", "請選擇可存取的行程再複製（自己建立或受邀的行程皆可）。");
     return;
   }
 
@@ -290,10 +363,14 @@ function renderAttractionResults() {
     <div class="attraction-grid">
       ${lastItinerarySearchResults.map(place => `
         <article class="attraction-card">
-          <div>
-            <strong>${escapeHtml(place.name)}</strong>
-            <span>${escapeHtml(place.type)}｜距台東車站 ${Number(place.distance).toFixed(1)} km</span>
-            <p>${escapeHtml(place.desc)}</p>
+          <div class="attraction-card-info">
+            <img class="attraction-thumb" src="${escapeAttribute(place.img || "")}" alt="${escapeAttribute(place.name)}"
+              onerror="this.src='https://picsum.photos/seed/taitung/400/200'" />
+            <div>
+              <strong>${escapeHtml(place.name)}</strong>
+              <span>${escapeHtml(place.type)}｜車站車程 ${formatTravelTime(place.distance)}</span>
+              <p>${escapeHtml(place.desc)}</p>
+            </div>
           </div>
           <button class="secondary-btn" onclick="addRecommendedPlaceToItinerary('${place.id}')">加入</button>
         </article>
@@ -333,6 +410,9 @@ function addManualItineraryPlace() {
     desc: "手動新增項目",
     estimatedCost
   });
+
+  const dayNumber = Number(getValue("attractionTargetDay")) || activeItineraryDay;
+  showToast(`「${name}」已加入第 ${dayNumber} 天`);
 
   setValue("manualAttractionName", "");
   setValue("manualAttractionDistance", "0");
@@ -456,6 +536,12 @@ function addRoomToItinerary(roomId) {
   setValue("manualAttractionType", "住宿");
   setValue("manualAttractionCost", "0");
   renderItineraryLodgingOptions(true);
+
+  // 加入後自動捲動到行程詳情，讓使用者看到新增的項目
+  setTimeout(() => {
+    const detail = document.getElementById("itineraryDetailPanel");
+    if (detail) detail.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 150);
 }
 
 function addPlaceToItinerary(place) {
@@ -517,10 +603,12 @@ function renderItinerarySelects() {
   }
 
   if (copySelect) {
-    const owned = visible.filter(isItineraryOwner);
-    copySelect.innerHTML = owned.length === 0
+    copySelect.innerHTML = visible.length === 0
       ? `<option value="">尚無可複製行程</option>`
-      : owned.map(itinerary => `<option value="${escapeAttribute(itinerary.id)}">${escapeHtml(itinerary.name)}</option>`).join("");
+      : visible.map(itinerary => {
+          const label = isItineraryOwner(itinerary) ? itinerary.name : `${itinerary.name}（受邀）`;
+          return `<option value="${escapeAttribute(itinerary.id)}">${escapeHtml(label)}</option>`;
+        }).join("");
   }
 
   const statusSelect = document.getElementById("itineraryStatusSelect");
@@ -562,24 +650,34 @@ function renderItineraryOverview() {
 
   container.innerHTML = `
     <div class="itinerary-overview-list">
-      ${visible.map(itinerary => `
-        <article class="itinerary-overview-card ${itinerary.id === activeItineraryId ? "active" : ""}" onclick="selectItinerary('${itinerary.id}')">
-          <div>
-            <span class="status-pill">${escapeHtml(itinerary.status)}</span>
-            <h3>${escapeHtml(itinerary.name)}</h3>
-            <p>${escapeHtml(itinerary.startDate)} ~ ${escapeHtml(itinerary.endDate)}｜${escapeHtml(itinerary.destination)}</p>
-            <small>${Number(itinerary.people || 1)} 人｜${Number(itinerary.days || 1)} 天｜成員 ${getItineraryMembers(itinerary).length} 人</small>
-          </div>
-          <div class="actions" onclick="event.stopPropagation()">
-            <select onchange="updateItineraryStatus('${itinerary.id}', this.value)">
-              <option value="規劃中" ${itinerary.status === "規劃中" ? "selected" : ""}>規劃中</option>
-              <option value="已完成" ${itinerary.status === "已完成" ? "selected" : ""}>已完成</option>
-              <option value="已取消" ${itinerary.status === "已取消" ? "selected" : ""}>已取消</option>
-            </select>
-            ${isItineraryOwner(itinerary) ? `<button class="danger-btn" onclick="deleteItinerary('${itinerary.id}')">刪除</button>` : ""}
-          </div>
-        </article>
-      `).join("")}
+      ${visible.map(itinerary => {
+        const owned = isItineraryOwner(itinerary);
+        return `
+          <article class="itinerary-overview-card ${itinerary.id === activeItineraryId ? "active" : ""}" onclick="selectItinerary('${itinerary.id}')">
+            <div>
+              <div class="overview-badges">
+                <span class="status-pill">${escapeHtml(itinerary.status)}</span>
+                <span class="${owned ? "owner-badge" : "member-badge"}">${owned ? "我建立" : "受邀旅伴"}</span>
+              </div>
+              <h3>${escapeHtml(itinerary.name)}</h3>
+              <p>${escapeHtml(itinerary.startDate)} ~ ${escapeHtml(itinerary.endDate)}｜${escapeHtml(itinerary.destination)}</p>
+              <small>${Number(itinerary.people || 1)} 人｜${Number(itinerary.days || 1)} 天｜成員 ${getItineraryMembers(itinerary).length} 人</small>
+            </div>
+            <div class="actions" onclick="event.stopPropagation()">
+              ${owned ? `
+                ${itinerary.status === "已完成"
+                  ? `<span class="status-pill">已完成</span>`
+                  : `<select onchange="updateItineraryStatus('${itinerary.id}', this.value)">
+                      <option value="規劃中" ${itinerary.status === "規劃中" ? "selected" : ""}>規劃中</option>
+                      <option value="已取消" ${itinerary.status === "已取消" ? "selected" : ""}>已取消</option>
+                    </select>`
+                }
+                <button class="danger-btn" onclick="deleteItinerary('${itinerary.id}')">刪除</button>
+              ` : `<span class="member-badge">唯讀</span>`}
+            </div>
+          </article>
+        `;
+      }).join("")}
     </div>
   `;
 }
@@ -656,31 +754,32 @@ function renderItineraryDetail() {
 }
 
 function renderItineraryBasicEditor(itinerary) {
+  const d = itinerary.status === "已取消" ? " disabled" : "";
   return `
     <div class="grid">
       <div>
         <label>行程名稱</label>
-        <input value="${escapeAttribute(itinerary.name)}" onchange="updateItineraryBasic('${itinerary.id}', 'name', this.value)" />
+        <input${d} value="${escapeAttribute(itinerary.name)}" onchange="updateItineraryBasic('${itinerary.id}', 'name', this.value)" />
       </div>
       <div>
         <label>目的地</label>
-        <input value="${escapeAttribute(itinerary.destination)}" onchange="updateItineraryBasic('${itinerary.id}', 'destination', this.value)" />
+        <input${d} value="${escapeAttribute(itinerary.destination)}" onchange="updateItineraryBasic('${itinerary.id}', 'destination', this.value)" />
       </div>
       <div>
         <label>人數</label>
-        <input type="number" min="1" value="${Number(itinerary.people || 1)}" onchange="updateItineraryBasic('${itinerary.id}', 'people', this.value)" />
+        <input${d} type="number" min="1" value="${Number(itinerary.people || 1)}" onchange="updateItineraryBasic('${itinerary.id}', 'people', this.value)" />
       </div>
       <div>
         <label>天數</label>
-        <input type="number" min="1" max="30" value="${Number(itinerary.days || 1)}" onchange="updateItineraryBasic('${itinerary.id}', 'days', this.value)" />
+        <input${d} type="number" min="1" max="30" value="${Number(itinerary.days || 1)}" onchange="updateItineraryBasic('${itinerary.id}', 'days', this.value)" />
       </div>
       <div>
         <label>出發日期</label>
-        <input type="date" value="${escapeAttribute(itinerary.startDate)}" onchange="updateItineraryBasic('${itinerary.id}', 'startDate', this.value)" />
+        <input${d} type="date" value="${escapeAttribute(itinerary.startDate)}" onchange="updateItineraryBasic('${itinerary.id}', 'startDate', this.value)" />
       </div>
       <div>
         <label>預算上限</label>
-        <input type="number" min="0" value="${Number(itinerary.budgetLimit || 0)}" onchange="updateItineraryBasic('${itinerary.id}', 'budgetLimit', this.value)" />
+        <input${d} type="number" min="0" value="${Number(itinerary.budgetLimit || 0)}" onchange="updateItineraryBasic('${itinerary.id}', 'budgetLimit', this.value)" />
       </div>
     </div>
   `;
@@ -701,14 +800,15 @@ function renderDayTabs(itinerary) {
 function renderDayPlan(itinerary, day) {
   if (!day) return `<div class="notice warning">找不到此日行程。</div>`;
 
+  const d = itinerary.status === "已取消" ? " disabled" : "";
   return `
     <div class="day-plan-toolbar">
       <div>
         <label>集合出發時間</label>
-        <input type="time" value="${escapeAttribute(day.startTime || "09:00")}" onchange="updateItineraryDayStart('${itinerary.id}', ${day.day}, this.value)" />
+        <input${d} type="time" value="${escapeAttribute(day.startTime || "09:00")}" onchange="updateItineraryDayStart('${itinerary.id}', ${day.day}, this.value)" />
       </div>
       <div class="actions">
-        <button class="secondary-btn" onclick="sortItineraryDayByTime('${itinerary.id}', ${day.day})">依時間排序</button>
+        <button${d} class="secondary-btn" onclick="sortItineraryDayByTime('${itinerary.id}', ${day.day})">依時間排序</button>
       </div>
     </div>
     <div class="itinerary-item-list">
@@ -719,36 +819,38 @@ function renderDayPlan(itinerary, day) {
 
 function renderItineraryItemCard(itinerary, day, item) {
   const expanded = Boolean(expandedItineraryItemIds[item.id]);
+  const cancelled = itinerary.status === "已取消";
+  const d = cancelled ? " disabled" : "";
 
   return `
     <article class="itinerary-item-card ${item.mustGo ? "must-go" : ""}"
-      draggable="true"
+      draggable="${cancelled ? "false" : "true"}"
       onclick="toggleItineraryItemNotesFromCard(event, '${item.id}')"
-      ondragstart="startItineraryDrag(${day.day}, '${item.id}')"
+      ondragstart="${cancelled ? "" : `startItineraryDrag(${day.day}, '${item.id}')`}"
       ondragover="event.preventDefault()"
-      ondrop="dropItineraryItem(${day.day}, '${item.id}')">
+      ondrop="${cancelled ? "" : `dropItineraryItem(${day.day}, '${item.id}')`}">
       <div class="itinerary-item-main">
         <div>
           <span class="type-pill">${escapeHtml(item.type)}</span>
           ${item.mustGo ? `<span class="must-pill">必去候選</span>` : ""}
           <h4>${escapeHtml(item.name)}</h4>
-          <p>距台東車站 ${Number(item.distance || 0).toFixed(1)} km｜預估 NT$ ${Number(item.estimatedCost || 0).toLocaleString()}</p>
+          <p>車站車程 ${formatTravelTime(item.distance)}｜預估 NT$ ${Number(item.estimatedCost || 0).toLocaleString()}</p>
         </div>
         <div class="itinerary-item-controls">
-          <input type="time" value="${escapeAttribute(item.time || "09:00")}" onchange="updateItineraryItemField(${day.day}, '${item.id}', 'time', this.value)" />
-          <button class="secondary-btn" onclick="toggleItineraryItemNotes('${item.id}')">${expanded ? "收合" : "備註"}</button>
-          <button class="danger-btn" onclick="removeItineraryItem(${day.day}, '${item.id}')">刪除</button>
+          <input${d} type="time" value="${escapeAttribute(item.time || "09:00")}" onchange="updateItineraryItemField(${day.day}, '${item.id}', 'time', this.value)" />
+          <button${d} class="secondary-btn" onclick="toggleItineraryItemNotes('${item.id}')">${expanded ? "收合" : "備註"}</button>
+          <button${d} class="danger-btn" onclick="removeItineraryItem(${day.day}, '${item.id}')">刪除</button>
         </div>
       </div>
       <div class="itinerary-note-panel ${expanded ? "open" : ""}">
         <label>
-          <input type="checkbox" ${item.mustGo ? "checked" : ""} onchange="updateItineraryItemField(${day.day}, '${item.id}', 'mustGo', this.checked)" />
+          <input${d} type="checkbox" ${item.mustGo ? "checked" : ""} onchange="updateItineraryItemField(${day.day}, '${item.id}', 'mustGo', this.checked)" />
           標記為必去候選
         </label>
         <label>預估費用</label>
-        <input type="number" min="0" value="${Number(item.estimatedCost || 0)}" onchange="updateItineraryItemField(${day.day}, '${item.id}', 'estimatedCost', this.value)" />
+        <input${d} type="number" min="0" value="${Number(item.estimatedCost || 0)}" onchange="updateItineraryItemField(${day.day}, '${item.id}', 'estimatedCost', this.value)" />
         <label>備註</label>
-        <textarea onchange="updateItineraryItemField(${day.day}, '${item.id}', 'notes', this.value)">${escapeHtml(item.notes || "")}</textarea>
+        <textarea${d} onchange="updateItineraryItemField(${day.day}, '${item.id}', 'notes', this.value)">${escapeHtml(item.notes || "")}</textarea>
       </div>
     </article>
   `;
@@ -985,6 +1087,62 @@ function renderConflictPanel(itinerary) {
   `;
 }
 
+function renderItineraryCandidatePanel() {
+  const container = document.getElementById("itineraryCandidatePanel");
+  if (!container) return;
+
+  const itinerary = getActiveItinerary();
+  if (!itinerary) {
+    container.innerHTML = "";
+    return;
+  }
+
+  // 收集所有天中 mustGo=true 的景點
+  const candidates = normalizeItineraryDays(itinerary).flatMap(day =>
+    day.items.filter(item => item.mustGo).map(item => ({ ...item, dayNumber: day.day }))
+  );
+
+  if (candidates.length === 0) {
+    container.innerHTML = `
+      <div class="panel candidate-panel">
+        <div class="itinerary-panel-title compact">
+          <div><h2>必去候選</h2><p>尚未標記任何必去景點。</p></div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="panel candidate-panel">
+      <div class="itinerary-panel-title compact">
+        <div>
+          <h2>必去候選</h2>
+          <p>共 ${candidates.length} 個景點已標記為必去。</p>
+        </div>
+      </div>
+      <div class="candidate-list">
+        ${candidates.map(item => `
+          <div class="candidate-item">
+            <div class="candidate-item-info">
+              <span class="must-pill">必去</span>
+              <div>
+                <strong>${escapeHtml(item.name)}</strong>
+                <small>第 ${item.dayNumber} 天｜${escapeHtml(item.time || "--:--")}｜${escapeHtml(item.type)}</small>
+              </div>
+            </div>
+            <button class="secondary-btn" onclick="unmarkMustGo(${item.dayNumber}, '${item.id}')">取消候選</button>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function unmarkMustGo(dayNumber, itemId) {
+  updateItineraryItemField(dayNumber, itemId, "mustGo", false);
+}
+
 function renderItineraryLogs(itinerary) {
   return `
     <h3>操作紀錄</h3>
@@ -1160,6 +1318,9 @@ function dropItineraryItem(dayNumber, targetItemId) {
   const [moving] = day.items.splice(fromIndex, 1);
   day.items.splice(toIndex, 0, moving);
 
+  // 拖曳後依集合出發時間自動重排每項時間（間隔 1 小時）
+  redistributeDayTimes(day);
+
   draggedItineraryDay = null;
   draggedItineraryItemId = null;
 
@@ -1170,7 +1331,7 @@ function dropItineraryItem(dayNumber, targetItemId) {
     details: `調整第 ${dayNumber} 天景點順序。`
   });
 
-  addItineraryLog(itinerary, "調整行程排序", `拖曳調整第 ${dayNumber} 天景點順序。`);
+  addItineraryLog(itinerary, "調整行程排序", `拖曳調整第 ${dayNumber} 天景點順序，時間已自動重排。`);
   touchItinerary(itinerary);
   saveAppData();
   renderAll();
@@ -1969,10 +2130,15 @@ function createItineraryId(prefix) {
 
 function addDays(dateText, offset) {
   if (!dateText) return "";
-  const date = new Date(`${dateText}T00:00:00`);
+  const parts = dateText.split("-").map(Number);
+  if (parts.length !== 3) return "";
+  // 使用本地時間建構子避免 UTC 時區偏移造成日期誤差
+  const date = new Date(parts[0], parts[1] - 1, parts[2] + Number(offset || 0));
   if (Number.isNaN(date.getTime())) return "";
-  date.setDate(date.getDate() + Number(offset || 0));
-  return date.toISOString().slice(0, 10);
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
 function nowText() {

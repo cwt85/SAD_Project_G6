@@ -89,6 +89,48 @@ button {
   cursor: pointer;
 }
 
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ===== Toast 提示 ===== */
+#toastContainer {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.toast {
+  padding: 12px 20px;
+  border-radius: 14px;
+  background: rgba(17, 24, 39, 0.88);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.28);
+  backdrop-filter: blur(10px);
+  max-width: 300px;
+  opacity: 0;
+  transform: translateY(10px) scale(0.97);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.toast.toast-show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
 img {
   max-width: 100%;
 }
@@ -2286,11 +2328,15 @@ td small {
   gap: 20px;
 }
 
-.itinerary-sidebar {
+.itinerary-sidebar-col {
   position: sticky;
   top: 92px;
   max-height: calc(100vh - 120px);
-  overflow: auto;
+  overflow-y: auto;
+}
+
+.itinerary-sidebar {
+  position: static;
 }
 
 .itinerary-main {
@@ -2301,6 +2347,12 @@ td small {
 
 .itinerary-quick-add {
   margin-bottom: 0;
+}
+
+.itinerary-quick-add.is-cancelled {
+  opacity: 0.5;
+  pointer-events: none;
+  user-select: none;
 }
 
 .itinerary-quick-row {
@@ -2762,6 +2814,108 @@ td small {
   margin-top: 12px;
 }
 
+/* --- 景點推薦卡片縮圖 --- */
+.attraction-card {
+  grid-template-columns: 1fr auto;
+  padding: 14px 16px;
+}
+
+.attraction-card-info {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.attraction-thumb {
+  width: 88px;
+  height: 66px;
+  object-fit: cover;
+  border-radius: 10px;
+  flex-shrink: 0;
+  background: var(--bg-main);
+}
+
+/* --- 行程總覽標籤 --- */
+.overview-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.owner-badge,
+.member-badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.owner-badge {
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.86);
+}
+
+.member-badge {
+  color: #6d28d9;
+  background: rgba(237, 233, 254, 0.86);
+}
+
+/* --- 側邊欄兩欄直排 --- */
+.itinerary-sidebar-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* --- 必去候選面板 --- */
+.candidate-panel {
+  padding: 18px !important;
+}
+
+.candidate-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.candidate-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 228, 230, 0.38);
+  border: 1px solid rgba(236, 72, 153, 0.22);
+}
+
+.candidate-item-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.candidate-item-info strong {
+  display: block;
+  color: #111827;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+.candidate-item-info small {
+  display: block;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 
 /* =========================================================
    16. Home / Train 整合模組
@@ -3000,6 +3154,11 @@ td small {
   .itinerary-quick-row,
   .itinerary-search-row {
     grid-template-columns: 1fr;
+  }
+
+  .itinerary-sidebar-col {
+    position: static;
+    max-height: none;
   }
 
   .itinerary-sidebar {
