@@ -79,6 +79,46 @@ function showToast(message, duration = 2500) {
   }, duration);
 }
 
+// 點擊導航列「行程規劃」時呼叫：重設選取並顯示列表頁
+function enterItinerarySection(btn) {
+  activeItineraryId = null;
+  activeItineraryDay = 1;
+  saveAppData();
+  if (typeof showSection === "function") showSection("itinerary", btn);
+  showItineraryListView();
+}
+
+// 顯示列表頁，隱藏編輯頁
+function showItineraryListView() {
+  activeItineraryId = null;
+  activeItineraryDay = 1;
+  saveAppData();
+  const listView = document.querySelector(".itinerary-list-view");
+  const detailView = document.querySelector(".itinerary-detail-view");
+  if (listView) listView.style.display = "";
+  if (detailView) detailView.style.display = "none";
+  renderAll();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// 顯示編輯頁，隱藏列表頁
+function showItineraryDetailView() {
+  const listView = document.querySelector(".itinerary-list-view");
+  const detailView = document.querySelector(".itinerary-detail-view");
+  if (listView) listView.style.display = "none";
+  if (detailView) detailView.style.display = "";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// 舊函式保留相容（現已由 view 切換取代）
+function updateWorkspaceVisibility() {}
+
+// 切換「建立新行程」抽屜的展開／收合狀態
+function toggleItineraryCreateDrawer() {
+  const drawer = document.querySelector(".itinerary-create-drawer");
+  if (drawer) drawer.open = !drawer.open;
+}
+
 // 行程已取消時，將快速加入面板所有輸入框 disable
 function updateQuickAddPanelState() {
   const panel = document.querySelector(".itinerary-quick-add");
@@ -143,6 +183,7 @@ function renderItineraryModule() {
   renderItineraryCandidatePanel();
   renderItineraryDetail();
   updateQuickAddPanelState();
+  updateWorkspaceVisibility();
 }
 
 function renderLoggedOutItineraryState(readonlyItinerary) {
@@ -265,6 +306,7 @@ function createItinerary() {
   renderAll();
   ItineraryEventBus.emit("trip:created", { itinerary });
   showNotice(notice, "success", "行程已建立，可開始新增景點與邀請旅伴。");
+  showItineraryDetailView();
 }
 
 function clearItineraryCreateForm() {
@@ -330,6 +372,7 @@ function copyItinerary() {
   renderAll();
   ItineraryEventBus.emit("trip:created", { itinerary: copy, source });
   showNotice(notice, "success", "行程已複製，可繼續編輯。");
+  showItineraryDetailView();
 }
 
 function searchItineraryAttractions() {
@@ -647,47 +690,92 @@ function renderItineraryOverview() {
   const container = document.getElementById("itineraryOverview");
   if (!container) return;
 
-  const visible = getVisibleItineraries().filter(itinerary =>
+  const allVisible = getVisibleItineraries();
+  const filtered = allVisible.filter(itinerary =>
     !itineraryStatusFilter || itinerary.status === itineraryStatusFilter
   );
 
-  if (visible.length === 0) {
-    container.innerHTML = `<div class="notice warning">目前沒有符合條件的行程。</div>`;
+  const tabs = [
+    { label: "全部", value: "" },
+    { label: "規劃中", value: "規劃中" },
+    { label: "已完成", value: "已完成" },
+    { label: "已取消", value: "已取消" }
+  ];
+
+  const tabsHtml = `
+    <div class="itinerary-tab-row">
+      ${tabs.map(tab => `
+        <button class="itinerary-tab-btn ${(itineraryStatusFilter || "") === tab.value ? "active" : ""}"
+          onclick="setItineraryStatusFilter('${tab.value}')">
+          ${escapeHtml(tab.label)}
+        </button>
+      `).join("")}
+    </div>
+  `;
+
+  if (filtered.length === 0) {
+    container.innerHTML = tabsHtml + `<div class="notice warning">目前沒有符合條件的行程。</div>`;
     return;
   }
 
-  container.innerHTML = `
-    <div class="itinerary-overview-list">
-      ${visible.map(itinerary => {
-        const owned = isItineraryOwner(itinerary);
-        return `
-          <article class="itinerary-overview-card ${itinerary.id === activeItineraryId ? "active" : ""}" onclick="selectItinerary('${itinerary.id}')">
-            <div>
-              <div class="overview-badges">
-                <span class="status-pill">${escapeHtml(itinerary.status)}</span>
-                <span class="${owned ? "owner-badge" : "member-badge"}">${owned ? "我建立" : "受邀旅伴"}</span>
-              </div>
-              <h3>${escapeHtml(itinerary.name)}</h3>
-              <p>${escapeHtml(itinerary.startDate)} ~ ${escapeHtml(itinerary.endDate)}｜${escapeHtml(itinerary.destination)}</p>
-              <small>${Number(itinerary.people || 1)} 人｜${Number(itinerary.days || 1)} 天｜成員 ${getItineraryMembers(itinerary).length} 人</small>
-            </div>
-            <div class="actions" onclick="event.stopPropagation()">
-              ${owned ? `
-                ${itinerary.status === "已完成"
-                  ? `<span class="status-pill">已完成</span>`
-                  : `<select onchange="updateItineraryStatus('${itinerary.id}', this.value)">
-                      <option value="規劃中" ${itinerary.status === "規劃中" ? "selected" : ""}>規劃中</option>
-                      <option value="已取消" ${itinerary.status === "已取消" ? "selected" : ""}>已取消</option>
-                    </select>`
-                }
-                <button class="danger-btn" onclick="deleteItinerary('${itinerary.id}')">刪除</button>
-              ` : `<span class="member-badge">唯讀</span>`}
-            </div>
-          </article>
-        `;
-      }).join("")}
+  container.innerHTML = tabsHtml + `
+    <div class="itinerary-card-grid">
+      ${filtered.map(itinerary => renderItineraryCard(itinerary)).join("")}
     </div>
   `;
+}
+
+function renderItineraryCard(itinerary) {
+  const owned = isItineraryOwner(itinerary);
+  const members = getItineraryMembers(itinerary);
+  const expense = getItineraryExpenseCost(itinerary);
+  const spotCount = normalizeItineraryDays(itinerary)
+    .reduce((sum, day) => sum + day.items.length, 0);
+  const dateShort = formatDateShort(itinerary.startDate);
+  const statusClass = { "規劃中": "planning", "已完成": "done", "已取消": "cancelled" }[itinerary.status] || "planning";
+  const active = itinerary.id === activeItineraryId;
+
+  return `
+    <article class="itinerary-card ${active ? "active" : ""}" onclick="selectItinerary('${itinerary.id}')">
+      <div class="itinerary-card-head">
+        <h3>${escapeHtml(itinerary.name)}</h3>
+        <span class="itinerary-card-status ${statusClass}">${escapeHtml(itinerary.status)}</span>
+      </div>
+      <div class="itinerary-card-meta">
+        <span>📍 ${escapeHtml(itinerary.destination)}</span>
+        <span>📅 ${escapeHtml(dateShort)}</span>
+        <span>🕐 ${Number(itinerary.days)} 天</span>
+        <span>🗺️ ${spotCount} 個景點</span>
+      </div>
+      <div class="itinerary-card-foot">
+        <span>👥 ${members.length} 人協作</span>
+        <span class="itinerary-card-expense">NT$${expense.toLocaleString()} 已記錄</span>
+      </div>
+      ${owned ? `
+        <div class="itinerary-card-actions" onclick="event.stopPropagation()">
+          ${itinerary.status === "已完成"
+            ? `<span class="itinerary-card-status done">已完成</span>`
+            : `<select onchange="updateItineraryStatus('${itinerary.id}', this.value)">
+                <option value="規劃中" ${itinerary.status === "規劃中" ? "selected" : ""}>規劃中</option>
+                <option value="已取消" ${itinerary.status === "已取消" ? "selected" : ""}>已取消</option>
+              </select>`
+          }
+          <button class="danger-btn" onclick="deleteItinerary('${itinerary.id}')">刪除</button>
+        </div>
+      ` : `
+        <div class="itinerary-card-actions">
+          <span class="member-badge">受邀旅伴</span>
+        </div>
+      `}
+    </article>
+  `;
+}
+
+function formatDateShort(dateText) {
+  if (!dateText) return "";
+  const parts = dateText.split("-").map(Number);
+  if (parts.length !== 3) return dateText;
+  return `${parts[1]}月${parts[2]}日`;
 }
 
 function renderItineraryDetail() {
@@ -1366,6 +1454,8 @@ function selectItinerary(id) {
   activeItineraryDay = 1;
   saveAppData();
   renderAll();
+  // 有選取行程時進入編輯頁
+  if (id) showItineraryDetailView();
 }
 
 function selectItineraryDay(dayNumber) {
@@ -1927,8 +2017,10 @@ function ensureActiveItinerary() {
     return;
   }
 
-  if (!visible.some(itinerary => itinerary.id === activeItineraryId)) {
-    activeItineraryId = visible[0].id;
+  // 只驗證現有選取是否仍有效，不自動選取第一個
+  // （讓使用者透過點擊卡片來明確選取行程）
+  if (activeItineraryId && !visible.some(itinerary => itinerary.id === activeItineraryId)) {
+    activeItineraryId = null;
     activeItineraryDay = 1;
   }
 

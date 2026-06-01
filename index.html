@@ -37,7 +37,7 @@
 
   <nav>
     <button data-section="home" class="active" onclick="showSection('home', this)">旅程首頁</button>
-    <button data-section="itinerary" onclick="showSection('itinerary', this)">行程規劃</button>
+    <button data-section="itinerary" onclick="enterItinerarySection(this)">行程規劃</button>
     <button data-section="search" onclick="showSection('search', this)">住宿訂房</button>
     <button data-section="train" onclick="showSection('train', this)">火車票務</button>
     <button data-section="cart" onclick="showSection('cart', this)">收藏 / 購物車</button>
@@ -86,117 +86,148 @@
     <section id="itinerary">
       <div id="readonlyItineraryPanel" class="panel readonly-itinerary"></div>
 
-      <div class="panel itinerary-command-panel">
-        <div class="itinerary-panel-title">
-          <div>
-            <h2>旅遊行程規劃</h2>
-            <p>先建立或選擇行程，再安排每日景點與費用。</p>
+      <!-- ===== View 1：行程列表（預設顯示） ===== -->
+      <div class="itinerary-list-view">
+        <div class="panel itinerary-command-panel">
+          <div class="itinerary-hero">
+            <div>
+              <div class="itinerary-hero-title">
+                <span class="itinerary-hero-icon">🗓️</span>
+                <h2>行程規劃</h2>
+              </div>
+              <p>建立行程後點選卡片開始安排景點，邀請旅伴共同編輯。</p>
+            </div>
+            <div class="actions">
+              <button class="secondary-btn" onclick="prefillItineraryToday()">帶入今天</button>
+              <button class="primary-btn" onclick="toggleItineraryCreateDrawer()">＋ 新增行程</button>
+            </div>
           </div>
-          <div class="actions">
-            <button class="secondary-btn" onclick="prefillItineraryToday()">帶入今天</button>
+
+          <details class="itinerary-create-drawer">
+            <summary>建立新行程</summary>
+            <div class="grid">
+              <div>
+                <label for="itineraryName">行程名稱</label>
+                <input id="itineraryName" placeholder="例如 台東三日小旅行" />
+              </div>
+              <div>
+                <label for="itineraryDestination">目的地</label>
+                <input id="itineraryDestination" value="台東車站周邊" />
+              </div>
+              <div>
+                <label for="itineraryPeople">人數</label>
+                <input id="itineraryPeople" type="number" min="1" value="2" />
+              </div>
+              <div>
+                <label for="itineraryDays">天數</label>
+                <input id="itineraryDays" type="number" min="1" max="30" value="2" />
+              </div>
+              <div>
+                <label for="itineraryStartDate">出發日期</label>
+                <input id="itineraryStartDate" type="date" />
+              </div>
+              <div>
+                <label for="itineraryBudgetLimit">預算上限</label>
+                <input id="itineraryBudgetLimit" type="number" min="0" placeholder="例如 12000" />
+              </div>
+            </div>
+            <div class="actions">
+              <button class="primary-btn" onclick="createItinerary()">建立行程</button>
+              <button class="secondary-btn" onclick="copyItinerary()">複製既有行程</button>
+            </div>
+          </details>
+
+          <div class="itinerary-filter-row">
+            <div>
+              <label for="itineraryCopySelect">複製來源</label>
+              <select id="itineraryCopySelect"></select>
+            </div>
+            <div>
+              <label for="itineraryStatusSelect">狀態篩選</label>
+              <select id="itineraryStatusSelect" onchange="setItineraryStatusFilter(this.value)">
+                <option value="">全部狀態</option>
+                <option value="規劃中">規劃中</option>
+                <option value="已完成">已完成</option>
+                <option value="已取消">已取消</option>
+              </select>
+            </div>
+            <select id="itineraryActiveSelect" onchange="selectItinerary(this.value)" hidden></select>
           </div>
+
+          <div id="itineraryNotice"></div>
         </div>
 
-        <div class="itinerary-stepper">
-          <span>1 建立或選擇</span>
-          <span>2 加入景點</span>
-          <span>3 協作與預算</span>
-        </div>
-
-        <details class="itinerary-create-drawer" open>
-          <summary>建立新行程</summary>
-          <div class="grid">
-            <div>
-              <label for="itineraryName">行程名稱</label>
-              <input id="itineraryName" placeholder="例如 台東三日小旅行" />
-            </div>
-            <div>
-              <label for="itineraryDestination">目的地</label>
-              <input id="itineraryDestination" value="台東車站周邊" />
-            </div>
-            <div>
-              <label for="itineraryPeople">人數</label>
-              <input id="itineraryPeople" type="number" min="1" value="2" />
-            </div>
-            <div>
-              <label for="itineraryDays">天數</label>
-              <input id="itineraryDays" type="number" min="1" max="30" value="2" />
-            </div>
-            <div>
-              <label for="itineraryStartDate">出發日期</label>
-              <input id="itineraryStartDate" type="date" />
-            </div>
-            <div>
-              <label for="itineraryBudgetLimit">預算上限</label>
-              <input id="itineraryBudgetLimit" type="number" min="0" placeholder="例如 12000" />
-            </div>
-          </div>
-
-          <div class="actions">
-            <button class="primary-btn" onclick="createItinerary()">建立行程</button>
-            <button class="secondary-btn" onclick="copyItinerary()">複製既有行程</button>
-          </div>
-        </details>
-
-        <div class="itinerary-picker-row">
-          <div>
-            <label for="itineraryActiveSelect">目前行程</label>
-            <select id="itineraryActiveSelect" onchange="selectItinerary(this.value)"></select>
-          </div>
-          <div>
-            <label for="itineraryCopySelect">可複製行程</label>
-            <select id="itineraryCopySelect"></select>
-          </div>
-          <div>
-            <label for="itineraryStatusSelect">狀態篩選</label>
-            <select id="itineraryStatusSelect" onchange="setItineraryStatusFilter(this.value)">
-              <option value="">全部狀態</option>
-              <option value="規劃中">規劃中</option>
-              <option value="已完成">已完成</option>
-              <option value="已取消">已取消</option>
-            </select>
-          </div>
-        </div>
-
-        <div id="itineraryNotice"></div>
+        <div id="itineraryOverview"></div>
       </div>
 
-      <div class="itinerary-workspace">
-        <aside class="panel itinerary-sidebar">
+      <!-- ===== View 2：行程編輯頁（點選卡片後進入，取代列表頁） ===== -->
+      <div class="itinerary-detail-view" style="display:none">
+        <!-- 返回列表的導航列 -->
+        <div class="itinerary-detail-nav panel">
+          <button class="secondary-btn itinerary-back-btn" onclick="showItineraryListView()">← 返回行程列表</button>
+        </div>
+
+        <!-- 快速加入面板 -->
+        <div class="panel itinerary-quick-add">
           <div class="itinerary-panel-title compact">
             <div>
-              <h2>我的行程</h2>
-              <p>點選一張行程卡即可切換編排。</p>
+              <h2>快速加入</h2>
+              <p>輸入名稱就能直接加到選定日期。</p>
             </div>
           </div>
-          <div id="itineraryOverview"></div>
-        </aside>
 
-        <div class="itinerary-main">
-          <div class="panel itinerary-quick-add">
-            <div class="itinerary-panel-title compact">
-              <div>
-                <h2>快速加入</h2>
-                <p>輸入名稱就能直接加到選定日期。</p>
-              </div>
+          <div class="itinerary-quick-row">
+            <div>
+              <label for="attractionTargetDay">日期</label>
+              <select id="attractionTargetDay"></select>
             </div>
+            <div>
+              <label for="attractionTargetTime">時間</label>
+              <input id="attractionTargetTime" type="time" value="09:00" />
+            </div>
+            <div class="quick-name-field">
+              <label for="manualAttractionName">項目名稱</label>
+              <input id="manualAttractionName" placeholder="例如 鹿野高台、午餐、租車" />
+            </div>
+            <div>
+              <label for="manualAttractionType">類型</label>
+              <select id="manualAttractionType" onchange="handleItineraryTypeChange()">
+                <option value="景點">景點</option>
+                <option value="餐廳">餐廳</option>
+                <option value="活動">活動</option>
+                <option value="住宿">住宿</option>
+                <option value="交通">交通</option>
+              </select>
+            </div>
+            <div>
+              <label for="manualAttractionCost">預估費用</label>
+              <input id="manualAttractionCost" type="number" min="0" value="0" />
+            </div>
+            <button class="primary-btn quick-add-btn" onclick="addManualItineraryPlace()">加入</button>
+          </div>
 
-            <div class="itinerary-quick-row">
+          <input id="manualAttractionDistance" type="hidden" value="0" />
+
+          <div class="quick-preset-row">
+            <button class="secondary-btn" onclick="quickAddItineraryPlace('台東車站集合', '交通', 0, 0)">車站集合</button>
+            <button class="secondary-btn" onclick="quickAddItineraryPlace('午餐', '餐廳', 0, 300)">午餐</button>
+            <button class="secondary-btn" onclick="showItineraryLodgingPicker()">選住宿</button>
+          </div>
+
+          <div id="itineraryLodgingPanel"></div>
+
+          <details class="itinerary-search-drawer">
+            <summary>搜尋台東推薦景點</summary>
+            <div class="itinerary-search-row">
               <div>
-                <label for="attractionTargetDay">日期</label>
-                <select id="attractionTargetDay"></select>
+                <label for="attractionSearchInput">關鍵字</label>
+                <input id="attractionSearchInput" placeholder="例如 車站、海濱、餐廳" />
               </div>
               <div>
-                <label for="attractionTargetTime">時間</label>
-                <input id="attractionTargetTime" type="time" value="09:00" />
-              </div>
-              <div class="quick-name-field">
-                <label for="manualAttractionName">項目名稱</label>
-                <input id="manualAttractionName" placeholder="例如 鹿野高台、午餐、租車" />
-              </div>
-              <div>
-                <label for="manualAttractionType">類型</label>
-                <select id="manualAttractionType" onchange="handleItineraryTypeChange()">
+                <label for="attractionCategoryFilter">分類</label>
+                <select id="attractionCategoryFilter">
+                  <option value="">全部分類</option>
+                  <option value="車站">車站</option>
                   <option value="景點">景點</option>
                   <option value="餐廳">餐廳</option>
                   <option value="活動">活動</option>
@@ -204,50 +235,14 @@
                   <option value="交通">交通</option>
                 </select>
               </div>
-              <div>
-                <label for="manualAttractionCost">預估費用</label>
-                <input id="manualAttractionCost" type="number" min="0" value="0" />
-              </div>
-              <button class="primary-btn quick-add-btn" onclick="addManualItineraryPlace()">加入</button>
+              <button class="secondary-btn" onclick="searchItineraryAttractions()">搜尋</button>
             </div>
-
-            <input id="manualAttractionDistance" type="hidden" value="0" />
-
-            <div class="quick-preset-row">
-              <button class="secondary-btn" onclick="quickAddItineraryPlace('台東車站集合', '交通', 0, 0)">車站集合</button>
-              <button class="secondary-btn" onclick="quickAddItineraryPlace('午餐', '餐廳', 0, 300)">午餐</button>
-              <button class="secondary-btn" onclick="showItineraryLodgingPicker()">選住宿</button>
-            </div>
-
-            <div id="itineraryLodgingPanel"></div>
-
-            <details class="itinerary-search-drawer">
-              <summary>搜尋台東推薦景點</summary>
-              <div class="itinerary-search-row">
-                <div>
-                  <label for="attractionSearchInput">關鍵字</label>
-                  <input id="attractionSearchInput" placeholder="例如 車站、海濱、餐廳" />
-                </div>
-                <div>
-                  <label for="attractionCategoryFilter">分類</label>
-                  <select id="attractionCategoryFilter">
-                    <option value="">全部分類</option>
-                    <option value="車站">車站</option>
-                    <option value="景點">景點</option>
-                    <option value="餐廳">餐廳</option>
-                    <option value="活動">活動</option>
-                    <option value="住宿">住宿</option>
-                    <option value="交通">交通</option>
-                  </select>
-                </div>
-                <button class="secondary-btn" onclick="searchItineraryAttractions()">搜尋</button>
-              </div>
-              <div id="attractionResults"></div>
-            </details>
-          </div>
-
-          <div id="itineraryDetailPanel"></div>
+            <div id="attractionResults"></div>
+          </details>
         </div>
+
+        <!-- 行程詳情編輯區 -->
+        <div id="itineraryDetailPanel"></div>
       </div>
     </section>
 

@@ -2247,6 +2247,181 @@ td small {
   padding-bottom: 22px;
 }
 
+/* Hero 標題列（圖示 + 大標題 + 按鈕） */
+.itinerary-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.itinerary-hero-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.itinerary-hero-title h2 {
+  font-size: 28px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.itinerary-hero-icon {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.itinerary-hero > div > p {
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+/* 狀態篩選 Pill Tabs */
+.itinerary-tab-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.itinerary-tab-btn {
+  padding: 8px 22px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(148, 163, 184, 0.30);
+  background: rgba(255, 255, 255, 0.70);
+  color: #334155;
+  font-size: 14px;
+  font-weight: 800;
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.itinerary-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.90);
+  border-color: rgba(79, 124, 255, 0.35);
+}
+
+.itinerary-tab-btn.active {
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  border-color: transparent;
+  color: #fff;
+}
+
+/* 行程卡片格線 */
+.itinerary-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+/* 行程卡片 */
+.itinerary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.60);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.itinerary-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.13);
+}
+
+.itinerary-card.active {
+  background: linear-gradient(135deg, rgba(219, 234, 254, 0.72), rgba(243, 232, 255, 0.58)), rgba(255, 255, 255, 0.42);
+  border-color: rgba(79, 124, 255, 0.42);
+}
+
+.itinerary-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.itinerary-card-head h3 {
+  font-size: 17px;
+  font-weight: 900;
+  color: #111827;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 卡片狀態標籤 */
+.itinerary-card-status {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.itinerary-card-status.planning {
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.86);
+}
+
+.itinerary-card-status.done {
+  color: #065f46;
+  background: rgba(209, 250, 229, 0.86);
+}
+
+.itinerary-card-status.cancelled {
+  color: #6b7280;
+  background: rgba(243, 244, 246, 0.86);
+}
+
+/* 卡片 metadata 列 */
+.itinerary-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  font-size: 13px;
+  color: var(--text-soft);
+  font-weight: 700;
+}
+
+/* 卡片底部（協作人數 + 費用） */
+.itinerary-card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.itinerary-card-expense {
+  color: var(--blue);
+  font-weight: 900;
+}
+
+/* 卡片操作列 */
+.itinerary-card-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.itinerary-card-actions select {
+  font-size: 13px;
+  flex: 1;
+}
+
 .itinerary-panel-title,
 .itinerary-detail-header,
 .itinerary-item-main,
@@ -2314,29 +2489,64 @@ td small {
   margin: 16px;
 }
 
-.itinerary-picker-row {
-  display: grid;
-  grid-template-columns: minmax(260px, 1.2fr) minmax(220px, 1fr) minmax(180px, 0.8fr);
-  gap: 14px;
-  margin-top: 16px;
+/* 篩選列（複製來源 + 狀態篩選） */
+.itinerary-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: end;
+  margin-top: 18px;
 }
 
-.itinerary-workspace {
+.itinerary-filter-row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 180px;
+}
+
+/* 行程卡片列表：響應式格線 */
+#itineraryOverview {
+  margin-bottom: 4px;
+}
+
+#itineraryOverview .itinerary-overview-list {
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+}
+
+#itineraryOverview .itinerary-overview-card {
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+#itineraryOverview .itinerary-overview-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.13);
+}
+
+/* 編輯頁返回導航列 */
+.itinerary-detail-nav {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px !important;
+}
+
+.itinerary-back-btn {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* 編輯頁內容（快速加入 + 詳情）的間距 */
+.itinerary-detail-view {
   display: grid;
-  grid-template-columns: minmax(280px, 32%) minmax(0, 1fr);
-  align-items: start;
   gap: 20px;
 }
 
-.itinerary-sidebar-col {
-  position: sticky;
-  top: 92px;
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
-}
-
-.itinerary-sidebar {
-  position: static;
+/* 工作區（保留相容）*/
+.itinerary-workspace {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
 }
 
 .itinerary-main {
@@ -3170,16 +3380,18 @@ td small {
     justify-content: flex-start;
   }
 
-  .itinerary-workspace,
-  .itinerary-picker-row,
   .itinerary-quick-row,
   .itinerary-search-row {
     grid-template-columns: 1fr;
   }
 
-  .itinerary-sidebar-col {
-    position: static;
-    max-height: none;
+  #itineraryOverview .itinerary-overview-list {
+    grid-template-columns: 1fr;
+  }
+
+  .itinerary-filter-row {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .itinerary-sidebar {
