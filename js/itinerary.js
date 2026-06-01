@@ -121,11 +121,16 @@ function renderItineraryModule() {
   if (!section) return;
 
   const readonlyItinerary = getReadonlyItineraryFromHash();
-  section.classList.toggle("readonly-mode", Boolean(readonlyItinerary && !isLoggedIn));
+  // 只要 URL 帶有分享 token，不論是否登入都進入唯讀模式
+  const isReadonlyMode = Boolean(readonlyItinerary);
+  section.classList.toggle("readonly-mode", isReadonlyMode);
   renderReadonlyItineraryShare(readonlyItinerary);
 
+  // 唯讀分享模式：不渲染任何編輯介面，直接結束
+  if (isReadonlyMode) return;
+
   if (!isLoggedIn || !currentUser) {
-    renderLoggedOutItineraryState(readonlyItinerary);
+    renderLoggedOutItineraryState(null);
     return;
   }
 
