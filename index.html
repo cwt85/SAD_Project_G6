@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>台東智慧旅遊整合平台</title>
+    <link rel="stylesheet" href="index.css" />
+    
+    <!-- 模組化腳本載入順序 -->
+    <!-- 1. 全域狀態資料 -->
+    <script src="js/state.js" defer></script>
+    
+    <!-- 2. 通用工具函式 -->
+    <script src="js/utils.js" defer></script>
+    
+    <!-- 3. 功能模組 -->
+    <script src="js/auth.js" defer></script>
+    <script src="js/rooms.js" defer></script>
+    <script src="js/orders.js" defer></script>
+    <script src="js/admin.js" defer></script>
+    <script src="js/pricing.js" defer></script>
+    <script src="js/chat.js" defer></script>
+    <script src="js/itinerary.js" defer></script>
+    <script src="js/bonus.js" defer></script>
+    <script src="js/trains.js" defer></script>
+    
+    <!-- 4. 應用初始化（最後載入） -->
+    <script src="js/app.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>台東智慧旅遊整合平台</h1>
+    <p>整合行程規劃、住宿訂房與火車票務，讓旅程安排、付款取票與協作討論集中管理。</p>
+  </header>
+
+
+
+  <nav>
+    <button data-section="home" class="active" onclick="showSection('home', this)">旅程首頁</button>
+    <button data-section="itinerary" onclick="showSection('itinerary', this)">行程規劃</button>
+    <button data-section="search" onclick="showSection('search', this)">住宿訂房</button>
+    <button data-section="train" onclick="showSection('train', this)">火車票務</button>
+    <button data-section="cart" onclick="showSection('cart', this)">收藏 / 購物車</button>
+    <button data-section="orders" onclick="showSection('orders', this)">歷史訂單</button>
+    <button data-section="admin" onclick="showSection('admin', this)">管理員後台</button>
+    <button data-section="chat" onclick="showSection('chat', this)">協作聊天室</button>
+    <button data-section="login" onclick="showSection('login', this)">登入 / 註冊</button>
+  </nav>
+  <div id="bonusPointBar" class="bonus-point-bar"></div>
+  <main>
+    <section id="home" class="active">
+      <div class="home-hero panel">
+        <div>
+          <span class="status-pill">A+B+C 整合流程</span>
+          <h2>從排行程開始，接著訂住宿與車票</h2>
+          <p>住宿與車票成功後會自動回寫到行程，系統也會檢查列車抵達時間與住宿 Check-in 是否衝突。</p>
+        </div>
+        <div class="home-actions">
+          <button class="primary-btn" onclick="showSection('itinerary')">開始排行程</button>
+          <button class="secondary-btn" onclick="showSection('search')">找住宿</button>
+          <button class="secondary-btn" onclick="showSection('train')">查火車</button>
+        </div>
+      </div>
+
+      <!-- <div class="home-module-grid">
+        <article class="home-module-card">
+          <strong>A 行程規劃</strong>
+          <p>多日行程、景點排序、住宿與車票整合、衝突提醒。</p>
+          <button class="secondary-btn" onclick="showSection('itinerary')">管理行程</button>
+        </article>
+        <article class="home-module-card">
+          <strong>B 住宿訂房</strong>
+          <p>房源搜尋、房型選擇、付款退款、住宿資訊加入行程。</p>
+          <button class="secondary-btn" onclick="showSection('search')">搜尋住宿</button>
+        </article>
+        <article class="home-module-card">
+          <strong>C 火車票務</strong>
+          <p>車次查詢、票價優惠、付款取票、改退票與分票管理。</p>
+          <button class="secondary-btn" onclick="showSection('train')">查詢車票</button>
+        </article>
+      </div> -->
+
+      <div id="homeDashboard"></div>
+    </section>
+
+    <section id="itinerary">
+      <div id="readonlyItineraryPanel" class="panel readonly-itinerary"></div>
+
+      <div class="panel itinerary-command-panel">
+        <div class="itinerary-panel-title">
+          <div>
+            <h2>旅遊行程規劃</h2>
+            <p>先建立或選擇行程，再安排每日景點與費用。</p>
+          </div>
+          <div class="actions">
+            <button class="secondary-btn" onclick="prefillItineraryToday()">帶入今天</button>
+          </div>
+        </div>
+
+        <div class="itinerary-stepper">
+          <span>1 建立或選擇</span>
+          <span>2 加入景點</span>
+          <span>3 協作與預算</span>
+        </div>
+
+        <details class="itinerary-create-drawer" open>
+          <summary>建立新行程</summary>
+          <div class="grid">
+            <div>
+              <label for="itineraryName">行程名稱</label>
+              <input id="itineraryName" placeholder="例如 台東三日小旅行" />
+            </div>
+            <div>
+              <label for="itineraryDestination">目的地</label>
+              <input id="itineraryDestination" value="台東車站周邊" />
+            </div>
+            <div>
+              <label for="itineraryPeople">人數</label>
+              <input id="itineraryPeople" type="number" min="1" value="2" />
+            </div>
+            <div>
+              <label for="itineraryDays">天數</label>
+              <input id="itineraryDays" type="number" min="1" max="30" value="2" />
+            </div>
+            <div>
+              <label for="itineraryStartDate">出發日期</label>
+              <input id="itineraryStartDate" type="date" />
+            </div>
+            <div>
+              <label for="itineraryBudgetLimit">預算上限</label>
+              <input id="itineraryBudgetLimit" type="number" min="0" placeholder="例如 12000" />
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="primary-btn" onclick="createItinerary()">建立行程</button>
+            <button class="secondary-btn" onclick="copyItinerary()">複製既有行程</button>
+          </div>
+        </details>
+
+        <div class="itinerary-picker-row">
+          <div>
+            <label for="itineraryActiveSelect">目前行程</label>
+            <select id="itineraryActiveSelect" onchange="selectItinerary(this.value)"></select>
+          </div>
+          <div>
+            <label for="itineraryCopySelect">可複製行程</label>
+            <select id="itineraryCopySelect"></select>
+          </div>
+          <div>
+            <label for="itineraryStatusSelect">狀態篩選</label>
+            <select id="itineraryStatusSelect" onchange="setItineraryStatusFilter(this.value)">
+              <option value="">全部狀態</option>
+              <option value="規劃中">規劃中</option>
+              <option value="已完成">已完成</option>
+              <option value="已取消">已取消</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="itineraryNotice"></div>
+      </div>
+
+      <div class="itinerary-workspace">
+        <aside class="panel itinerary-sidebar">
+          <div class="itinerary-panel-title compact">
+            <div>
+              <h2>我的行程</h2>
+              <p>點選一張行程卡即可切換編排。</p>
+            </div>
+          </div>
+          <div id="itineraryOverview"></div>
+        </aside>
+
+        <div class="itinerary-main">
+          <div class="panel itinerary-quick-add">
+            <div class="itinerary-panel-title compact">
+              <div>
+                <h2>快速加入</h2>
+                <p>輸入名稱就能直接加到選定日期。</p>
+              </div>
+            </div>
+
+            <div class="itinerary-quick-row">
+              <div>
+                <label for="attractionTargetDay">日期</label>
+                <select id="attractionTargetDay"></select>
+              </div>
+              <div>
+                <label for="attractionTargetTime">時間</label>
+                <input id="attractionTargetTime" type="time" value="09:00" />
+              </div>
+              <div class="quick-name-field">
+                <label for="manualAttractionName">項目名稱</label>
+                <input id="manualAttractionName" placeholder="例如 鹿野高台、午餐、租車" />
+              </div>
+              <div>
+                <label for="manualAttractionType">類型</label>
+                <select id="manualAttractionType" onchange="handleItineraryTypeChange()">
+                  <option value="景點">景點</option>
+                  <option value="餐廳">餐廳</option>
+                  <option value="活動">活動</option>
+                  <option value="住宿">住宿</option>
+                  <option value="交通">交通</option>
+                </select>
+              </div>
+              <div>
+                <label for="manualAttractionCost">預估費用</label>
+                <input id="manualAttractionCost" type="number" min="0" value="0" />
+              </div>
+              <button class="primary-btn quick-add-btn" onclick="addManualItineraryPlace()">加入</button>
+            </div>
+
+            <input id="manualAttractionDistance" type="hidden" value="0" />
+
+            <div class="quick-preset-row">
+              <button class="secondary-btn" onclick="quickAddItineraryPlace('台東車站集合', '交通', 0, 0)">車站集合</button>
+              <button class="secondary-btn" onclick="quickAddItineraryPlace('午餐', '餐廳', 0, 300)">午餐</button>
+              <button class="secondary-btn" onclick="showItineraryLodgingPicker()">選住宿</button>
+            </div>
+
+            <div id="itineraryLodgingPanel"></div>
+
+            <details class="itinerary-search-drawer">
+              <summary>搜尋台東推薦景點</summary>
+              <div class="itinerary-search-row">
+                <div>
+                  <label for="attractionSearchInput">關鍵字</label>
+                  <input id="attractionSearchInput" placeholder="例如 車站、海濱、餐廳" />
+                </div>
+                <div>
+                  <label for="attractionCategoryFilter">分類</label>
+                  <select id="attractionCategoryFilter">
+                    <option value="">全部分類</option>
+                    <option value="車站">車站</option>
+                    <option value="景點">景點</option>
+                    <option value="餐廳">餐廳</option>
+                    <option value="活動">活動</option>
+                    <option value="住宿">住宿</option>
+                    <option value="交通">交通</option>
+                  </select>
+                </div>
+                <button class="secondary-btn" onclick="searchItineraryAttractions()">搜尋</button>
+              </div>
+              <div id="attractionResults"></div>
+            </details>
+          </div>
+
+          <div id="itineraryDetailPanel"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="train">
+      <div class="panel train-panel">
+        <div class="itinerary-panel-title">
+          <div>
+            <h2>火車票務查詢與訂票</h2>
+            <p>查詢車次、票種優惠、座位偏好、付款取票、分票、改票與退票都在這裡處理。</p>
+          </div>
+          <button class="secondary-btn" onclick="prefillTrainToday()">帶入今天</button>
+        </div>
+
+        <div class="train-search-grid">
+          <div>
+            <label for="trainFromStation">出發站</label>
+            <select id="trainFromStation"></select>
+          </div>
+          <div>
+            <label for="trainToStation">抵達站</label>
+            <select id="trainToStation"></select>
+          </div>
+          <div>
+            <label for="trainDate">乘車日期</label>
+            <input id="trainDate" type="date" />
+          </div>
+          <div>
+            <label for="trainPeriod">時段</label>
+            <select id="trainPeriod">
+              <option value="all">全天</option>
+              <option value="morning">上午</option>
+              <option value="afternoon">下午</option>
+              <option value="night">晚上</option>
+            </select>
+          </div>
+          <div>
+            <label for="trainCabinFilter">車廂類型</label>
+            <select id="trainCabinFilter">
+              <option value="standard">標準車廂</option>
+              <option value="business">商務車廂</option>
+            </select>
+          </div>
+          <label class="check-row">
+            <input id="trainAllowTransfer" type="checkbox" />
+            接受轉車
+          </label>
+        </div>
+        <div class="actions">
+          <button class="primary-btn" onclick="searchTrains()">查詢車次</button>
+          <button class="secondary-btn" onclick="resetTrainSearch()">重設</button>
+        </div>
+        <div id="trainNotice"></div>
+      </div>
+
+      <div id="trainResults"></div>
+      <div id="trainBookingPanel"></div>
+      <div id="trainOrdersPanel"></div>
+    </section>
+
+    <section id="search">
+      <div class="panel">
+        <h2>搜尋與篩選台東民宿</h2>
+        <div class="grid">
+          <div>
+            <label for="checkIn">入住日期</label>
+            <input id="checkIn" type="date" />
+          </div>
+          <div>
+            <label for="checkOut">退房日期</label>
+            <input id="checkOut" type="date" />
+          </div>
+          <div>
+            <label for="guests">人數</label>
+            <input id="guests" type="number" min="1" value="2" />
+          </div>
+          <div>
+            <label for="maxPrice">最高價格</label>
+            <input id="maxPrice" type="number" min="0" placeholder="例如 5000" />
+          </div>
+          <div>
+            <label for="locationFilter">地點</label>
+            <select id="locationFilter">
+              <option value="">不限</option>
+              <option value="臺東縣">臺東縣</option>
+            </select>
+          </div>
+          <div>
+            <label for="ratingFilter">最低評價</label>
+            <select id="ratingFilter">
+              <option value="0">不限</option>
+              <option value="4">4 星以上</option>
+              <option value="4.5">4.5 星以上</option>
+            </select>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="primary-btn" onclick="searchRooms()">執行搜尋</button>
+          <button class="secondary-btn" onclick="resetSearch()">重設條件</button>
+        </div>
+        <div id="searchNotice"></div>
+      </div>
+      <div id="roomList" class="card-list"></div>
+    </section>
+
+    <section id="cart">
+      <div class="panel">
+        <h2>收藏清單</h2>
+        <div id="favoriteList"></div>
+      </div>
+      <div class="panel">
+        <h2>購物車清單</h2>
+        <div id="cartList"></div>
+      </div>
+    </section>
+
+    <section id="orders">
+      <div class="panel">
+        <h2>歷史訂單</h2>
+        <div id="orderList"></div>
+      </div>
+    </section>
+
+    <section id="admin">
+      <div class="panel">
+        <h2>管理員：新增 / 更新房源</h2>
+        <div class="grid">
+          <div>
+            <label for="adminName">房源名稱</label>
+            <input id="adminName" placeholder="例如 海景雙人房" />
+          </div>
+          <div>
+            <label for="adminLocation">地點</label>
+            <input id="adminLocation" placeholder="例如 臺東縣關山鎮" />
+          </div>
+          <div>
+            <label for="adminAddress">完整地址</label>
+            <input id="adminAddress" placeholder="例如 臺東縣關山鎮長興47號" />
+          </div>
+          <div>
+            <label for="adminImageUrls">圖片連結</label>
+            <input id="adminImageUrls" placeholder="請以逗號分隔多張圖片網址" />
+          </div>
+        </div>
+
+        <div class="grid">
+          <div>
+            <label for="adminPrice">平日價格</label>
+            <input id="adminPrice" type="number" placeholder="例如 3200" />
+          </div>
+          <div>
+            <label for="adminStock">可售房數量</label>
+            <input id="adminStock" type="number" min="1" value="1" />
+          </div>
+          <div>
+            <label for="adminCapacity">可入住人數</label>
+            <input id="adminCapacity" type="number" min="1" value="2" />
+          </div>
+          <div>
+            <label for="adminCheckInTime">入住時間</label>
+            <input id="adminCheckInTime" placeholder="例如 15:00" />
+          </div>
+        </div>
+
+        <div class="grid">
+          <div>
+            <label for="adminBookingStart">可訂房起始</label>
+            <input id="adminBookingStart" type="date" />
+          </div>
+          <div>
+            <label for="adminBookingEnd">可訂房結束</label>
+            <input id="adminBookingEnd" type="date" />
+          </div>
+          <div>
+            <label for="adminFacilities">設備服務</label>
+            <input id="adminFacilities" placeholder="例如 Wi-Fi, 早餐, 停車場" />
+          </div>
+          <div>
+            <label for="adminPolicies">住房政策</label>
+            <input id="adminPolicies" placeholder="例如 禁菸, 禁寵物" />
+          </div>
+        </div>
+
+        <div class="panel-subtitle">房型設定</div>
+        <div class="grid">
+          <div>
+            <label for="adminTypeName">房型名稱</label>
+            <input id="adminTypeName" placeholder="例如 標準雙人房" />
+          </div>
+          <div>
+            <label for="adminTypePrice">房型價格</label>
+            <input id="adminTypePrice" type="number" placeholder="例如 2800" />
+          </div>
+          <div>
+            <label for="adminTypeCapacity">房型人數</label>
+            <input id="adminTypeCapacity" type="number" min="1" value="2" />
+          </div>
+          <div>
+            <label for="adminTypeStock">房型庫存</label>
+            <input id="adminTypeStock" type="number" min="1" value="1" />
+          </div>
+        </div>
+        <div class="grid">
+          <div>
+            <label for="adminTypeBed">床型</label>
+            <input id="adminTypeBed" placeholder="例如 1 張雙人床" />
+          </div>
+          <div>
+            <label for="adminTypeDesc">房型說明</label>
+            <input id="adminTypeDesc" placeholder="例如 含早餐" />
+          </div>
+          <div>&nbsp;</div>
+          <div class="actions">
+            <button class="secondary-btn" onclick="addAdminRoomType()">新增房型</button>
+          </div>
+        </div>
+        <div id="adminRoomTypeList"></div>
+
+        <label for="adminDesc">房源描述</label>
+        <textarea id="adminDesc" placeholder="請輸入設施、政策、入住時間等資訊"></textarea>
+        <div class="actions">
+          <button class="primary-btn" onclick="saveRoomByAdmin()">儲存房源</button>
+          <button class="secondary-btn" onclick="cancelEditRoom()">取消編輯</button>
+        </div>
+        <div id="adminNotice"></div>
+      </div>
+
+      <div class="panel">
+        <h3>房源管理列表</h3>
+        <div id="adminRoomList"></div>
+      </div>
+
+      <div class="panel">
+        <h2>定價與折扣管理</h2>
+        <div class="grid">
+          <div>
+            <label for="pricingRoomSelect">選擇房源</label>
+            <select id="pricingRoomSelect" onchange="updatePricingTypeSelect()"></select>
+          </div>
+          <div>
+            <label for="pricingTypeSelect">選擇房型</label>
+            <select id="pricingTypeSelect" onchange="syncPricingTypeForm()"></select>
+          </div>
+          <div>
+            <label for="pricingWeekdayPrice">平日價格</label>
+            <input id="pricingWeekdayPrice" type="number" placeholder="例如 3000" />
+          </div>
+          <div>
+            <label for="pricingHolidayPrice">假日價格</label>
+            <input id="pricingHolidayPrice" type="number" placeholder="例如 3600" />
+          </div>
+        </div>
+        <div class="grid">
+          <div>
+            <label for="pricingSpecialStart">特殊期間起</label>
+            <input id="pricingSpecialStart" type="date" />
+          </div>
+          <div>
+            <label for="pricingSpecialEnd">特殊期間迄</label>
+            <input id="pricingSpecialEnd" type="date" />
+          </div>
+          <div>
+            <label for="pricingSpecialPrice">特殊價格</label>
+            <input id="pricingSpecialPrice" type="number" placeholder="例如 4200" />
+          </div>
+          <div>
+            <label for="pricingDiscountType">折扣類型</label>
+            <select id="pricingDiscountType">
+              <option value="none">無折扣</option>
+              <option value="early_bird">早鳥</option>
+              <option value="package">套裝</option>
+              <option value="percentage">百分比折扣</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid">
+          <div>
+            <label for="pricingDiscountValue">折扣數值</label>
+            <input id="pricingDiscountValue" type="number" placeholder="例如 10" />
+          </div>
+          <div>
+            <label for="pricingDiscountStart">折扣起始</label>
+            <input id="pricingDiscountStart" type="date" />
+          </div>
+          <div>
+            <label for="pricingDiscountEnd">折扣迄止</label>
+            <input id="pricingDiscountEnd" type="date" />
+          </div>
+          <div class="actions">
+            <button class="secondary-btn" onclick="calculatePricingPreview()">預覽價格</button>
+            <button class="primary-btn" onclick="savePricingSettings()">儲存定價</button>
+          </div>
+        </div>
+        <div id="pricingResult"></div>
+      </div>
+
+      <div class="panel">
+        <h2>歷史定價紀錄查詢</h2>
+        <div class="grid">
+          <div>
+            <label for="historyRoomSelect">房源</label>
+            <select id="historyRoomSelect" onchange="updateHistoryTypeSelect()"></select>
+          </div>
+          <div>
+            <label for="historyTypeSelect">房型</label>
+            <select id="historyTypeSelect"></select>
+          </div>
+          <div>
+            <label for="historyStartDate">查詢起始</label>
+            <input id="historyStartDate" type="date" />
+          </div>
+          <div>
+            <label for="historyEndDate">查詢結束</label>
+            <input id="historyEndDate" type="date" />
+          </div>
+        </div>
+        <div class="actions">
+          <button class="secondary-btn" onclick="queryPricingHistory()">查詢紀錄</button>
+        </div>
+        <div id="pricingHistoryResult"></div>
+      </div>
+
+      <!-- ===== 管理員客服訊息中心 ===== -->
+      <div class="panel" id="adminChatPanel">
+        <h2>📨 客服訊息中心</h2>
+        <div class="admin-chat-container">
+          <div class="admin-chat-users" id="adminChatUserList">
+            <div class="admin-chat-users-header">使用者列表</div>
+            <div class="admin-chat-users-body" id="adminChatUsersBody">
+              <div class="chat-empty-state small">
+                <p>尚無使用者訊息</p>
+              </div>
+            </div>
+          </div>
+          <div class="admin-chat-conversation" id="adminChatConversation">
+            <div class="admin-chat-conv-header" id="adminChatConvHeader">
+              <span>請選擇使用者以檢視對話</span>
+            </div>
+            <div class="admin-chat-conv-body chat-box" id="adminChatConvBody">
+              <div class="chat-empty-state">
+                <div class="chat-empty-icon">📩</div>
+                <p>請從左側選擇使用者以檢視對話記錄</p>
+              </div>
+            </div>
+            <div class="admin-chat-conv-input" id="adminChatConvInput" style="display:none;">
+              <input id="adminChatInput" placeholder="回覆訊息..." />
+              <button class="primary-btn chat-send-btn" onclick="adminSendMessage()">回覆</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="chat">
+      <div class="panel">
+        <h2>協作聊天室</h2>
+        <p class="chat-subtitle" id="chatSubtitle">客服、行程留言與投票決策集中分類管理。</p>
+
+        <div class="chat-tabs">
+          <button class="chat-tab active" data-chat-category="service" onclick="switchChatCategory('service')">客服</button>
+          <button class="chat-tab" data-chat-category="itinerary" onclick="switchChatCategory('itinerary')">行程討論</button>
+          <button class="chat-tab" data-chat-category="polls" onclick="switchChatCategory('polls')">投票決策</button>
+        </div>
+
+        <div id="serviceChatPanel" class="chat-category-panel active">
+          <div id="chatBox" class="chat-box">
+            <div class="chat-empty-state" id="chatEmptyState">
+              <div class="chat-empty-icon">💬</div>
+              <p>尚未有對話紀錄，輸入訊息開始對話吧！</p>
+            </div>
+          </div>
+          <div class="chat-input-row">
+            <input id="chatInput" placeholder="輸入客服訊息..." />
+            <button class="primary-btn chat-send-btn" onclick="sendMessage()">送出</button>
+          </div>
+        </div>
+
+        <div id="itineraryChatPanel" class="chat-category-panel"></div>
+        <div id="pollChatPanel" class="chat-category-panel"></div>
+      </div>
+    </section>
+
+    <section id="login">
+      <div class="panel auth-panel">
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">登入</button>
+          <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">註冊</button>
+        </div>
+
+        <!-- ===== 登入表單 ===== -->
+        <div id="loginForm" class="auth-form active">
+          <div class="grid">
+            <div>
+              <label>身份</label>
+              <div class="radio-row">
+                <label><input type="radio" name="loginRole" value="customer" checked onchange="updateLoginMode()" /> 顧客</label>
+                <label><input type="radio" name="loginRole" value="admin" onchange="updateLoginMode()" /> 管理員</label>
+              </div>
+            </div>
+            <div>
+              <label for="accountInput">Email 或手機號碼</label>
+              <input id="accountInput" placeholder="example@mail.com / 0912345678" />
+            </div>
+            <div id="passwordGroup" style="display:none;">
+              <label for="passwordInput">密碼</label>
+              <div class="password-field">
+                <input id="passwordInput" type="password" placeholder="管理員密碼" />
+                <button type="button" class="toggle-pw-btn" onclick="togglePasswordVisibility('passwordInput', this)">顯示</button>
+              </div>
+            </div>
+            <div id="codeGroup">
+              <label for="verifyCode">驗證碼</label>
+              <input id="verifyCode" placeholder="輸入驗證碼" />
+            </div>
+          </div>
+          <div class="actions">
+            <button id="sendCodeBtn" class="secondary-btn" onclick="sendCode()">發送驗證碼</button>
+            <button class="primary-btn" onclick="login()">完成登入</button>
+          </div>
+          <div class="notice info">
+            管理員預設帳號：admin@example.com<br />密碼：Admin1234
+          </div>
+        </div>
+
+        <!-- ===== 註冊表單 ===== -->
+        <div id="registerForm" class="auth-form">
+          <div class="grid">
+            <div>
+              <label>註冊身份</label>
+              <div class="radio-row">
+                <label><input type="radio" name="registerRole" value="customer" checked onchange="updateRegisterMode()" /> 顧客</label>
+                <label><input type="radio" name="registerRole" value="admin" onchange="updateRegisterMode()" /> 管理員</label>
+              </div>
+            </div>
+            <div>
+              <label for="regDisplayName">顯示名稱</label>
+              <input id="regDisplayName" placeholder="例如：小明" />
+            </div>
+            <div>
+              <label for="regAccount">Email 或手機號碼</label>
+              <input id="regAccount" placeholder="example@mail.com / 0912345678" />
+            </div>
+            <div>
+              <label for="regVerifyCode">驗證碼</label>
+              <input id="regVerifyCode" placeholder="輸入驗證碼" />
+            </div>
+            <div id="adminRegisterFields" style="display:none;">
+              <div>
+                <label for="regPassword">管理員密碼</label>
+                <div class="password-field">
+                  <input id="regPassword" type="password" placeholder="至少 8 碼，含英文與數字" />
+                  <button type="button" class="toggle-pw-btn" onclick="togglePasswordVisibility('regPassword', this)">顯示</button>
+                </div>
+              </div>
+              <div>
+                <label for="regConfirmPassword">確認密碼</label>
+                <div class="password-field">
+                  <input id="regConfirmPassword" type="password" placeholder="再次輸入管理員密碼" />
+                  <button type="button" class="toggle-pw-btn" onclick="togglePasswordVisibility('regConfirmPassword', this)">顯示</button>
+                </div>
+              </div>
+              <div>
+                <label for="regInviteCode">管理員邀請碼</label>
+                <input id="regInviteCode" placeholder="預設：ADMIN2026" />
+              </div>
+            </div>
+          </div>
+          <div class="actions">
+            <button id="regSendCodeBtn" class="secondary-btn" onclick="sendRegisterCode()">發送驗證碼</button>
+            <button class="primary-btn" onclick="completeRegister()">完成註冊</button>
+          </div>
+          <div class="notice info">
+            首次使用？填寫資料後點擊「發送驗證碼」，驗證完成即可開始使用。
+          </div>
+        </div>
+
+        <div id="loginNotice"></div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

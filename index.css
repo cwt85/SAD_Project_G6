@@ -1,0 +1,3081 @@
+/* =========================================================
+   台東民宿訂房平台 index.css
+   風格：
+   1. 高級玻璃感
+   2. 淡彩漸層背景
+   3. 主頁房卡左右排版
+   4. 詳細頁輪播圖片
+   5. 手機版自動改為上下排版
+========================================================= */
+
+
+/* =========================================================
+   01. 全域設定 / 色彩變數
+========================================================= */
+
+:root {
+  --bg-main: #eef4ff;
+  --bg-soft: #f7ecff;
+
+  --glass-bg: rgba(255, 255, 255, 0.30);
+  --glass-bg-light: rgba(255, 255, 255, 0.48);
+  --glass-border: rgba(255, 255, 255, 0.42);
+  --glass-shadow: 0 22px 60px rgba(15, 23, 42, 0.16);
+
+  --text-main: #172033;
+  --text-soft: #5d6475;
+  --text-muted: #64748b;
+
+  --blue: #4f7cff;
+  --cyan: #35d0ff;
+  --purple: #8b5cf6;
+  --pink: #ec4899;
+  --orange: #f97316;
+  --green: #10b981;
+  --red: #ef4444;
+
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 26px;
+  --radius-xl: 32px;
+
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  font-family: "Noto Sans TC", Arial, sans-serif;
+  color: var(--text-main);
+  line-height: 1.6;
+  background:
+    radial-gradient(circle at 8% 10%, rgba(79, 124, 255, 0.25), transparent 28%),
+    radial-gradient(circle at 90% 8%, rgba(236, 72, 153, 0.18), transparent 30%),
+    radial-gradient(circle at 82% 72%, rgba(53, 208, 255, 0.18), transparent 32%),
+    radial-gradient(circle at 14% 86%, rgba(249, 115, 22, 0.13), transparent 26%),
+    linear-gradient(135deg, #eef4ff 0%, #f7ecff 42%, #eafff8 100%);
+  background-attachment: fixed;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.36), transparent 42%),
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.36), transparent 32%);
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+}
+
+
+/* =========================================================
+   02. Header 頁首
+========================================================= */
+
+header {
+  position: relative;
+  overflow: hidden;
+  color: white;
+  padding: 42px 8%;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(79, 124, 255, 0.82),
+      rgba(139, 92, 246, 0.72),
+      rgba(236, 72, 153, 0.58)
+    );
+  box-shadow: 0 24px 70px rgba(79, 70, 229, 0.22);
+}
+
+header::before {
+  content: "";
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  right: -90px;
+  top: -140px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.20);
+  filter: blur(4px);
+}
+
+header::after {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  left: 18%;
+  bottom: -120px;
+  border-radius: 50%;
+  background: rgba(53, 208, 255, 0.22);
+  filter: blur(3px);
+}
+
+header h1,
+header p {
+  position: relative;
+  z-index: 1;
+}
+
+header h1 {
+  margin-bottom: 8px;
+  font-size: 38px;
+  letter-spacing: 1px;
+  text-shadow: 0 8px 24px rgba(15, 23, 42, 0.24);
+}
+
+header p {
+  font-size: 16px;
+  opacity: 0.94;
+}
+
+
+/* =========================================================
+   03. Navigation 導覽列
+========================================================= */
+
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 8%;
+  background: rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.10);
+}
+
+nav button,
+.primary-btn,
+.secondary-btn,
+.danger-btn {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+nav button::before,
+.primary-btn::before,
+.secondary-btn::before,
+.danger-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.38),
+    transparent
+  );
+  transform: translateX(-120%);
+  transition: transform 0.5s ease;
+}
+
+nav button:hover::before,
+.primary-btn:hover::before,
+.secondary-btn:hover::before,
+.danger-btn:hover::before {
+  transform: translateX(120%);
+}
+
+nav button {
+  color: #334155;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+nav button:hover,
+nav button.active {
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(79, 70, 229, 0.20);
+}
+
+.bonus-point-bar {
+  padding: 10px 8%;
+  background: rgba(255, 255, 255, 0.64);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.48);
+}
+
+.bonus-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.bonus-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
+}
+
+.bonus-summary span {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.bonus-summary strong {
+  color: #1e3a8a;
+  font-size: 22px;
+}
+
+.bonus-summary small {
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.bonus-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.bonus-history {
+  position: relative;
+}
+
+.bonus-history summary {
+  min-height: 42px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  cursor: pointer;
+  font-weight: 900;
+  list-style: none;
+}
+
+.bonus-history summary::-webkit-details-marker {
+  display: none;
+}
+
+.bonus-history-list {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  z-index: 30;
+  display: grid;
+  gap: 8px;
+  width: min(340px, 86vw);
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.bonus-record {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(241, 245, 249, 0.72);
+}
+
+.bonus-record.add strong {
+  color: #047857;
+}
+
+.bonus-record.deduct strong {
+  color: #b91c1c;
+}
+
+.bonus-record span,
+.bonus-record small,
+.bonus-history-empty {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   04. Main / Section
+========================================================= */
+
+main {
+  width: 84%;
+  margin: 28px auto;
+  position: relative;
+}
+
+section {
+  display: none;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+section.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* =========================================================
+   05. Panel / Grid / Summary
+========================================================= */
+
+.panel {
+  margin-bottom: 24px;
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.auth-panel .grid {
+  grid-template-columns: 1fr;
+}
+
+.auth-panel #adminRegisterFields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.auth-panel .actions {
+  flex-direction: column;
+}
+
+.auth-panel .actions button {
+  width: 100%;
+}
+
+.panel h2 {
+  margin-bottom: 16px;
+  color: #111827;
+  font-size: 26px;
+  letter-spacing: 0.5px;
+}
+
+.panel h3 {
+  margin: 22px 0 12px;
+  color: #1f2937;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.10);
+}
+
+.auth-tab {
+  flex: 1;
+  height: 42px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-weight: 900;
+  letter-spacing: 0;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.80);
+  border: 1px solid rgba(148, 163, 184, 0.30);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.auth-tab.active {
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+  border-color: transparent;
+  box-shadow: 0 16px 30px rgba(79, 70, 229, 0.22);
+}
+
+.auth-tab:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 26px rgba(15, 23, 42, 0.12);
+}
+
+.auth-tab:active {
+  transform: translateY(0);
+}
+
+.auth-form {
+  display: none;
+}
+
+.auth-form.active {
+  display: block;
+}
+
+.summary-box {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.auth-summary {
+  width: 84%;
+  margin: -18px auto 0;
+  padding: 0;
+  position: relative;
+  z-index: 25;
+}
+
+.summary-item {
+  padding: 18px;
+  border-radius: 22px;
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.38);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.auth-summary .summary-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.74);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.auth-summary .summary-item span {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.summary-item strong {
+  display: block;
+  font-size: 26px;
+  color: transparent;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.auth-summary .summary-item strong {
+  max-width: 60%;
+  overflow: hidden;
+  font-size: 20px;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   06. Form 表單
+========================================================= */
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  color: #263047;
+  font-weight: 700;
+}
+
+.auth-panel .radio-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--glass-border);
+}
+
+.auth-panel .radio-row label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  margin: 0;
+  font-weight: 800;
+  color: #1f2a44;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.auth-panel .radio-row label:last-child {
+  border-bottom: none;
+}
+
+.auth-panel .radio-row input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--blue);
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 12px 13px;
+  font-size: 15px;
+  color: #1f2937;
+  background: rgba(255, 255, 255, 0.56);
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  border-radius: 16px;
+  outline: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  transition: var(--transition-fast);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  background: rgba(255, 255, 255, 0.76);
+  border-color: rgba(79, 124, 255, 0.65);
+  box-shadow:
+    0 0 0 4px rgba(79, 124, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+
+/* =========================================================
+   07. Buttons 按鈕
+========================================================= */
+
+.primary-btn {
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  box-shadow: 0 10px 24px rgba(79, 70, 229, 0.18);
+}
+
+.secondary-btn {
+  color: #075985;
+  background: linear-gradient(
+    135deg,
+    rgba(224, 242, 254, 0.92),
+    rgba(207, 250, 254, 0.78)
+  );
+  box-shadow: 0 10px 24px rgba(14, 116, 144, 0.10);
+}
+
+.danger-btn {
+  color: white;
+  background: linear-gradient(135deg, #fb7185, var(--red));
+  box-shadow: 0 10px 24px rgba(239, 68, 68, 0.16);
+}
+
+.primary-btn:hover,
+.secondary-btn:hover,
+.danger-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.16);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  padding-right: 76px;
+}
+
+.toggle-pw-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  color: #334155;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.10);
+}
+
+.toggle-pw-btn:hover {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.auth-action-btn {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 28px;
+}
+
+
+/* =========================================================
+   08. Notice 提示訊息
+========================================================= */
+
+.notice {
+  margin: 14px 0;
+  padding: 14px 16px;
+  border-radius: 18px;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.success {
+  color: #166534;
+  background: rgba(220, 252, 231, 0.72);
+}
+
+.warning {
+  color: #92400e;
+  background: rgba(254, 243, 199, 0.76);
+}
+
+.error {
+  color: #991b1b;
+  background: rgba(254, 226, 226, 0.76);
+}
+
+.info {
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.76);
+}
+
+
+/* =========================================================
+   09. Room List 主頁 / 搜尋頁房卡
+========================================================= */
+
+.card-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+}
+
+.room-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  align-items: stretch;
+  min-height: 240px;
+  overflow: hidden;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.34);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  transform: translateZ(0);
+  transition:
+    transform var(--transition-normal),
+    box-shadow var(--transition-normal);
+}
+
+.room-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(79, 124, 255, 0.18),
+    rgba(53, 208, 255, 0.15),
+    rgba(236, 72, 153, 0.14),
+    rgba(249, 115, 22, 0.12)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.room-card:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 30px 72px rgba(79, 70, 229, 0.18);
+}
+
+.room-image {
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+  overflow: hidden;
+  border-radius: 28px 0 0 28px;
+  background:
+    linear-gradient(135deg, rgba(79, 124, 255, 0.26), rgba(236, 72, 153, 0.18)),
+    rgba(255, 255, 255, 0.30);
+}
+
+.room-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(1.08) contrast(1.03);
+  transition:
+    transform 0.45s ease,
+    filter 0.45s ease;
+}
+
+.room-card:hover .room-image img {
+  transform: scale(1.06);
+  filter: saturate(1.16) contrast(1.06);
+}
+
+.room-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 26px 30px;
+}
+
+.room-body h3 {
+  margin-bottom: 10px;
+  color: #111827;
+  font-size: 24px;
+}
+
+.room-body p {
+  margin-bottom: 6px;
+  color: #334155;
+}
+
+.price {
+  margin: 12px 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: transparent;
+  background: linear-gradient(135deg, #ef4444, #f97316, #ec4899);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.room-card .actions {
+  margin-top: auto;
+}
+
+
+/* =========================================================
+   10. Detail Page 詳細頁
+========================================================= */
+
+.detail-card {
+  display: block;
+  max-width: 980px;
+  margin: 0 auto;
+  border-radius: var(--radius-xl);
+}
+
+.detail-card .room-body {
+  display: block;
+  padding: 26px 30px 32px;
+}
+
+.detail-card .room-body h2 {
+  margin: 18px 0 12px;
+  color: #111827;
+  font-size: 30px;
+}
+
+.detail-card .room-body h3 {
+  margin: 22px 0 10px;
+  color: #1f2937;
+}
+
+.detail-card .room-body p {
+  margin-bottom: 8px;
+}
+
+.detail-slider {
+  position: relative;
+  width: 100%;
+  height: 460px;
+  overflow: hidden;
+  border-radius: 30px;
+  margin-bottom: 14px;
+  background: rgba(255, 255, 255, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.46);
+  box-shadow: 0 26px 70px rgba(15, 23, 42, 0.20);
+}
+
+.slider-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.35s ease;
+}
+
+.slider-item {
+  min-width: 100%;
+  height: 100%;
+}
+
+.slider-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(1.10) contrast(1.03);
+}
+
+/* =========================================================
+   詳細頁輪播控制按鈕 / 圓點
+   淡色玻璃版
+========================================================= */
+
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+
+  width: 46px;
+  height: 46px;
+
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  border-radius: 50%;
+
+  transform: translateY(-50%);
+
+  font-size: 30px;
+  line-height: 42px;
+  text-align: center;
+
+  color: rgba(17, 24, 39, 0.72);
+  background: rgba(255, 255, 255, 0.34);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 12px 26px rgba(15, 23, 42, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+
+  cursor: pointer;
+
+  transition:
+    transform 0.22s ease,
+    background 0.22s ease,
+    color 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.slider-btn:hover {
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    rgba(79, 124, 255, 0.58),
+    rgba(139, 92, 246, 0.48),
+    rgba(236, 72, 153, 0.42)
+  );
+
+  box-shadow:
+    0 16px 34px rgba(79, 70, 229, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.slider-btn:active {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.slider-prev {
+top: 50%;
+  left: clamp(14px, 3vw, 34px);
+}
+
+.slider-next {
+top: 50%;
+  right: clamp(14px, 3vw, 34px);
+}
+
+/* 下方圓點 */
+.slider-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 24px;
+}
+
+/* 一般圓點 */
+.slider-dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.46);
+
+  box-shadow:
+    0 6px 14px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+
+  cursor: pointer;
+
+  transition:
+    width 0.22s ease,
+    background 0.22s ease,
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.slider-dot:hover {
+  transform: scale(1.2);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+/* 目前圖片的圓點 */
+.slider-dot.active {
+  width: 26px;
+  background: linear-gradient(
+    135deg,
+    rgba(79, 124, 255, 0.62),
+    rgba(139, 92, 246, 0.52),
+    rgba(236, 72, 153, 0.46)
+  );
+
+  box-shadow:
+    0 8px 18px rgba(79, 70, 229, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.62);
+}
+
+/* 手機版 */
+@media (max-width: 768px) {
+  .slider-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 26px;
+    line-height: 34px;
+  }
+
+  .slider-prev {
+    left: 10px;
+  }
+
+  .slider-next {
+    right: 10px;
+  }
+
+  .slider-dots {
+    gap: 7px;
+  }
+
+  .slider-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .slider-dot.active {
+    width: 22px;
+  }
+}
+
+
+/* =========================================================
+   11. Tags 詳細頁設備標籤
+   主頁房卡 JS 已不輸出 tag；這裡主要給詳細頁使用
+========================================================= */
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.tag {
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.50);
+  border: 1px solid rgba(255, 255, 255, 0.54);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+}
+
+.tag:nth-child(3n + 1) {
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.70);
+}
+
+.tag:nth-child(3n + 2) {
+  color: #7e22ce;
+  background: rgba(243, 232, 255, 0.70);
+}
+
+.tag:nth-child(3n + 3) {
+  color: #be123c;
+  background: rgba(255, 228, 230, 0.70);
+}
+
+
+/* =========================================================
+   12. Table 表格：收藏、購物車、訂單、管理員列表
+========================================================= */
+
+table {
+  width: 100%;
+  margin-top: 12px;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+th,
+td {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(203, 213, 225, 0.3);
+  text-align: left;
+  vertical-align: middle;
+}
+
+th {
+  color: #1e3a8a;
+  background: linear-gradient(135deg, rgba(219, 234, 254, 0.8), rgba(191, 219, 254, 0.6));
+  font-weight: 600;
+  font-size: 14px;
+}
+
+td {
+  color: #334155;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+tbody tr:hover {
+  background: rgba(241, 245, 249, 0.5);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+.cart-room-type-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(248, 249, 250, 0.6));
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.cart-room-type-select {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 16px;
+  border: 2px solid rgba(79, 70, 229, 0.2);
+  border-radius: 8px;
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 14px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.75));
+  outline: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.06);
+}
+
+.cart-room-type-select:hover {
+  border-color: rgba(79, 70, 229, 0.4);
+  box-shadow: 0 4px 8px rgba(79, 70, 229, 0.1);
+}
+
+.cart-room-type-select:focus {
+  border-color: rgba(79, 70, 229, 0.8);
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15), 0 4px 12px rgba(79, 70, 229, 0.15);
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+}
+
+.cart-room-type-info {
+  font-size: 13px;
+  color: #475569;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, rgba(226, 232, 240, 0.4), rgba(203, 213, 225, 0.2));
+  border-radius: 6px;
+  line-height: 1.5;
+  border-left: 3px solid rgba(79, 70, 229, 0.3);
+  font-weight: 500;
+}
+
+.order-admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.order-admin-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+  transform: none;
+  box-shadow: none;
+}
+
+/* =========================================================
+   13. Admin 後台管理
+========================================================= */
+
+.admin-accordion {
+  padding: 0;
+}
+
+.admin-accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 26px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.admin-accordion-header::-webkit-details-marker {
+  display: none;
+}
+
+.admin-accordion-header::after {
+  content: "展開";
+  flex: 0 0 auto;
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.78);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-accordion[open] .admin-accordion-header::after {
+  content: "收合";
+}
+
+.admin-accordion-header span {
+  color: #111827;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.admin-accordion-header small {
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.admin-accordion-body {
+  padding: 0 26px 26px;
+}
+
+.admin-room-summary,
+.admin-chat-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 14px 0 18px;
+}
+
+.admin-room-summary div,
+.admin-chat-stats div {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.54);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.admin-room-summary span,
+.admin-chat-stats span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-room-summary strong,
+.admin-chat-stats strong {
+  display: block;
+  margin-top: 4px;
+  color: #1e3a8a;
+  font-size: 24px;
+}
+
+.admin-room-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-room-card {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 18px;
+  padding: 16px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.10);
+}
+
+.admin-room-cover {
+  min-height: 180px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.48);
+}
+
+.admin-room-cover img {
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.admin-room-content {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-room-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-room-title-row h4 {
+  margin-bottom: 4px;
+  color: #111827;
+  font-size: 20px;
+}
+
+.admin-room-title-row p,
+.admin-room-desc {
+  color: var(--text-muted);
+}
+
+.admin-room-status {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: #047857;
+  background: rgba(209, 250, 229, 0.78);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.admin-room-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.admin-room-meta div,
+.admin-room-type-pill {
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.52);
+  border: 1px solid rgba(255, 255, 255, 0.56);
+}
+
+.admin-room-meta span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.admin-room-meta strong {
+  color: #1f2937;
+}
+
+.admin-room-type-list,
+.admin-room-tags,
+.admin-room-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-room-type-pill strong,
+.admin-room-type-pill span {
+  display: block;
+}
+
+.admin-room-type-pill span {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.admin-room-tags span {
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.70);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-room-tags.policy span {
+  color: #7e22ce;
+  background: rgba(243, 232, 255, 0.72);
+}
+
+.pricing-preview {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.54);
+  border: 1px solid var(--glass-border);
+}
+
+.pricing-preview p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.price-diff {
+  color: #dc2626;
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   14. Chat 聊天室
+========================================================= */
+
+.chat-box {
+  height: 260px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+  padding: 14px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.36);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+#chat .panel {
+  max-width: 920px;
+  margin-inline: auto;
+  padding: 0;
+  overflow: hidden;
+}
+
+#chat .panel h2 {
+  margin: 0;
+  padding: 22px 26px 4px;
+}
+
+.chat-subtitle {
+  padding: 0 26px 18px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.chat-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 0 22px 18px;
+}
+
+.chat-tab {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 999px;
+  padding: 10px 16px;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.66);
+  font-weight: 900;
+}
+
+.chat-tab.active {
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  border-color: transparent;
+}
+
+.chat-category-panel {
+  display: none;
+}
+
+.chat-category-panel.active {
+  display: block;
+}
+
+.chat-linked-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 22px 16px;
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.56);
+  border: 1px solid var(--glass-border);
+}
+
+.chat-linked-header h3 {
+  margin: 6px 0 2px;
+  font-size: 20px;
+}
+
+.chat-category-panel .itinerary-comment-box,
+.chat-category-panel .itinerary-comments,
+.chat-category-panel .grid,
+.chat-category-panel .actions,
+.chat-category-panel .vote-list {
+  margin: 0 22px 18px;
+}
+
+.chat-category-panel .itinerary-chat-shell {
+  margin: 0;
+}
+
+#chat .itinerary-discussion-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 430px;
+  margin: 0 22px;
+}
+
+#chat .itinerary-discussion-message {
+  margin-bottom: 0;
+}
+
+#chat .itinerary-chat-input-row {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+}
+
+#chat .itinerary-chat-input-row textarea {
+  min-height: 48px;
+  max-height: 120px;
+  resize: vertical;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+#chat .chat-box {
+  height: 430px;
+  margin: 0 22px;
+  padding: 22px;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0.28)),
+    radial-gradient(circle at 0% 0%, rgba(219, 234, 254, 0.72), transparent 36%),
+    radial-gradient(circle at 100% 100%, rgba(243, 232, 255, 0.68), transparent 34%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+#chat .chat-input-row {
+  padding: 18px 22px 22px;
+  background: rgba(255, 255, 255, 0.30);
+  border-top: 1px solid var(--glass-border);
+}
+
+#chat .chat-input-row input {
+  min-height: 48px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+#chat .chat-send-btn {
+  min-width: 96px;
+}
+
+.message {
+  max-width: 78%;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.user-msg {
+  margin-left: auto;
+  color: #1e3a8a;
+  background: linear-gradient(
+    135deg,
+    rgba(219, 234, 254, 0.90),
+    rgba(207, 250, 254, 0.78)
+  );
+}
+
+.admin-msg {
+  color: #475569;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.message-customer {
+  margin-right: auto;
+  color: #1e3a8a;
+  background: linear-gradient(135deg, rgba(219, 234, 254, 0.92), rgba(207, 250, 254, 0.76));
+}
+
+.message-admin {
+  margin-left: auto;
+  color: #475569;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+#chat .message {
+  max-width: min(76%, 560px);
+  padding: 13px 15px;
+  border-radius: 20px;
+}
+
+#chat .message-customer {
+  margin-left: auto;
+  margin-right: 0;
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+}
+
+#chat .message-admin {
+  margin-left: 0;
+  margin-right: auto;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+}
+
+#chat .message-customer .message-time {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.chat-empty-state {
+  display: grid;
+  place-items: center;
+  min-height: 170px;
+  color: var(--text-muted);
+  text-align: center;
+  font-weight: 800;
+}
+
+.chat-empty-icon {
+  margin-bottom: 8px;
+  font-size: 34px;
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.message-time {
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.admin-chat-container {
+  display: grid;
+  grid-template-columns: minmax(280px, 34%) 1fr;
+  gap: 16px;
+}
+
+.admin-chat-users,
+.admin-chat-conversation {
+  min-height: 430px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.40);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.admin-chat-users-header,
+.admin-chat-conv-header {
+  padding: 14px 16px;
+  color: #1e3a8a;
+  background: rgba(219, 234, 254, 0.70);
+  font-weight: 900;
+}
+
+.admin-chat-users-body {
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.admin-chat-user-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.admin-chat-user-item:hover,
+.admin-chat-user-item.active {
+  background: rgba(255, 255, 255, 0.72);
+  transform: translateY(-1px);
+}
+
+.admin-chat-user-info,
+.admin-chat-conv-header-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.admin-chat-user-avatar {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+  font-weight: 900;
+}
+
+.admin-chat-user-avatar.small {
+  width: 34px;
+  height: 34px;
+  font-size: 14px;
+}
+
+.admin-chat-user-detail {
+  min-width: 0;
+}
+
+.admin-chat-user-name,
+.admin-chat-user-account,
+.admin-chat-user-preview,
+.admin-chat-user-footnote {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-chat-user-name {
+  color: #111827;
+  font-weight: 900;
+}
+
+.admin-chat-user-account,
+.admin-chat-user-footnote {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-chat-user-preview {
+  color: #334155;
+  font-size: 13px;
+}
+
+.admin-chat-user-meta {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.unread-badge {
+  display: grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  color: white;
+  background: var(--red);
+}
+
+.admin-chat-conv-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-chat-conv-header-info span {
+  display: block;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-chat-conv-body {
+  height: 360px;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.admin-chat-thread-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.admin-chat-thread-meta span {
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: #475569;
+  background: rgba(255, 255, 255, 0.70);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.admin-chat-conv-input,
+.chat-input-row {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+}
+
+.admin-chat-conv-input input,
+.chat-input-row input {
+  flex: 1;
+}
+
+#search .grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#search .grid > div {
+  width: 100%;
+}
+
+#search label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+#search input,
+#search select {
+  width: 100%;
+  box-sizing: border-box;
+}
+/* =========================================================
+   15. Footer / Helper
+========================================================= */
+
+.hidden {
+  display: none;
+}
+
+footer {
+  padding: 24px;
+  text-align: center;
+  color: #475569;
+}
+
+
+/* =========================================================
+   16. Scrollbar
+========================================================= */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+}
+
+
+/* =========================================================
+   17. Responsive 響應式
+========================================================= */
+
+@media (max-width: 900px) {
+  main {
+    width: 90%;
+  }
+
+  .room-card {
+    grid-template-columns: 280px 1fr;
+  }
+
+  .room-body {
+    padding: 24px;
+  }
+
+  .admin-room-card,
+  .admin-chat-container {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-room-cover,
+  .admin-room-cover img {
+    min-height: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  header,
+  .auth-summary,
+  .bonus-point-bar,
+  nav,
+  main {
+    width: 100%;
+  }
+
+  header {
+    padding: 34px 18px;
+  }
+
+  header h1 {
+    font-size: 28px;
+  }
+
+  nav {
+    padding: 12px 18px;
+  }
+
+  .bonus-point-bar {
+    padding: 10px 18px;
+  }
+
+  .bonus-bar-inner,
+  .bonus-actions {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .bonus-bar-inner {
+    flex-direction: column;
+  }
+
+  .auth-summary {
+    margin: -14px auto 0;
+    padding: 0 18px;
+  }
+
+  main {
+    padding: 0 18px;
+    margin: 22px auto;
+  }
+
+  .panel {
+    padding: 20px;
+    border-radius: 22px;
+  }
+
+  .panel h2 {
+    font-size: 22px;
+  }
+
+  .admin-accordion-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-accordion-body {
+    padding: 0 20px 20px;
+  }
+
+  .admin-room-title-row,
+  .admin-chat-conv-header {
+    flex-direction: column;
+  }
+
+  .room-card {
+    display: block;
+    min-height: auto;
+    border-radius: 24px;
+  }
+
+  .room-image {
+    height: 210px;
+    min-height: 210px;
+    border-radius: 24px 24px 0 0;
+  }
+
+  .room-body,
+  .detail-card .room-body {
+    display: block;
+    padding: 22px;
+  }
+
+  .room-body h3 {
+    font-size: 22px;
+  }
+
+  .room-card .actions {
+    margin-top: 14px;
+  }
+
+  .detail-slider {
+    height: 280px;
+    border-radius: 24px;
+  }
+
+  .slider-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 28px;
+    line-height: 38px;
+  }
+
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .message {
+    max-width: 88%;
+  }
+}
+
+@media (max-width: 480px) {
+  nav button,
+  .primary-btn,
+  .secondary-btn,
+  .danger-btn {
+    width: 100%;
+  }
+
+  .actions {
+    width: 100%;
+  }
+
+  .summary-box {
+    grid-template-columns: 1fr;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-slider {
+    height: 230px;
+  }
+}
+
+
+/* =========================================================
+   房型選擇區
+========================================================= */
+
+.room-type-list {
+  display: grid;
+  gap: 14px;
+  margin: 14px 0 24px;
+}
+
+.room-type-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  align-items: center;
+
+  padding: 18px 20px;
+  border-radius: 22px;
+
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.56);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+
+  cursor: pointer;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    background 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.room-type-card:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.12);
+}
+
+.room-type-card.active {
+  border-color: rgba(79, 124, 255, 0.65);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(219, 234, 254, 0.72),
+      rgba(243, 232, 255, 0.64),
+      rgba(255, 228, 230, 0.52)
+    );
+  box-shadow:
+    0 18px 42px rgba(79, 70, 229, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.68);
+}
+
+.room-type-card h4 {
+  margin-bottom: 6px;
+  color: #111827;
+  font-size: 18px;
+}
+
+.room-type-card p {
+  margin-bottom: 4px;
+  color: #475569;
+}
+
+.room-type-price {
+  min-width: 140px;
+  text-align: right;
+  font-size: 20px;
+  font-weight: 800;
+
+  color: transparent;
+  background: linear-gradient(135deg, #ef4444, #f97316, #ec4899);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* 訂單房型小字 */
+td small {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.order-status {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 999px;
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.76);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.room-reviews {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 18px;
+}
+
+.review-item {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.52);
+  border: 1px solid var(--glass-border);
+}
+
+.review-item strong,
+.review-item span {
+  display: block;
+}
+
+.review-item span {
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.review-item p {
+  margin-top: 8px;
+  color: #334155;
+}
+
+/* 手機版 */
+@media (max-width: 768px) {
+  .room-type-card {
+    grid-template-columns: 1fr;
+  }
+
+  .room-type-price {
+    min-width: auto;
+    text-align: left;
+  }
+}
+
+/* =========================================================
+   18. Itinerary 行程規劃
+========================================================= */
+
+.readonly-mode > .panel:not(.readonly-itinerary) {
+  display: none;
+}
+
+.readonly-mode .itinerary-workspace {
+  display: none;
+}
+
+.itinerary-command-panel {
+  padding-bottom: 22px;
+}
+
+.itinerary-panel-title,
+.itinerary-detail-header,
+.itinerary-item-main,
+.vote-header,
+.conflict-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.itinerary-panel-title.compact h2 {
+  margin-bottom: 4px;
+  font-size: 22px;
+}
+
+.itinerary-panel-title p,
+.itinerary-detail-header p,
+.attraction-card p,
+.itinerary-item-card p,
+.readonly-item p {
+  color: var(--text-muted);
+}
+
+.itinerary-stepper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.itinerary-stepper span {
+  padding: 10px 12px;
+  border-radius: 16px;
+  color: #1e3a8a;
+  background: rgba(219, 234, 254, 0.66);
+  border: 1px solid var(--glass-border);
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.itinerary-create-drawer,
+.itinerary-search-drawer {
+  margin-top: 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.32);
+  border: 1px solid var(--glass-border);
+  overflow: hidden;
+}
+
+.itinerary-create-drawer summary,
+.itinerary-search-drawer summary {
+  padding: 13px 16px;
+  color: #1e3a8a;
+  background: rgba(219, 234, 254, 0.58);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.itinerary-create-drawer .grid,
+.itinerary-create-drawer .actions,
+.itinerary-search-drawer .itinerary-search-row,
+.itinerary-search-drawer #attractionResults {
+  margin: 16px;
+}
+
+.itinerary-picker-row {
+  display: grid;
+  grid-template-columns: minmax(260px, 1.2fr) minmax(220px, 1fr) minmax(180px, 0.8fr);
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.itinerary-workspace {
+  display: grid;
+  grid-template-columns: minmax(280px, 32%) minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+}
+
+.itinerary-sidebar {
+  position: sticky;
+  top: 92px;
+  max-height: calc(100vh - 120px);
+  overflow: auto;
+}
+
+.itinerary-main {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+
+.itinerary-quick-add {
+  margin-bottom: 0;
+}
+
+.itinerary-quick-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.7fr) minmax(110px, 0.7fr) minmax(220px, 1.5fr) minmax(130px, 0.8fr) minmax(120px, 0.8fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.quick-name-field {
+  min-width: 0;
+}
+
+.quick-add-btn {
+  height: 48px;
+  min-width: 86px;
+}
+
+.quick-preset-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.quick-preset-row button {
+  padding: 8px 12px;
+}
+
+.lodging-picker {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.38);
+  border: 1px solid var(--glass-border);
+}
+
+.lodging-picker-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.lodging-picker-header strong,
+.lodging-picker-header span {
+  display: block;
+}
+
+.lodging-picker-header strong {
+  color: #111827;
+  font-size: 18px;
+}
+
+.lodging-picker-header span {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.lodging-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.lodging-card {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 12px;
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+}
+
+.lodging-card img {
+  width: 104px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.lodging-card h4 {
+  margin-bottom: 4px;
+  color: #111827;
+}
+
+.lodging-card p,
+.lodging-card span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.lodging-card strong {
+  display: block;
+  margin-top: 6px;
+  color: #dc2626;
+  font-size: 16px;
+}
+
+.lodging-card .actions {
+  margin-top: 10px;
+}
+
+.itinerary-search-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(150px, 0.6fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.inline-control {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.inline-control.compact input {
+  min-width: 220px;
+}
+
+.itinerary-copy-row {
+  margin-top: 18px;
+}
+
+.attraction-grid,
+.itinerary-overview-list,
+.vote-list,
+.expense-list,
+.conflict-list,
+.log-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.attraction-card,
+.itinerary-overview-card,
+.vote-card,
+.expense-item,
+.conflict-card,
+.log-item,
+.readonly-day,
+.readonly-item {
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.46);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.attraction-card,
+.itinerary-overview-card,
+.vote-option,
+.expense-split-list div,
+.budget-summary {
+  display: grid;
+  gap: 10px;
+}
+
+.attraction-card {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.attraction-card strong,
+.itinerary-overview-card h3,
+.itinerary-detail-header h2,
+.itinerary-item-card h4 {
+  color: #111827;
+}
+
+.attraction-card span,
+.itinerary-overview-card small,
+.expense-item span,
+.log-item small,
+.conflict-card small,
+.readonly-item span,
+.vote-option span {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.itinerary-overview-card {
+  grid-template-columns: minmax(240px, 1fr) auto;
+  align-items: center;
+}
+
+.itinerary-sidebar .itinerary-overview-list {
+  margin-top: 0;
+}
+
+.itinerary-sidebar .itinerary-overview-card {
+  grid-template-columns: 1fr;
+  cursor: pointer;
+}
+
+.itinerary-overview-card .actions {
+  align-items: center;
+}
+
+.itinerary-overview-card select {
+  min-width: 130px;
+}
+
+.itinerary-overview-card.active {
+  background:
+    linear-gradient(135deg, rgba(219, 234, 254, 0.72), rgba(243, 232, 255, 0.58)),
+    rgba(255, 255, 255, 0.42);
+  border-color: rgba(79, 124, 255, 0.42);
+}
+
+.status-pill,
+.type-pill,
+.must-pill {
+  display: inline-block;
+  width: fit-content;
+  margin-bottom: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.status-pill {
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.76);
+}
+
+.type-pill {
+  color: #047857;
+  background: rgba(209, 250, 229, 0.78);
+}
+
+.must-pill {
+  color: #be123c;
+  background: rgba(255, 228, 230, 0.78);
+}
+
+.itinerary-cost-box {
+  min-width: 210px;
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid var(--glass-border);
+  text-align: right;
+}
+
+.itinerary-cost-box.warning {
+  background: rgba(254, 242, 242, 0.78);
+  border-color: rgba(248, 113, 113, 0.38);
+}
+
+.itinerary-cost-box span,
+.itinerary-cost-box small,
+.budget-summary span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.itinerary-cost-box strong,
+.budget-summary strong {
+  color: transparent;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-size: 26px;
+}
+
+.itinerary-subsection {
+  margin-top: 14px;
+  padding: 0;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.28);
+  border: 1px solid var(--glass-border);
+  overflow: hidden;
+}
+
+.itinerary-subsection summary {
+  padding: 16px 18px;
+  cursor: pointer;
+  color: #1e3a8a;
+  background: rgba(219, 234, 254, 0.62);
+  font-weight: 900;
+}
+
+.itinerary-subsection > *:not(summary) {
+  margin: 16px;
+}
+
+.day-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.day-tabs button {
+  padding: 9px 14px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 999px;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.68);
+  font-weight: 800;
+}
+
+.day-tabs button.active {
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  border-color: transparent;
+}
+
+.day-plan-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.itinerary-item-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.itinerary-item-card {
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.50);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.itinerary-item-card.must-go {
+  border-color: rgba(236, 72, 153, 0.42);
+  background:
+    linear-gradient(135deg, rgba(255, 228, 230, 0.52), rgba(243, 232, 255, 0.44)),
+    rgba(255, 255, 255, 0.50);
+}
+
+.itinerary-item-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.itinerary-item-controls input[type="time"] {
+  width: 130px;
+}
+
+.itinerary-note-panel {
+  display: none;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.itinerary-note-panel.open {
+  display: grid;
+}
+
+.member-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.member-list span,
+.expense-split-list div {
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid var(--glass-border);
+  font-weight: 800;
+}
+
+.readonly-share-box {
+  display: grid;
+  gap: 8px;
+}
+
+.vote-option {
+  grid-template-columns: minmax(220px, 1fr) auto;
+  align-items: center;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.itinerary-comment-box,
+.itinerary-comments {
+  display: grid;
+  gap: 10px;
+}
+
+.itinerary-comment {
+  max-width: min(78%, 620px);
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.70);
+  border: 1px solid var(--glass-border);
+}
+
+.itinerary-comment.mine {
+  justify-self: end;
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+}
+
+.itinerary-comment span {
+  display: block;
+  color: inherit;
+  opacity: 0.76;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.budget-summary {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-bottom: 14px;
+}
+
+.budget-summary div {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.56);
+  border: 1px solid var(--glass-border);
+}
+
+.expense-split-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.expense-split-list div {
+  border-radius: 18px;
+}
+
+.expense-split-list span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.readonly-itinerary .readonly-day {
+  margin-top: 12px;
+}
+
+
+/* =========================================================
+   16. Home / Train 整合模組
+========================================================= */
+
+.home-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 24px;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(219, 234, 254, 0.72), rgba(240, 253, 250, 0.62)),
+    rgba(255, 255, 255, 0.42);
+}
+
+.home-hero h2 {
+  margin: 10px 0;
+  color: #172033;
+  font-size: 44px;
+  line-height: 1.12;
+}
+
+.home-hero p,
+.home-module-card p {
+  color: var(--text-soft);
+  font-weight: 700;
+}
+
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.home-module-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin: 22px 0;
+}
+
+.home-module-card {
+  display: grid;
+  align-content: space-between;
+  min-height: 180px;
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.54);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.10);
+}
+
+.home-module-card strong {
+  color: #1e3a8a;
+  font-size: 20px;
+}
+
+.home-module-card button {
+  width: fit-content;
+  margin-top: 16px;
+}
+
+.home-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+}
+
+.home-dashboard-grid .summary-item,
+.train-bonus-box {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid var(--glass-border);
+}
+
+.home-dashboard-grid .summary-item span,
+.train-bonus-box span,
+.train-meta-grid span,
+.train-price-card span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.home-dashboard-grid .summary-item strong,
+.train-bonus-box strong {
+  display: block;
+  margin-top: 4px;
+  color: #172033;
+  font-size: 22px;
+}
+
+.train-search-grid,
+.train-booking-grid,
+.train-meta-grid,
+.train-price-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.train-result-list,
+.train-order-list {
+  display: grid;
+  gap: 14px;
+}
+
+.train-empty-panel p,
+.train-panel p,
+.train-booking-panel p {
+  color: var(--text-soft);
+  font-weight: 700;
+}
+
+.train-result-card,
+.train-order-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.56);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+}
+
+.train-result-card.unavailable {
+  opacity: 0.72;
+  background: rgba(241, 245, 249, 0.72);
+}
+
+.train-result-card.selected {
+  border-color: rgba(79, 124, 255, 0.62);
+  box-shadow: 0 18px 40px rgba(79, 124, 255, 0.18);
+}
+
+.train-result-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.train-result-head h3 {
+  margin: 8px 0 2px;
+  color: #172033;
+  font-size: 22px;
+}
+
+.train-result-head p {
+  color: var(--text-muted);
+  font-weight: 800;
+}
+
+.train-result-head > strong {
+  color: #1e3a8a;
+  font-size: 24px;
+  white-space: nowrap;
+}
+
+.train-status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  color: #075985;
+  background: rgba(224, 242, 254, 0.86);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.train-meta-grid > div,
+.train-price-card > div {
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.54);
+}
+
+.train-meta-grid strong,
+.train-price-card strong {
+  color: #172033;
+  font-size: 16px;
+}
+
+.train-result-actions,
+.train-check-row {
+  margin-top: 4px;
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #334155;
+  font-weight: 900;
+}
+
+.check-row input {
+  width: auto;
+}
+
+.train-price-preview {
+  margin-top: 16px;
+}
+
+.train-bonus-box {
+  min-width: 130px;
+  text-align: right;
+}
+
+.train-order-card .actions,
+.train-result-card .actions,
+.train-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 1100px) {
+  .home-hero,
+  .home-module-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-actions {
+    justify-content: flex-start;
+  }
+
+  .itinerary-workspace,
+  .itinerary-picker-row,
+  .itinerary-quick-row,
+  .itinerary-search-row {
+    grid-template-columns: 1fr;
+  }
+
+  .itinerary-sidebar {
+    position: static;
+    max-height: none;
+  }
+
+  .quick-add-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .itinerary-panel-title,
+  .itinerary-detail-header,
+  .itinerary-item-main,
+  .chat-linked-header,
+  .train-result-head,
+  .vote-header,
+  .conflict-card,
+  .itinerary-overview-card,
+  .attraction-card,
+  .vote-option,
+  .inline-control {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .itinerary-cost-box {
+    min-width: 0;
+    text-align: left;
+  }
+
+  .itinerary-item-controls {
+    justify-content: flex-start;
+  }
+
+  .train-result-head > strong,
+  .train-bonus-box {
+    text-align: left;
+  }
+
+  .home-hero h2 {
+    font-size: 32px;
+  }
+
+  .itinerary-stepper {
+    grid-template-columns: 1fr;
+  }
+
+  .lodging-picker-header,
+  .lodging-card {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .lodging-card img {
+    width: 100%;
+    height: 180px;
+  }
+
+  .itinerary-create-drawer .grid,
+  .itinerary-create-drawer .actions,
+  .itinerary-search-drawer .itinerary-search-row,
+  .itinerary-search-drawer #attractionResults {
+    margin: 12px;
+  }
+}
+#bonusPointBar {
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}

@@ -1,0 +1,471 @@
+/* =========================================================
+   管理員功能 (admin.js)
+========================================================= */
+
+// ===== 新增 / 修改房源 =====
+function saveRoomByAdmin() {
+  if (!requireAdmin()) return;
+
+  const name = getValue("adminName").trim();
+  const location = getValue("adminLocation").trim();
+  const address = getValue("adminAddress").trim();
+  const imageUrls = getValue("adminImageUrls").trim();
+  const price = Number(getValue("adminPrice"));
+  const stock = Number(getValue("adminStock"));
+  const capacity = Number(getValue("adminCapacity"));
+  const checkInTime = getValue("adminCheckInTime").trim();
+  const bookingStart = getValue("adminBookingStart").trim();
+  const bookingEnd = getValue("adminBookingEnd").trim();
+  const facilities = getValue("adminFacilities").trim();
+  const policies = getValue("adminPolicies").trim();
+  const desc = getValue("adminDesc").trim();
+
+  const notice = document.getElementById("adminNotice");
+
+  if (!name || !location || !price || !stock || !capacity || !checkInTime || !bookingStart || !bookingEnd || !desc) {
+    showNotice(notice, "error", "必填資料未完整填寫，請補齊房源名稱、地點、價格、庫存、人數、入住時間、訂房期間與描述。");
+    return;
+  }
+
+  if (price <= 0 || stock <= 0 || capacity <= 0) {
+    showNotice(notice, "error", "價格、可售房數量與入住人數必須大於 0。");
+    return;
+  }
+
+  if (new Date(bookingEnd) < new Date(bookingStart)) {
+    showNotice(notice, "error", "訂房結束日期不可早於起始日期。");
+    return;
+  }
+
+  const images = imageUrls.split(",").map(url => url.trim()).filter(Boolean);
+  const facilityList = facilities.split(",").map(item => item.trim()).filter(Boolean);
+  const policyList = policies.split(",").map(item => item.trim()).filter(Boolean);
+
+  if (images.some(url => !isValidImageUrl(url))) {
+    showNotice(notice, "error", "圖片連結格式錯誤，請輸入 http 或 https 開頭的圖片網址。");
+    return;
+  }
+
+  let selectedTypes = adminRoomTypes.length > 0 ? adminRoomTypes.map(type => ({...type})) : generateDefaultRoomTypes({
+    id: getNextRoomId(),
+    price,
+    capacity
+  });
+
+  // 修改模式
+  if (editingRoomId !== null) {
+    const room = findRoom(editingRoomId);
+
+    if (!room) {
+      showNotice(notice, "error", "找不到要修改的房源。");
+      return;
+    }
+
+    room.name = name;
+    room.location = location;
+    room.address = address || room.address;
+    room.price = price;
+    room.capacity = capacity;
+    room.stationDistance = checkInTime;
+    room.bookingStart = bookingStart;
+    room.bookingEnd = bookingEnd;
+    room.facilities = facilityList.length ? facilityList : room.facilities;
+    room.policies = policyList.length ? policyList : room.policies;
+    room.desc = desc;
+    room.images = images.length ? images : room.images;
+    room.roomTypes = selectedTypes;
+    room.status = room.status || "active";
+    room.updatedAt = new Date().toLocaleString("zh-TW");
+    room.updatedBy = currentUser.account;
+
+    showNotice(notice, "success", "房源資料修改成功。");
+
+    editingRoomId = null;
+    adminRoomTypes = [];
+    clearAdminForm();
+    saveAppData();
+    renderAll();
+    return;
+  }
+
+  // 新增模式
+  const newRoomId = getNextRoomId();
+
+  const newRoom = {
+    id: newRoomId,
+    name,
+    location,
+    address: address || "管理員尚未設定",
+    price,
+    rating: 4.5,
+    capacity,
+    stationDistance: checkInTime,
+    bookingStart,
+    bookingEnd,
+    facilities: facilityList.length ? facilityList : ["待補充設備"],
+    policies: policyList.length ? policyList : ["待補充政策"],
+    desc,
+    icon: "🛏️",
+    image: images[0] || defaultRoomImages[newRoomId % defaultRoomImages.length],
+    images: images.length ? images : getRoomImages(newRoomId),
+    roomTypes: selectedTypes,
+    status: "active",
+    createdAt: new Date().toLocaleString("zh-TW"),
+    createdBy: currentUser.account
+  };
+
+  rooms.unshift(newRoom);
+
+  showNotice(notice, "success", "房源新增成功。");
+
+  editingRoomId = null;
+  adminRoomTypes = [];
+  clearAdminForm();
+  saveAppData();
+  renderAll();
+}
+
+// ===== 房源管理列表 =====
+function renderAdminRooms() {
+  const adminRoomList = document.getElementById("adminRoomList");
+
+  if (!adminRoomList) return;
+
+  if (!Array.isArray(rooms) || rooms.length === 0) {
+    adminRoomList.innerHTML = `
+      <div class="notice warning">
+        目前沒有房源可管理。
+      </div>
+    `;
+    return;
+  }
+
+  const totalRoomTypes = rooms.reduce((sum, room) => sum + getAdminRoomTypeCount(room), 0);
+  const totalStock = rooms.reduce((sum, room) => sum + getAdminRoomTotalStock(room), 0);
+  const visibleLocations = [...new Set(rooms.map(room => room.location).filter(Boolean))];
+
+  adminRoomList.innerHTML = `
+    <div class="admin-room-summary">
+      <div>
+        <span>房源總數</span>
+        <strong>${rooms.length}</strong>
+      </div>
+      <div>
+        <span>房型總數</span>
+        <strong>${totalRoomTypes}</strong>
+      </div>
+      <div>
+        <span>總庫存</span>
+        <strong>${totalStock}</strong>
+      </div>
+      <div>
+        <span>涵蓋地區</span>
+        <strong>${visibleLocations.length}</strong>
+      </div>
+    </div>
+
+    <div class="admin-room-grid">
+      ${rooms.map(room => {
+        const roomTypes = Array.isArray(room.roomTypes) ? room.roomTypes : [];
+        const priceRange = getAdminRoomPriceRange(room);
+        const totalTypeStock = getAdminRoomTotalStock(room);
+        const coverImage = room.image || (Array.isArray(room.images) ? room.images[0] : "") || getRoomCoverImage(room.id);
+
+        return `
+          <article class="admin-room-card">
+            <div class="admin-room-cover">
+              <img src="${escapeHtml(coverImage)}" alt="${escapeHtml(room.name)}" onerror="this.src='${escapeHtml(getRoomCoverImage(room.id))}'" />
+            </div>
+
+            <div class="admin-room-content">
+              <div class="admin-room-title-row">
+                <div>
+                  <h4>${escapeHtml(room.name)}</h4>
+                  <p>${escapeHtml(room.location || "未設定地點")}｜${escapeHtml(room.address || "未設定地址")}</p>
+                </div>
+                <span class="admin-room-status">${totalTypeStock > 0 ? "可售中" : "無庫存"}</span>
+              </div>
+
+              <div class="admin-room-meta">
+                <div><span>價格區間</span><strong>${escapeHtml(priceRange)}</strong></div>
+                <div><span>房型 / 庫存</span><strong>${roomTypes.length} 種 / ${totalTypeStock} 間</strong></div>
+                <div><span>可住人數</span><strong>${escapeHtml(String(getMaxRoomTypeCapacity(room)))} 人</strong></div>
+                <div><span>評價</span><strong>${escapeHtml(String(room.rating || "未評分"))}</strong></div>
+                <div><span>入住時間</span><strong>${escapeHtml(room.stationDistance || "未設定")}</strong></div>
+                <div><span>可訂期間</span><strong>${escapeHtml(room.bookingStart || "未設定")} ~ ${escapeHtml(room.bookingEnd || "未設定")}</strong></div>
+              </div>
+
+              <div class="admin-room-type-list">
+                ${roomTypes.length ? roomTypes.map(type => `
+                  <div class="admin-room-type-pill">
+                    <strong>${escapeHtml(type.name)}</strong>
+                    <span>NT$ ${Number(type.price || 0).toLocaleString()}｜${escapeHtml(String(type.capacity || "-"))} 人｜庫存 ${escapeHtml(String(type.stock || 0))}</span>
+                  </div>
+                `).join("") : `<div class="notice warning">尚未設定房型</div>`}
+              </div>
+
+              <div class="admin-room-tags">
+                ${renderAdminTags(room.facilities, "待補充設備")}
+              </div>
+              <div class="admin-room-tags policy">
+                ${renderAdminTags(room.policies, "待補充政策")}
+              </div>
+
+              <p class="admin-room-desc">${escapeHtml(room.desc || "尚未填寫房源描述。")}</p>
+
+              <div class="admin-room-actions">
+                <button class="secondary-btn" onclick="showRoomDetail(${room.id})">查看前台</button>
+                <button class="secondary-btn" onclick="editRoomByAdmin(${room.id})">修改資料</button>
+                <button class="danger-btn" onclick="deleteRoomByAdmin(${room.id})">刪除房源</button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("")}
+    </div>
+  `;
+  renderAdminManagementSelects();
+}
+
+function getAdminRoomTypeCount(room) {
+  return Array.isArray(room.roomTypes) ? room.roomTypes.length : 0;
+}
+
+function getAdminRoomTotalStock(room) {
+  if (!Array.isArray(room.roomTypes) || room.roomTypes.length === 0) {
+    return Number(room.stock) || 0;
+  }
+
+  return room.roomTypes.reduce((sum, type) => sum + (Number(type.stock) || 0), 0);
+}
+
+function getAdminRoomPriceRange(room) {
+  const prices = Array.isArray(room.roomTypes) && room.roomTypes.length > 0
+    ? room.roomTypes.map(type => Number(type.price) || 0).filter(price => price > 0)
+    : [Number(room.price) || 0].filter(price => price > 0);
+
+  if (prices.length === 0) return "未設定";
+
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+
+  if (minPrice === maxPrice) return `NT$ ${minPrice.toLocaleString()}`;
+  return `NT$ ${minPrice.toLocaleString()} ~ ${maxPrice.toLocaleString()}`;
+}
+
+function renderAdminTags(items, fallback) {
+  const list = Array.isArray(items) && items.length > 0 ? items : [fallback];
+  return list.map(item => `<span>${escapeHtml(item)}</span>`).join("");
+}
+
+// ===== 編輯房源 =====
+function editRoomByAdmin(roomId) {
+  if (!requireAdmin()) return;
+
+  const room = findRoom(roomId);
+  const notice = document.getElementById("adminNotice");
+
+  if (!room) {
+    showNotice(notice, "error", "找不到此房源。");
+    return;
+  }
+
+  editingRoomId = room.id;
+  adminRoomTypes = Array.isArray(room.roomTypes) ? room.roomTypes.map(type => ({...type})) : [];
+
+  setValue("adminName", room.name);
+  setValue("adminLocation", room.location);
+  setValue("adminAddress", room.address || "");
+  setValue("adminImageUrls", room.images ? room.images.join(", ") : "");
+  setValue("adminPrice", room.price);
+  setValue("adminStock", room.roomTypes ? room.roomTypes.reduce((sum, type) => sum + (Number(type.stock) || 0), 0) : 1);
+  setValue("adminCapacity", room.capacity || 2);
+  setValue("adminCheckInTime", room.stationDistance || "");
+  setValue("adminBookingStart", room.bookingStart || "");
+  setValue("adminBookingEnd", room.bookingEnd || "");
+  setValue("adminFacilities", room.facilities ? room.facilities.join(", ") : "");
+  setValue("adminPolicies", room.policies ? room.policies.join(", ") : "");
+  setValue("adminDesc", room.desc || "");
+
+  renderAdminRoomTypeList();
+  showNotice(notice, "warning", `目前正在修改「${room.name}」。修改完成後請按儲存房源。`);
+}
+
+// ===== 刪除房源 =====
+function deleteRoomByAdmin(roomId) {
+  if (!requireAdmin()) return;
+
+  const room = findRoom(roomId);
+  const notice = document.getElementById("adminNotice");
+
+  if (!room) {
+    showNotice(notice, "error", "找不到此房源。");
+    return;
+  }
+
+  const confirmed = confirm(`是否確定刪除「${room.name}」？`);
+
+  if (!confirmed) return;
+
+  rooms = rooms.filter(item => Number(item.id) !== Number(roomId));
+  favorites = favorites.filter(item => Number(item.id) !== Number(roomId));
+  cart = cart.filter(item => Number(item.id) !== Number(roomId));
+
+  if (Number(editingRoomId) === Number(roomId)) {
+    editingRoomId = null;
+    clearAdminForm();
+  }
+
+  showNotice(notice, "success", "房源已刪除。");
+  saveAppData();
+  renderAll();
+}
+
+// ===== 取消編輯 =====
+function cancelEditRoom() {
+  editingRoomId = null;
+  clearAdminForm();
+
+  const notice = document.getElementById("adminNotice");
+  showNotice(notice, "success", "已取消編輯，回到新增模式。");
+}
+
+// ===== 清空表單 =====
+function clearAdminForm() {
+  setValue("adminName", "");
+  setValue("adminLocation", "");
+  setValue("adminAddress", "");
+  setValue("adminImageUrls", "");
+  setValue("adminPrice", "");
+  setValue("adminStock", "1");
+  setValue("adminCapacity", "2");
+  setValue("adminCheckInTime", "");
+  setValue("adminBookingStart", "");
+  setValue("adminBookingEnd", "");
+  setValue("adminFacilities", "");
+  setValue("adminPolicies", "");
+  setValue("adminDesc", "");
+  setValue("adminTypeName", "");
+  setValue("adminTypePrice", "");
+  setValue("adminTypeCapacity", "2");
+  setValue("adminTypeStock", "1");
+  setValue("adminTypeBed", "");
+  setValue("adminTypeDesc", "");
+  adminRoomTypes = [];
+  renderAdminRoomTypeList();
+}
+
+// ===== 房型管理 =====
+function addAdminRoomType() {
+  if (!requireAdmin()) return;
+
+  const type = getAdminRoomTypeFormData();
+  const notice = document.getElementById("adminNotice");
+
+  if (!type) return;
+
+  adminRoomTypes.push(type);
+  showNotice(notice, "success", `已新增房型：${escapeHtml(type.name)}。`);
+  clearAdminRoomTypeInputs();
+  renderAdminRoomTypeList();
+}
+
+function clearAdminRoomTypeInputs() {
+  setValue("adminTypeName", "");
+  setValue("adminTypePrice", "");
+  setValue("adminTypeCapacity", "2");
+  setValue("adminTypeStock", "1");
+  setValue("adminTypeBed", "");
+  setValue("adminTypeDesc", "");
+}
+
+function getAdminRoomTypeFormData() {
+  const name = getValue("adminTypeName").trim();
+  const price = Number(getValue("adminTypePrice"));
+  const capacity = Number(getValue("adminTypeCapacity"));
+  const stock = Number(getValue("adminTypeStock"));
+  const bedType = getValue("adminTypeBed").trim();
+  const desc = getValue("adminTypeDesc").trim();
+  const notice = document.getElementById("adminNotice");
+
+  if (!name || !price || !capacity || !stock) {
+    showNotice(notice, "error", "請完整填寫房型名稱、價格、人數與庫存。" );
+    return null;
+  }
+
+  if (price <= 0 || capacity <= 0 || stock <= 0) {
+    showNotice(notice, "error", "房型價格、人數與庫存均需大於 0。" );
+    return null;
+  }
+
+  return {
+    id: `type-${Date.now()}-${name.replace(/\s+/g, "-")}`,
+    name,
+    price,
+    capacity,
+    stock,
+    bedType: bedType || "無",
+    desc: desc || "無"
+  };
+}
+
+function renderAdminRoomTypeList() {
+  const target = document.getElementById("adminRoomTypeList");
+
+  if (!target) return;
+
+  if (adminRoomTypes.length === 0) {
+    target.innerHTML = `
+      <div class="notice info">
+        尚未新增房型，可先於上方填寫後新增。
+      </div>
+    `;
+    return;
+  }
+
+  target.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>房型</th>
+          <th>價格</th>
+          <th>人數</th>
+          <th>庫存</th>
+          <th>床型</th>
+          <th>說明</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${adminRoomTypes.map((type, index) => `
+          <tr>
+            <td>${escapeHtml(type.name)}</td>
+            <td>NT$ ${Number(type.price).toLocaleString()}</td>
+            <td>${escapeHtml(String(type.capacity))}</td>
+            <td>${escapeHtml(String(type.stock))}</td>
+            <td>${escapeHtml(type.bedType)}</td>
+            <td>${escapeHtml(type.desc)}</td>
+            <td>
+              <button class="danger-btn" onclick="removeAdminRoomType(${index})">移除</button>
+            </td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+function removeAdminRoomType(index) {
+  if (index < 0 || index >= adminRoomTypes.length) return;
+  adminRoomTypes.splice(index, 1);
+  renderAdminRoomTypeList();
+}
+
+function isValidImageUrl(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
