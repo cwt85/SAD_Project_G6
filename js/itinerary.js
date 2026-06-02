@@ -311,8 +311,9 @@ function renderReadonlyItineraryShare(itinerary) {
 }
 
 function prefillItineraryToday() {
-  const today = new Date().toISOString().slice(0, 10);
-  setValue("itineraryStartDate", today);
+  const now = new Date();
+  const localToday = new Date(now - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  setValue("itineraryStartDate", localToday);
 }
 
 function createItinerary() {
@@ -578,7 +579,7 @@ function renderItineraryLodgingOptions(forceOpen = false) {
     <div class="lodging-picker">
       <div class="lodging-picker-header">
         <div>
-          <strong>B 模組住宿</strong>
+          <strong>尋找您的住宿</strong>
           <span>從住宿房源直接加入當天行程</span>
         </div>
         <button class="secondary-btn" onclick="hideItineraryLodgingPicker()">收合</button>
@@ -735,6 +736,14 @@ function renderItinerarySelects() {
 
   const statusSelect = document.getElementById("itineraryStatusSelect");
   if (statusSelect) statusSelect.value = itineraryStatusFilter || "";
+
+  // 出發日期不可選過去：直接用本地時間 getter，避免 UTC 偏移問題
+  const startDateInput = document.getElementById("itineraryStartDate");
+  if (startDateInput) {
+    const t = new Date();
+    const pad = v => String(v).padStart(2, "0");
+    startDateInput.min = t.getFullYear() + "-" + pad(t.getMonth() + 1) + "-" + pad(t.getDate());
+  }
 
   const createDrawer = document.querySelector(".itinerary-create-drawer");
   if (createDrawer) {
@@ -1082,9 +1091,28 @@ function renderCollaborationPanel(itinerary) {
   `;
 }
 
+// 回傳「現在起 1 分鐘後」的 datetime-local min 字串（本地時間，無時區偏移問題）
+function getDeadlineMin() {
+  const n = new Date(Date.now() + 60000); // 現在起 1 分鐘後
+  const pad = v => String(v).padStart(2, "0");
+  return n.getFullYear() + "-" + pad(n.getMonth() + 1) + "-" + pad(n.getDate())
+    + "T" + pad(n.getHours()) + ":" + pad(n.getMinutes());
+}
+
+// 截止時間選完後立即驗證，選到過去時間就清除並提示
+function onDeadlineChange(input) {
+  if (!input.value) return;
+  input.min = getDeadlineMin(); // 更新到最新的 min
+  if (new Date(input.value) <= new Date()) {
+    input.value = "";
+    showToast("截止時間必須晚於現在，請重新選擇。", "error");
+  }
+}
+
 function renderVotingPanel(itinerary) {
   const days = normalizeItineraryDays(itinerary);
   const isOwner = isItineraryOwner(itinerary);
+  const minDeadline = getDeadlineMin();
 
   return `
     <div class="grid">
@@ -1098,7 +1126,9 @@ function renderVotingPanel(itinerary) {
       </div>
       <div>
         <label for="voteDeadlineInput">截止時間（選填）</label>
-        <input id="voteDeadlineInput" type="datetime-local" />
+        <input id="voteDeadlineInput" type="datetime-local" min="${minDeadline}"
+          onfocus="this.min=getDeadlineMin()"
+          onchange="onDeadlineChange(this)" />
       </div>
     </div>
     <div class="actions">
@@ -1754,6 +1784,11 @@ function createItineraryVote(itineraryId) {
 
   if (!title || !optionName) {
     alert("請輸入投票主題與至少一個選項。");
+    return;
+  }
+
+  if (deadline && new Date(deadline) <= new Date()) {
+    alert("截止時間必須晚於現在，請重新選擇。");
     return;
   }
 
