@@ -52,6 +52,7 @@ function addBonusPoints(amount, reason = "系統核發", source = "system", user
     "train-abnormal",
     "train-refund",
     "train-change",
+    "lodging-overlap-compensation",
     "system-award",
     "consumption-milestone"
   ];
@@ -212,7 +213,7 @@ bar.innerHTML = `
     <div class="bonus-summary">
       <span>紅利點數</span>
       <strong id="bonusBarPointsText">${Number(points || 0).toLocaleString()} 點</strong>
-      <small>系統自動核發，無使用期限。訂票、完成行程、異常補償等均可獲得。</small>
+      <small>系統自動核發，無使用期限。購票消費、訂房重疊補償與異常補償皆會留下紀錄。</small>
     </div>
     <div class="bonus-actions">
       <details class="bonus-history">

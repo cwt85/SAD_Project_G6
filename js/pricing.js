@@ -6,6 +6,7 @@
 function savePricingSettings() {
   if (!requireAdmin()) return;
 
+  try {
   const selectedRoomId = Number(getValue("pricingRoomSelect"));
   const selectedTypeId = getValue("pricingTypeSelect");
   const weekdayPrice = Number(getValue("pricingWeekdayPrice"));
@@ -104,10 +105,15 @@ function savePricingSettings() {
   showNotice(notice, "success", "定價設定已保存，房型平日價格已同步更新。");
   saveAppData();
   renderAll();
+  } catch (error) {
+    console.error("定價設定失敗：", error);
+    showNotice(document.getElementById("pricingResult"), "error", "價格計算或儲存失敗，請重新操作。");
+  }
 }
 
 // ===== 定價預覽 =====
 function calculatePricingPreview() {
+  try {
   const weekdayPrice = Number(getValue("pricingWeekdayPrice")) || 0;
   const holidayPrice = Number(getValue("pricingHolidayPrice")) || 0;
   const specialPrice = Number(getValue("pricingSpecialPrice")) || 0;
@@ -130,6 +136,10 @@ function calculatePricingPreview() {
       ${specialPrice ? `<p><strong>特殊期間價：</strong><span>NT$ ${specialFinal.toLocaleString()}</span>${renderPriceDiff(specialPrice, specialFinal)}</p>` : ""}
     </div>
   `;
+  } catch (error) {
+    console.error("價格預覽計算失敗：", error);
+    showNotice(document.getElementById("pricingResult"), "error", "價格計算失敗，請重新操作。");
+  }
 }
 
 function applyPricingDiscount(price, discountType, discountValue) {
@@ -149,6 +159,7 @@ function renderPriceDiff(originalPrice, finalPrice) {
 
 // ===== 查詢定價歷史 =====
 function queryPricingHistory() {
+  try {
   const selectedRoomId = Number(getValue("historyRoomSelect"));
   const selectedTypeId = getValue("historyTypeSelect");
   const dateStart = getValue("historyStartDate");
@@ -156,6 +167,25 @@ function queryPricingHistory() {
   const resultContainer = document.getElementById("pricingHistoryResult");
 
   if (!resultContainer) return;
+
+  if ((dateStart && Number.isNaN(new Date(dateStart).getTime())) ||
+      (dateEnd && Number.isNaN(new Date(dateEnd).getTime()))) {
+    resultContainer.innerHTML = `
+      <div class="notice error">
+        日期格式錯誤，請重新選擇查詢條件。
+      </div>
+    `;
+    return;
+  }
+
+  if (dateStart && dateEnd && new Date(dateEnd) < new Date(dateStart)) {
+    resultContainer.innerHTML = `
+      <div class="notice error">
+        查詢結束日期不可早於起始日期。
+      </div>
+    `;
+    return;
+  }
 
   const criteria = [];
 
@@ -186,6 +216,17 @@ function queryPricingHistory() {
   }
 
   renderPricingHistoryResult(results);
+  } catch (error) {
+    console.error("歷史定價查詢失敗：", error);
+    const resultContainer = document.getElementById("pricingHistoryResult");
+    if (resultContainer) {
+      resultContainer.innerHTML = `
+        <div class="notice error">
+          歷史定價查詢失敗，請重新操作。
+        </div>
+      `;
+    }
+  }
 }
 
 // ===== 渲染查詢結果 =====

@@ -22,9 +22,132 @@ function setText(id, text) {
   }
 }
 
+const originalWindowAlert = typeof window !== "undefined" && typeof window.alert === "function"
+  ? window.alert.bind(window)
+  : null;
+
+const noticeDialogMeta = {
+  success: {
+    title: "操作成功",
+    label: "SUCCESS"
+  },
+  warning: {
+    title: "請注意",
+    label: "NOTICE"
+  },
+  error: {
+    title: "無法完成操作",
+    label: "ERROR"
+  },
+  info: {
+    title: "系統提示",
+    label: "INFO"
+  }
+};
+
 function showNotice(element, type, message) {
-  if (!element) return;
-  element.innerHTML = `<div class="notice ${type}">${escapeHtml(message)}</div>`;
+  if (element) {
+    element.innerHTML = "";
+  }
+
+  showDialogNotice(type, message);
+}
+
+function showDialogNotice(type = "info", message = "") {
+  const dialog = ensureNoticeDialog();
+  const safeType = noticeDialogMeta[type] ? type : "info";
+  const meta = noticeDialogMeta[safeType];
+
+  if (!dialog) {
+    if (originalWindowAlert) {
+      originalWindowAlert(String(message || ""));
+    }
+    return;
+  }
+
+  dialog.className = `notice-dialog ${safeType}`;
+  dialog.querySelector(".notice-dialog-label").textContent = meta.label;
+  dialog.querySelector(".notice-dialog-title").textContent = meta.title;
+  dialog.querySelector(".notice-dialog-message").textContent = String(message || "");
+
+  if (typeof dialog.showModal === "function") {
+    if (dialog.open) {
+      dialog.close();
+    }
+    dialog.showModal();
+  } else {
+    dialog.setAttribute("open", "");
+    dialog.classList.add("is-open");
+  }
+
+  const actionButton = dialog.querySelector(".notice-dialog-action");
+  if (actionButton) {
+    actionButton.focus();
+  }
+}
+
+function ensureNoticeDialog() {
+  if (typeof document === "undefined" || !document.body) return null;
+
+  let dialog = document.getElementById("appNoticeDialog");
+  if (dialog) return dialog;
+
+  dialog = document.createElement("dialog");
+  dialog.id = "appNoticeDialog";
+  dialog.className = "notice-dialog info";
+  dialog.innerHTML = `
+    <div class="notice-dialog-card">
+      <div class="notice-dialog-accent" aria-hidden="true"></div>
+      <div class="notice-dialog-content">
+        <span class="notice-dialog-label">INFO</span>
+        <h3 class="notice-dialog-title">系統提示</h3>
+        <p class="notice-dialog-message"></p>
+      </div>
+      <button type="button" class="notice-dialog-close" aria-label="關閉提示" onclick="closeNoticeDialog()">&times;</button>
+      <button type="button" class="primary-btn notice-dialog-action" onclick="closeNoticeDialog()">知道了</button>
+    </div>
+  `;
+
+  dialog.addEventListener("click", event => {
+    if (event.target === dialog) {
+      closeNoticeDialog();
+    }
+  });
+
+  document.body.appendChild(dialog);
+  return dialog;
+}
+
+function closeNoticeDialog() {
+  const dialog = document.getElementById("appNoticeDialog");
+  if (!dialog) return;
+
+  if (typeof dialog.close === "function" && dialog.open) {
+    dialog.close();
+  } else {
+    dialog.removeAttribute("open");
+    dialog.classList.remove("is-open");
+  }
+}
+
+function installDialogAlert() {
+  if (typeof window === "undefined" || window.__dialogAlertInstalled) return;
+  window.__dialogAlertInstalled = true;
+  window.alert = function dialogAlert(message) {
+    showDialogNotice("info", message);
+  };
+}
+
+if (typeof document !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      ensureNoticeDialog();
+      installDialogAlert();
+    });
+  } else {
+    ensureNoticeDialog();
+    installDialogAlert();
+  }
 }
 
 function escapeHtml(text) {
@@ -130,6 +253,15 @@ function showSection(id, btn) {
   document.querySelectorAll("section").forEach(section => {
     section.classList.remove("active");
   });
+
+  const isAdminUser = typeof isAdmin === "function"
+    ? isAdmin()
+    : Boolean(isLoggedIn && currentUser && currentUser.role === "admin");
+  const adminHiddenSections = ["itinerary", "train", "favorite", "cart"];
+  if (isAdminUser && adminHiddenSections.includes(id)) {
+    id = "admin";
+    btn = null;
+  }
 
   let targetSection = document.getElementById(id);
 

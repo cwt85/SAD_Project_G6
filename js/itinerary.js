@@ -2232,14 +2232,15 @@ function addSystemItemToItinerary(data = {}) {
 function integrateLodgingOrderToItinerary(order) {
   if (!order || typeof addSystemItemToItinerary !== "function") return null;
   const room = typeof findRoom === "function" ? findRoom(order.roomId) : null;
-  const checkInTime = room?.checkInTime || "15:00";
+  const checkInTime = order.checkInTime || room?.checkInTime || "15:00";
+  const checkOutTime = order.checkOutTime || room?.checkOutTime || "11:00";
 
   return addSystemItemToItinerary({
     name: `${order.roomName}（${order.roomTypeName || "住宿"}）`,
     type: "住宿",
     date: order.checkIn,
     time: checkInTime,
-    endTime: "11:00",
+    endTime: checkOutTime,
     estimatedCost: Number(order.amount || 0),
     sourceModule: "B",
     sourceId: `lodging-${order.id}`,

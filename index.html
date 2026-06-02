@@ -33,20 +33,21 @@
     <p>整合行程規劃、住宿訂房與火車票務，讓旅程安排、付款取票與協作討論集中管理。</p>
   </header>
 
-
+  <div id="bonusPointBar" class="bonus-point-bar"></div>
 
   <nav>
     <button data-section="home" class="active" onclick="showSection('home', this)">旅程首頁</button>
     <button data-section="itinerary" onclick="enterItinerarySection(this)">行程規劃</button>
     <button data-section="search" onclick="showSection('search', this)">住宿訂房</button>
     <button data-section="train" onclick="showSection('train', this)">火車票務</button>
-    <button data-section="cart" onclick="showSection('cart', this)">收藏 / 購物車</button>
+    <button data-section="favorite" onclick="showSection('favorite', this)">收藏清單</button>
+    <button data-section="cart" onclick="showSection('cart', this)">購物車</button>
     <button data-section="orders" onclick="showSection('orders', this)">歷史訂單</button>
     <button data-section="admin" onclick="showSection('admin', this)">管理員後台</button>
     <button data-section="chat" onclick="showSection('chat', this)">協作聊天室</button>
     <button data-section="login" onclick="showSection('login', this)">登入 / 註冊</button>
   </nav>
-  <div id="bonusPointBar" class="bonus-point-bar"></div>
+
   <main>
     <section id="home" class="active">
       <div class="home-hero panel">
@@ -336,55 +337,133 @@
     </section>
 
     <section id="search">
-      <div class="panel">
-        <h2>搜尋與篩選台東民宿</h2>
-        <div class="grid">
-          <div>
-            <label for="checkIn">入住日期</label>
-            <input id="checkIn" type="date" />
+      <div class="booking-search-layout">
+        <aside class="panel booking-search-panel">
+          <div class="booking-search-heading">
+            <span>住宿訂房</span>
+            <h2>搜尋與篩選</h2>
+            <p>先設定入住資訊，再用房型、距離與評價縮小結果。</p>
           </div>
-          <div>
-            <label for="checkOut">退房日期</label>
-            <input id="checkOut" type="date" />
+
+          <div class="booking-filter-section">
+            <div class="booking-filter-title">入住資訊</div>
+            <div class="booking-date-picker">
+              <div class="date-range-item">
+                <span class="date-range-marker">IN</span>
+                <div class="date-range-fields">
+                  <div>
+                    <label for="checkIn">入住日期</label>
+                    <input id="checkIn" type="date" />
+                  </div>
+                  <div>
+                    <label for="checkInTime">入住時間</label>
+                    <input id="checkInTime" type="time" value="15:00" />
+                  </div>
+                </div>
+              </div>
+              <div class="date-range-connector">至</div>
+              <div class="date-range-item">
+                <span class="date-range-marker">OUT</span>
+                <div class="date-range-fields">
+                  <div>
+                    <label for="checkOut">退房日期</label>
+                    <input id="checkOut" type="date" />
+                  </div>
+                  <div>
+                    <label for="checkOutTime">退房時間</label>
+                    <input id="checkOutTime" type="time" value="11:00" />
+                  </div>
+                </div>
+              </div>
+              <div id="bookingDateSummary" class="booking-date-summary">請選擇入住與退房日期</div>
+              <div class="booking-guests-field">
+                <label for="guests">人數</label>
+                <input id="guests" type="number" min="1" value="2" />
+              </div>
+            </div>
           </div>
-          <div>
-            <label for="guests">人數</label>
-            <input id="guests" type="number" min="1" value="2" />
+
+          <div class="booking-filter-section">
+            <div class="booking-filter-title">房源條件</div>
+            <div class="booking-filter-grid">
+              <div>
+                <label for="maxPrice">最高價格</label>
+                <input id="maxPrice" type="number" min="0" placeholder="例如 5000" />
+              </div>
+              <div>
+                <label for="roomTypePreference">房型偏好</label>
+                <select id="roomTypePreference">
+                  <option value="">不限</option>
+                  <option value="標準">標準雙人房</option>
+                  <option value="景觀">景觀四人房</option>
+                  <option value="家庭">家庭六人房</option>
+                </select>
+              </div>
+              <div>
+                <label for="stationDistanceFilter">距離車站</label>
+                <select id="stationDistanceFilter">
+                  <option value="">不限</option>
+                  <option value="5">5 分鐘內</option>
+                  <option value="10">10 分鐘內</option>
+                  <option value="15">15 分鐘內</option>
+                  <option value="20">20 分鐘內</option>
+                </select>
+              </div>
+              <div>
+                <label for="locationFilter">地點</label>
+                <select id="locationFilter">
+                  <option value="">不限</option>
+                  <option value="臺東縣">臺東縣</option>
+                </select>
+              </div>
+              <div>
+                <label for="ratingFilter">最低評價</label>
+                <select id="ratingFilter">
+                  <option value="0">不限</option>
+                  <option value="4">4 星以上</option>
+                  <option value="4.5">4.5 星以上</option>
+                </select>
+              </div>
+            </div>
           </div>
-          <div>
-            <label for="maxPrice">最高價格</label>
-            <input id="maxPrice" type="number" min="0" placeholder="例如 5000" />
+
+          <div class="actions booking-filter-actions">
+            <button class="primary-btn" onclick="searchRooms()">執行搜尋</button>
+            <button class="secondary-btn" onclick="resetSearch()">重設條件</button>
           </div>
-          <div>
-            <label for="locationFilter">地點</label>
-            <select id="locationFilter">
-              <option value="">不限</option>
-              <option value="臺東縣">臺東縣</option>
-            </select>
+          <div id="searchNotice"></div>
+        </aside>
+
+        <div class="booking-results-panel">
+          <div class="panel room-list-toolbar">
+            <div>
+              <h2>房源列表</h2>
+              <p id="roomResultSummary">載入房源中...</p>
+            </div>
+            <div class="room-page-size-control">
+              <label for="roomPageSizeSelect">每頁顯示</label>
+              <select id="roomPageSizeSelect" onchange="updateRoomPageSize(this.value)">
+                <option value="5">5 筆</option>
+                <option value="10" selected>10 筆</option>
+                <option value="20">20 筆</option>
+                <option value="50">50 筆</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label for="ratingFilter">最低評價</label>
-            <select id="ratingFilter">
-              <option value="0">不限</option>
-              <option value="4">4 星以上</option>
-              <option value="4.5">4.5 星以上</option>
-            </select>
-          </div>
+          <div id="roomList" class="card-list"></div>
+          <div id="roomPagination" class="room-pagination"></div>
         </div>
-        <div class="actions">
-          <button class="primary-btn" onclick="searchRooms()">執行搜尋</button>
-          <button class="secondary-btn" onclick="resetSearch()">重設條件</button>
-        </div>
-        <div id="searchNotice"></div>
       </div>
-      <div id="roomList" class="card-list"></div>
     </section>
 
-    <section id="cart">
+    <section id="favorite">
       <div class="panel">
         <h2>收藏清單</h2>
         <div id="favoriteList"></div>
       </div>
+    </section>
+
+    <section id="cart">
       <div class="panel">
         <h2>購物車清單</h2>
         <div id="cartList"></div>
@@ -399,7 +478,34 @@
     </section>
 
     <section id="admin">
-      <div class="panel">
+      <div class="admin-shell">
+        <aside class="admin-sidebar panel" aria-label="管理員後台功能">
+          <div class="admin-sidebar-title">
+            <span>後台工作台</span>
+            <h2>管理員後台</h2>
+            <p>集中管理房源、價格、歷史紀錄與客服訊息。</p>
+          </div>
+          <button class="admin-nav-btn active" data-admin-panel="rooms" onclick="switchAdminPanel('rooms')">
+            <strong>房源資訊管理</strong>
+            <span>新增、修改、刪除房源與房型</span>
+          </button>
+          <button class="admin-nav-btn" data-admin-panel="pricing" onclick="switchAdminPanel('pricing')">
+            <strong>定價與折扣管理</strong>
+            <span>設定平日、假日、特殊價與折扣</span>
+          </button>
+          <button class="admin-nav-btn" data-admin-panel="history" onclick="switchAdminPanel('history')">
+            <strong>歷史定價紀錄</strong>
+            <span>依房源、房型、日期查詢修改紀錄</span>
+          </button>
+          <button class="admin-nav-btn" data-admin-panel="service" onclick="switchAdminPanel('service')">
+            <strong>客服訊息中心</strong>
+            <span>查看使用者對話並即時回覆</span>
+          </button>
+        </aside>
+
+        <div class="admin-workspace">
+          <div class="admin-section-panel active" data-admin-panel-content="rooms">
+            <div class="panel">
         <h2>管理員：新增 / 更新房源</h2>
         <div class="grid">
           <div>
@@ -434,12 +540,20 @@
             <input id="adminCapacity" type="number" min="1" value="2" />
           </div>
           <div>
-            <label for="adminCheckInTime">入住時間</label>
-            <input id="adminCheckInTime" placeholder="例如 15:00" />
+            <label for="adminStationDistance">距離車站</label>
+            <input id="adminStationDistance" placeholder="例如 8 分鐘" />
           </div>
         </div>
 
         <div class="grid">
+          <div>
+            <label for="adminCheckInTime">入住時間</label>
+            <input id="adminCheckInTime" type="time" value="15:00" />
+          </div>
+          <div>
+            <label for="adminCheckOutTime">退房時間</label>
+            <input id="adminCheckOutTime" type="time" value="11:00" />
+          </div>
           <div>
             <label for="adminBookingStart">可訂房起始</label>
             <input id="adminBookingStart" type="date" />
@@ -448,6 +562,9 @@
             <label for="adminBookingEnd">可訂房結束</label>
             <input id="adminBookingEnd" type="date" />
           </div>
+        </div>
+
+        <div class="grid">
           <div>
             <label for="adminFacilities">設備服務</label>
             <input id="adminFacilities" placeholder="例如 Wi-Fi, 早餐, 停車場" />
@@ -502,12 +619,14 @@
         <div id="adminNotice"></div>
       </div>
 
-      <div class="panel">
-        <h3>房源管理列表</h3>
-        <div id="adminRoomList"></div>
-      </div>
+            <div class="panel">
+              <h3>房源管理列表</h3>
+              <div id="adminRoomList"></div>
+            </div>
+          </div>
 
-      <div class="panel">
+          <div class="admin-section-panel" data-admin-panel-content="pricing">
+            <div class="panel">
         <h2>定價與折扣管理</h2>
         <div class="grid">
           <div>
@@ -568,10 +687,12 @@
             <button class="primary-btn" onclick="savePricingSettings()">儲存定價</button>
           </div>
         </div>
-        <div id="pricingResult"></div>
-      </div>
+              <div id="pricingResult"></div>
+            </div>
+          </div>
 
-      <div class="panel">
+          <div class="admin-section-panel" data-admin-panel-content="history">
+            <div class="panel">
         <h2>歷史定價紀錄查詢</h2>
         <div class="grid">
           <div>
@@ -594,12 +715,15 @@
         <div class="actions">
           <button class="secondary-btn" onclick="queryPricingHistory()">查詢紀錄</button>
         </div>
-        <div id="pricingHistoryResult"></div>
-      </div>
+              <div id="pricingHistoryResult"></div>
+            </div>
+          </div>
 
-      <!-- ===== 管理員客服訊息中心 ===== -->
-      <div class="panel" id="adminChatPanel">
+          <div class="admin-section-panel" data-admin-panel-content="service">
+            <!-- ===== 管理員客服訊息中心 ===== -->
+            <div class="panel" id="adminChatPanel">
         <h2>📨 客服訊息中心</h2>
+        <div class="admin-chat-stats" id="adminChatStats"></div>
         <div class="admin-chat-container">
           <div class="admin-chat-users" id="adminChatUserList">
             <div class="admin-chat-users-header">使用者列表</div>
@@ -622,6 +746,9 @@
             <div class="admin-chat-conv-input" id="adminChatConvInput" style="display:none;">
               <input id="adminChatInput" placeholder="回覆訊息..." />
               <button class="primary-btn chat-send-btn" onclick="adminSendMessage()">回覆</button>
+            </div>
+          </div>
+        </div>
             </div>
           </div>
         </div>
@@ -755,5 +882,6 @@
       </div>
     </section>
   </main>
+  <button id="backToTopBtn" class="back-to-top-btn" onclick="scrollToTop()" aria-label="回到頁面頂部" title="回到頂部">↑</button>
 </body>
 </html>

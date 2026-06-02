@@ -35,6 +35,7 @@ let userBonusPoints = {};
 let userBonusAwardedMilestones = {};
 let bonusPointRecords = [];
 let trainWaitingList = [];
+let manualReviewQueue = [];
 
 // 房源相關
 let rooms = [];
@@ -48,6 +49,7 @@ let pricingRecords = [];
 // 常數
 const VERIFICATION_CODE_EXPIRE_MS = 5 * 60 * 1000;
 const APP_STORAGE_KEY = "taitungBookingData";
+const MAX_ROOM_DATASET_SIZE = 50;
 const defaultRoomImages = [
   "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80",
   "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80",
@@ -82,7 +84,8 @@ function saveAppData() {
       userBonusPoints,
       userBonusAwardedMilestones,
       bonusPointRecords,
-      trainWaitingList
+      trainWaitingList,
+      manualReviewQueue
     }));
   } catch (error) {
     console.error("系統資料儲存失敗：", error);
@@ -95,6 +98,8 @@ function loadAppData() {
     if (!savedData) return;
 
     const data = JSON.parse(savedData);
+    let shouldRefreshStoredRooms = false;
+
     favorites = Array.isArray(data.favorites) ? data.favorites : [];
     cart = Array.isArray(data.cart) ? data.cart : [];
     orders = Array.isArray(data.orders) ? data.orders : [];
@@ -114,6 +119,7 @@ function loadAppData() {
       ? data.userBonusAwardedMilestones
       : {};
     bonusPointRecords = Array.isArray(data.bonusPointRecords) ? data.bonusPointRecords : [];
+    manualReviewQueue = Array.isArray(data.manualReviewQueue) ? data.manualReviewQueue : [];
 
     if (
       currentUser &&
@@ -130,8 +136,18 @@ function loadAppData() {
       ? data.selectedRoomTypes
       : {};
 
-    if (Array.isArray(data.rooms) && data.rooms.length > 0) {
-      rooms = data.rooms;
+    if (Array.isArray(data.rooms) && data.rooms.length > 0 && data.rooms.length <= MAX_ROOM_DATASET_SIZE) {
+      rooms = data.rooms.map(room => ({
+        ...room,
+        checkInTime: room.checkInTime || "15:00",
+        checkOutTime: room.checkOutTime || "11:00"
+      }));
+    } else if (Array.isArray(data.rooms) && data.rooms.length > MAX_ROOM_DATASET_SIZE) {
+      shouldRefreshStoredRooms = true;
+    }
+
+    if (shouldRefreshStoredRooms) {
+      saveAppData();
     }
   } catch (error) {
     console.error("系統資料讀取失敗：", error);

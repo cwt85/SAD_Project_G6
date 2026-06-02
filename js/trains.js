@@ -1196,7 +1196,7 @@ function awardPlatformConsumptionBonus() {
   trainBonusAwardedMilestones = milestones;
   return `已達平台 ${milestones * 5} 次消費，自動核發 ${points} 點無期限紅利。`;
 }
-function refreshTrainBonusDisplay() {
+function refreshTrainBonusDisplayLegacy() {
   const bonusPoints = typeof getCurrentBonusPoints === "function"
     ? Number(getCurrentBonusPoints() || 0)
     : Number(trainBonusPoints || 0);
@@ -1230,7 +1230,7 @@ function refreshTrainBonusDisplay() {
   }
 }
 
-function createTrainOrder() {
+function createTrainOrderLegacy() {
   if (!requireCustomer()) return;
 
   const result = getSelectedTrainResult();
@@ -1401,7 +1401,7 @@ function createTrainOrder() {
   );
 }
 
-function payTrainOrder(orderId) {
+function payTrainOrderLegacy(orderId) {
   if (!requireCustomer()) return;
 
   const order = findTrainOrder(orderId);

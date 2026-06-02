@@ -7,6 +7,7 @@ async function initializeApp() {
   console.log("應用程式初始化中...");
 
   initAuth();
+  initBackToTopButton();
 
   await loadRooms();
   loadAppData();
@@ -56,17 +57,20 @@ function updateNavigation() {
   const trainBtn = document.querySelector('nav button[data-section="train"]');
   const homeBtn = document.querySelector('nav button[data-section="home"]');
   const chatBtn = document.querySelector('nav button[data-section="chat"]');
+  const isAdminUser = typeof isAdmin === "function"
+    ? isAdmin()
+    : Boolean(isLoggedIn && currentUser && currentUser.role === "admin");
 
   if (adminBtn) {
-    adminBtn.style.display = !isLoggedIn || currentUser.role !== "admin" ? "none" : "block";
+    adminBtn.style.display = isAdminUser ? "block" : "none";
   }
 
   if (favoriteBtn) {
-    favoriteBtn.style.display = !isLoggedIn ? "none" : "block";
+    favoriteBtn.style.display = !isLoggedIn || isAdminUser ? "none" : "block";
   }
 
   if (cartBtn) {
-    cartBtn.style.display = !isLoggedIn ? "none" : "block";
+    cartBtn.style.display = !isLoggedIn || isAdminUser ? "none" : "block";
   }
 
   if (orderBtn) {
@@ -74,20 +78,33 @@ function updateNavigation() {
   }
 
   if (itineraryBtn) {
-    itineraryBtn.style.display = "block";
+    itineraryBtn.style.display = isAdminUser ? "none" : "block";
   }
 
   if (trainBtn) {
-    trainBtn.style.display = "block";
+    trainBtn.style.display = isAdminUser ? "none" : "block";
   }
 
   if (homeBtn) {
     homeBtn.style.display = "block";
   }
 
-  // 購物車按鈕標籤
-  if (cartBtn && isLoggedIn && cart.length > 0) {
-    cartBtn.innerHTML = `購物車 <span class="badge">${cart.length}</span>`;
+  const currentUserId = currentUser ? String(currentUser.id) : "";
+  const favoriteCount = isLoggedIn && currentUser
+    ? favorites.filter(item => String(item.userId || currentUser.id) === currentUserId).length
+    : 0;
+  const cartCount = isLoggedIn && currentUser
+    ? cart.filter(item => String(item.userId || currentUser.id) === currentUserId).length
+    : 0;
+
+  if (favoriteBtn && isLoggedIn && favoriteCount > 0) {
+    favoriteBtn.innerHTML = `收藏清單 <span class="badge">${favoriteCount}</span>`;
+  } else if (favoriteBtn) {
+    favoriteBtn.innerHTML = "收藏清單";
+  }
+
+  if (cartBtn && isLoggedIn && cartCount > 0) {
+    cartBtn.innerHTML = `購物車 <span class="badge">${cartCount}</span>`;
   } else if (cartBtn) {
     cartBtn.innerHTML = "購物車";
   }
@@ -197,6 +214,15 @@ function showSection(id, btn) {
     section.classList.remove("active");
   });
 
+  const isAdminUser = typeof isAdmin === "function"
+    ? isAdmin()
+    : Boolean(isLoggedIn && currentUser && currentUser.role === "admin");
+  const adminHiddenSections = ["itinerary", "train", "favorite", "cart"];
+  if (isAdminUser && adminHiddenSections.includes(id)) {
+    id = "admin";
+    btn = null;
+  }
+
   let targetSection = document.getElementById(id);
 
   if (id === "admin" && (!currentUser || currentUser.role !== "admin")) {
@@ -230,6 +256,26 @@ function showSection(id, btn) {
   }
 
   renderAll();
+}
+
+function initBackToTopButton() {
+  if (typeof window === "undefined") return;
+  updateBackToTopButton();
+  window.addEventListener("scroll", updateBackToTopButton, { passive: true });
+}
+
+function updateBackToTopButton() {
+  const button = document.getElementById("backToTopBtn");
+  if (!button || typeof window === "undefined") return;
+  button.classList.toggle("visible", Number(window.scrollY || 0) > 260);
+}
+
+function scrollToTop() {
+  if (typeof window === "undefined") return;
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 }
 
 // ===== 頁面載入完成後初始化 =====
