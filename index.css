@@ -821,6 +821,7 @@ textarea {
   box-shadow: 0 14px 30px rgba(79, 124, 255, 0.24);
 }
 
+
 .notice-dialog.success .notice-dialog-accent {
   background: linear-gradient(135deg, #16a34a, #22c55e);
 }
@@ -5108,4 +5109,5 @@ td small {
   font-weight: 500;
   margin-left: 8px;
   color: var(--text-muted);
+}
 }
