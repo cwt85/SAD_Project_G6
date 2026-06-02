@@ -3709,3 +3709,74 @@ td small {
     align-items: flex-start;
   }
 }
+/* =========================================================
+   手動選座位系統
+========================================================= */
+
+.train-seat-map-section {
+  grid-column: 1 / -1;
+  padding: 14px 0 4px;
+}
+
+.train-seat-map {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  background: rgba(255,255,255,0.45);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+}
+
+.train-seat-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.train-seat {
+  width: 44px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(79,124,255,0.35);
+  background: rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+  user-select: none;
+}
+
+.train-seat:hover:not(.booked) {
+  background: rgba(79,124,255,0.15);
+  border-color: var(--blue);
+}
+
+.train-seat.selected {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+
+.train-seat.booked {
+  background: rgba(0,0,0,0.08);
+  border-color: rgba(0,0,0,0.12);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.train-seat-aisle {
+  width: 20px;
+}
+
+.train-seat-selected-text {
+  font-size: 13px;
+  font-weight: 500;
+  margin-left: 8px;
+  color: var(--text-muted);
+}

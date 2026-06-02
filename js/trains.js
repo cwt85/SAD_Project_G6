@@ -304,12 +304,17 @@ function renderTrainBookingPanel() {
         </div>
         <div>
           <label for="trainSeatPreference">座位偏好</label>
-          <select id="trainSeatPreference">
+          <select id="trainSeatPreference" onchange="toggleTrainSeatMap()">
             <option value="none">系統自動分配</option>
             <option value="window">靠窗</option>
             <option value="aisle">走道</option>
             <option value="quiet">安靜車廂</option>
+            <option value="manual">手動選位</option>
           </select>
+        </div>
+        <div id="trainSeatMapSection" style="display:none;" class="train-seat-map-section">
+          <label>座位圖　<span id="trainSelectedSeatsDisplay" class="train-seat-selected-text">尚未選擇</span></label>
+          <div id="trainSeatMapContainer" class="train-seat-map"></div>
         </div>
         <div>
           <label for="trainPaymentMethod">付款方式</label>
@@ -1305,7 +1310,18 @@ function createTrainOrder() {
     }
   }
 
-  const seat = assignTrainSeats(result, seatPreference, quantity);
+  // 手動選位：使用座位圖選取結果，否則由系統分配
+  let seat;
+  if (seatPreference === "manual") {
+    if (trainManualSelectedSeats.length < quantity) {
+      alert(`請在座位圖中選取 ${quantity} 個座位（目前已選 ${trainManualSelectedSeats.length} 個）。`);
+      return;
+    }
+    const manualSeats = trainManualSelectedSeats.slice(0, quantity);
+    seat = { seats: manualSeats, warning: "" };
+  } else {
+    seat = assignTrainSeats(result, seatPreference, quantity);
+  }
   const departAt = getTrainDateTime(result.travelDate, result.departTime);
   const paymentDueAt = new Date(departAt.getTime() - 20 * 60 * 1000);
 
@@ -1433,4 +1449,98 @@ function payTrainOrder(orderId) {
   }
 
   alert(`付款成功，可至 ${order.pickupMethod} 取票。${bonusNotice ? `\n${bonusNotice}` : ""}`);
+}
+
+/* =========================================================
+   手動選座位系統（整合自 master ticket.js）
+========================================================= */
+
+// 記錄使用者在座位圖中手動選取的座位
+let trainManualSelectedSeats = [];
+
+// 座位偏好下拉改變時，決定是否顯示座位圖
+function toggleTrainSeatMap() {
+  const preference = getValue("trainSeatPreference");
+  const section = document.getElementById("trainSeatMapSection");
+  if (!section) return;
+
+  if (preference === "manual") {
+    section.style.display = "";
+    renderTrainSeatMap(); // 顯示時才產生座位圖
+  } else {
+    section.style.display = "none";
+    clearTrainSeats();   // 切回自動模式時清除已選座位
+  }
+}
+
+// 依購票張數產生隨機座位圖（6 排 × A/B/C/D 共 24 格）
+function renderTrainSeatMap() {
+  const container = document.getElementById("trainSeatMapContainer");
+  if (!container || container.innerHTML.trim() !== "") return; // 避免重複產生
+
+  const rows = 6;
+  const cols = ["A", "B", "C", "D"];
+  let html = "";
+
+  for (let i = 1; i <= rows; i++) {
+    html += `<div class="train-seat-row">`;
+    cols.forEach(col => {
+      // 隨機 30% 已售出
+      const isBooked = Math.random() < 0.3;
+      const seatId = `${i}${col}`;
+      const cls = isBooked ? "train-seat booked" : "train-seat";
+      const click = isBooked ? "" : `onclick="selectTrainSeat(this, '${seatId}')"`;
+      html += `<div class="${cls}" ${click}>${seatId}</div>`;
+      if (col === "B") html += `<div class="train-seat-aisle"></div>`; // 走道
+    });
+    html += `</div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+// 點擊座位：選取 / 取消選取
+function selectTrainSeat(el, seatId) {
+  if (el.classList.contains("booked")) return;
+
+  const maxSeats = parseInt(getValue("trainTicketQuantity") || "1");
+
+  if (el.classList.contains("selected")) {
+    // 取消選取
+    el.classList.remove("selected");
+    trainManualSelectedSeats = trainManualSelectedSeats.filter(s => s !== seatId);
+  } else {
+    // 超過張數限制
+    if (trainManualSelectedSeats.length >= maxSeats) {
+      alert(`您選擇了 ${maxSeats} 張票，無法再選更多座位。\n若需更多，請先調整「購票張數」。`);
+      return;
+    }
+    el.classList.add("selected");
+    trainManualSelectedSeats.push(seatId);
+  }
+
+  updateTrainSeatDisplay();
+}
+
+// 更新已選座位文字顯示
+function updateTrainSeatDisplay() {
+  const display = document.getElementById("trainSelectedSeatsDisplay");
+  if (!display) return;
+  if (trainManualSelectedSeats.length === 0) {
+    display.textContent = "尚未選擇";
+    display.style.color = "";
+  } else {
+    display.textContent = trainManualSelectedSeats.join("、");
+    display.style.color = "#b45309";
+  }
+}
+
+// 清除所有手動選座（切換偏好或重設時呼叫）
+function clearTrainSeats() {
+  trainManualSelectedSeats = [];
+  document.querySelectorAll(".train-seat.selected").forEach(el => el.classList.remove("selected"));
+  updateTrainSeatDisplay();
+  // 清空容器讓下次重新產生（避免售出狀態過時）
+  const container = document.getElementById("trainSeatMapContainer");
+  if (container) container.innerHTML = "";
 }
