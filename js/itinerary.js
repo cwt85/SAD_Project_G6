@@ -1161,7 +1161,7 @@ function renderVotingPanel(itinerary) {
                   <div class="inline-control compact">
                     <input id="voteNewOption-${vote.id}" placeholder="新增選項" />
                     <button class="secondary-btn" onclick="addVoteOption('${itinerary.id}', '${vote.id}')">加入</button>
-                    ${isOwner ? `<button class="danger-btn" onclick="closeItineraryVote('${itinerary.id}', '${vote.id}')">結束投票</button>` : ""}
+                    ${isVoteCreator(vote) ? `<button class="danger-btn" onclick="closeItineraryVote('${itinerary.id}', '${vote.id}')">結束投票</button>` : ""}
                   </div>
                 ` : ""}
               </div>
@@ -1187,7 +1187,7 @@ function renderVotingPanel(itinerary) {
                       ${!ended ? `
                         <div class="actions">
                           <button class="${hasVoted ? "danger-btn" : "secondary-btn"}" onclick="toggleVoteOption('${itinerary.id}', '${vote.id}', '${option.id}')">${hasVoted ? "取消" : "投票"}</button>
-                          ${isOwner ? `<button class="danger-btn" onclick="deleteVoteOption('${itinerary.id}', '${vote.id}', '${option.id}')">刪除</button>` : ""}
+                          ${isVoteCreator(vote) ? `<button class="danger-btn" onclick="deleteVoteOption('${itinerary.id}', '${vote.id}', '${option.id}')">刪除</button>` : ""}
                         </div>
                       ` : ""}
                     </div>
@@ -1807,6 +1807,7 @@ function createItineraryVote(itineraryId) {
     title,
     options: [{ id: createItineraryId("opt"), name: optionName, voterIds: [] }],
     createdById: currentUser.id,
+    createdByAccount: currentUser.account,  // 用 account 比對更穩定
     createdAt: nowText(),
     ...(deadline ? { deadline } : {})
   };
@@ -1876,13 +1877,13 @@ function toggleVoteOption(itineraryId, voteId, optionId) {
 
 function deleteVoteOption(itineraryId, voteId, optionId) {
   const itinerary = findItinerary(itineraryId);
-  if (!itinerary || !isItineraryOwner(itinerary)) {
-    alert("只有主邀約人可以刪除投票選項。");
-    return;
-  }
+  if (!itinerary) return;
 
   const vote = findVote(itinerary, voteId);
-  if (!vote) return;
+  if (!isVoteCreator(vote)) {
+    alert("只有建立投票的人可以刪除投票選項。");
+    return;
+  }
 
   const option = vote.options.find(item => item.id === optionId);
   vote.options = vote.options.filter(item => item.id !== optionId);
@@ -1900,6 +1901,13 @@ function isVoteEnded(vote) {
   return false;
 }
 
+// 判斷目前登入者是否為投票建立者（account 優先，id 為備援）
+function isVoteCreator(vote) {
+  if (!currentUser || !vote) return false;
+  if (vote.createdByAccount && currentUser.account === vote.createdByAccount) return true;
+  return String(currentUser.id) === String(vote.createdById);
+}
+
 // 取得票數最多的勝出選項，平手時回傳第一個，無人投票回傳 null
 function getVoteWinner(vote) {
   const options = vote.options || [];
@@ -1909,15 +1917,15 @@ function getVoteWinner(vote) {
   return options.find(opt => (opt.voterIds || []).length === maxVotes) || null;
 }
 
-// 發起人手動結束投票
+// 建立投票的人可以手動結束投票
 function closeItineraryVote(itineraryId, voteId) {
   const itinerary = findItinerary(itineraryId);
-  if (!itinerary || !isItineraryOwner(itinerary)) {
-    alert("只有發起人可以結束投票。");
+  if (!itinerary) return;
+  const vote = findVote(itinerary, voteId);
+  if (!isVoteCreator(vote)) {
+    alert("只有建立投票的人可以結束投票。");
     return;
   }
-  const vote = findVote(itinerary, voteId);
-  if (!vote) return;
 
   if (!confirm(`確定要結束投票「${vote.title}」嗎？結束後將無法繼續投票。`)) return;
 
