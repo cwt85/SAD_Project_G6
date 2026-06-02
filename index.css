@@ -811,6 +811,8 @@ textarea {
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
+}
+
 .notice-dialog-accent {
   width: 52px;
   height: 52px;

@@ -707,6 +707,13 @@ function addPlaceToItinerary(place) {
   touchItinerary(itinerary);
   saveAppData();
   renderAll();
+
+  // 加入後檢查是否超出預算，僅提示不阻擋
+  const totalAfter = getItineraryTotalCost(itinerary);
+  if (Number(itinerary.budgetLimit) > 0 && totalAfter > Number(itinerary.budgetLimit)) {
+    alert(`提醒：加入「${item.name}」後，累積花費 NT$${totalAfter.toLocaleString()} 已超過預算上限 NT$${Number(itinerary.budgetLimit).toLocaleString()}。`);
+  }
+
   ItineraryEventBus.emit("spot:added", { itinerary, day, item });
 }
 
@@ -1563,6 +1570,9 @@ function removeItineraryItem(dayNumber, itemId) {
 
   const index = day.items.findIndex(item => item.id === itemId);
   if (index < 0) return;
+
+  // 刪除前請使用者確認
+  if (!confirm(`確定要刪除「${day.items[index].name}」嗎？此操作無法還原。`)) return;
 
   const [removed] = day.items.splice(index, 1);
   const conflict = recordCompanionUpdate(itinerary, {
