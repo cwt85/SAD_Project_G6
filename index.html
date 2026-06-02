@@ -805,37 +805,25 @@
               <label for="accountInput">Email 或手機號碼</label>
               <input id="accountInput" placeholder="example@mail.com / 0912345678" />
             </div>
-            <div id="passwordGroup" style="display:none;">
+            <div id="passwordGroup">
               <label for="passwordInput">密碼</label>
               <div class="password-field">
-                <input id="passwordInput" type="password" placeholder="管理員密碼" />
+                <input id="passwordInput" type="password" placeholder="請輸入密碼" />
                 <button type="button" class="toggle-pw-btn" onclick="togglePasswordVisibility('passwordInput', this)">顯示</button>
               </div>
             </div>
-            <div id="codeGroup">
-              <label for="verifyCode">驗證碼</label>
-              <input id="verifyCode" placeholder="輸入驗證碼" />
-            </div>
           </div>
           <div class="actions">
-            <button id="sendCodeBtn" class="secondary-btn" onclick="sendCode()">發送驗證碼</button>
             <button class="primary-btn" onclick="login()">完成登入</button>
           </div>
           <div class="notice info">
-            管理員預設帳號：admin@example.com<br />密碼：Admin1234
+            管理員請使用既有後台帳號登入，前台不提供管理員註冊。
           </div>
         </div>
 
         <!-- ===== 註冊表單 ===== -->
         <div id="registerForm" class="auth-form">
           <div class="grid">
-            <div>
-              <label>註冊身份</label>
-              <div class="radio-row">
-                <label><input type="radio" name="registerRole" value="customer" checked onchange="updateRegisterMode()" /> 顧客</label>
-                <label><input type="radio" name="registerRole" value="admin" onchange="updateRegisterMode()" /> 管理員</label>
-              </div>
-            </div>
             <div>
               <label for="regDisplayName">顯示名稱</label>
               <input id="regDisplayName" placeholder="例如：小明" />
@@ -844,13 +832,9 @@
               <label for="regAccount">Email 或手機號碼</label>
               <input id="regAccount" placeholder="example@mail.com / 0912345678" />
             </div>
-            <div>
-              <label for="regVerifyCode">驗證碼</label>
-              <input id="regVerifyCode" placeholder="輸入驗證碼" />
-            </div>
-            <div id="adminRegisterFields" style="display:none;">
+            <div id="registerPasswordFields">
               <div>
-                <label for="regPassword">管理員密碼</label>
+                <label for="regPassword">密碼</label>
                 <div class="password-field">
                   <input id="regPassword" type="password" placeholder="至少 8 碼，含英文與數字" />
                   <button type="button" class="toggle-pw-btn" onclick="togglePasswordVisibility('regPassword', this)">顯示</button>
@@ -859,22 +843,17 @@
               <div>
                 <label for="regConfirmPassword">確認密碼</label>
                 <div class="password-field">
-                  <input id="regConfirmPassword" type="password" placeholder="再次輸入管理員密碼" />
+                  <input id="regConfirmPassword" type="password" placeholder="再次輸入密碼" />
                   <button type="button" class="toggle-pw-btn" onclick="togglePasswordVisibility('regConfirmPassword', this)">顯示</button>
                 </div>
-              </div>
-              <div>
-                <label for="regInviteCode">管理員邀請碼</label>
-                <input id="regInviteCode" placeholder="預設：ADMIN2026" />
               </div>
             </div>
           </div>
           <div class="actions">
-            <button id="regSendCodeBtn" class="secondary-btn" onclick="sendRegisterCode()">發送驗證碼</button>
             <button class="primary-btn" onclick="completeRegister()">完成註冊</button>
           </div>
           <div class="notice info">
-            首次使用？填寫資料後點擊「發送驗證碼」，驗證完成即可開始使用。
+            註冊僅開放顧客帳號。管理員請使用既有後台帳號登入。
           </div>
         </div>
 

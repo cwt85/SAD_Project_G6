@@ -434,7 +434,7 @@ section.active {
   grid-template-columns: 1fr;
 }
 
-.auth-panel #adminRegisterFields {
+.auth-panel #registerPasswordFields {
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
@@ -5109,5 +5109,4 @@ td small {
   font-weight: 500;
   margin-left: 8px;
   color: var(--text-muted);
-}
 }
