@@ -15,6 +15,8 @@ let users = [
     password: "Admin1234"
   }
 ];
+let verificationCodes = {};
+let lastCodeSentAt = {};
 
 // 用戶操作相關
 let favorites = [];
