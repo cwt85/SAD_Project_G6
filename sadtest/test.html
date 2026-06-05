@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unit Tests — SAD Project G6</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+      color: white;
+      padding: 28px 36px 22px;
+    }
+    header h1 { font-size: 1.7rem; font-weight: 700; letter-spacing: -0.3px; }
+    header p  { font-size: 0.85rem; opacity: 0.75; margin-top: 4px; }
+
+    /* ── Sticky Summary Bar ── */
+    .summary-bar {
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 14px 36px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+    }
+    .stat { display: flex; flex-direction: column; align-items: center; min-width: 56px; }
+    .stat-label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: .5px; }
+    .stat-num   { font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
+    .stat.total .stat-num { color: #475569; }
+    .stat.pass  .stat-num { color: #16a34a; }
+    .stat.fail  .stat-num { color: #dc2626; }
+    .divider { width: 1px; height: 36px; background: #e2e8f0; }
+    .progress-wrap { flex: 1; }
+    .progress-label { font-size: 0.75rem; color: #64748b; margin-bottom: 4px; }
+    .progress-bar { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; background: #16a34a; border-radius: 4px; width: 0; transition: width .4s ease; }
+    .status-badge {
+      padding: 5px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; white-space: nowrap;
+    }
+    .badge-running { background: #fef9c3; color: #854d0e; }
+    .badge-pass    { background: #dcfce7; color: #15803d; }
+    .badge-fail    { background: #fee2e2; color: #991b1b; }
+
+    /* ── Main content ── */
+    main { padding: 24px 36px 48px; max-width: 980px; margin: 0 auto; }
+
+    /* ── Suite Card ── */
+    .suite-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      transition: box-shadow .2s;
+    }
+    .suite-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.09); }
+
+    .suite-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 18px;
+      cursor: pointer;
+      user-select: none;
+      background: #f8fafc;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .suite-header:hover { background: #f1f5f9; }
+    .suite-icon { font-size: 1rem; }
+    .suite-name { font-weight: 600; font-size: 0.92rem; flex: 1; color: #0f172a; }
+    .suite-stat { font-size: 0.8rem; }
+    .suite-stat .p { color: #16a34a; font-weight: 700; }
+    .suite-stat .f { color: #dc2626; font-weight: 700; }
+    .chevron { color: #94a3b8; font-size: 0.75rem; transition: transform .2s; }
+    .suite-card.collapsed .suite-body { display: none; }
+    .suite-card.collapsed .chevron { transform: rotate(-90deg); }
+
+    /* ── Suite body ── */
+    .suite-body { padding: 4px 14px 10px; }
+
+    .subsuite { margin: 6px 0; }
+    .subsuite-name {
+      font-size: 0.78rem; font-weight: 600; color: #64748b;
+      padding: 8px 4px 4px;
+      border-bottom: 1px solid #f1f5f9;
+      margin-bottom: 2px;
+      letter-spacing: .2px;
+    }
+
+    /* ── Test Item ── */
+    .test-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 6px 6px;
+      border-radius: 6px;
+      font-size: 0.858rem;
+      transition: background .15s;
+    }
+    .test-item:hover { background: #f8fafc; }
+    .test-icon { flex-shrink: 0; margin-top: 1px; font-size: 0.9rem; }
+    .test-icon.pass { color: #16a34a; }
+    .test-icon.fail { color: #dc2626; }
+    .test-body { flex: 1; min-width: 0; }
+    .test-name { color: #334155; line-height: 1.4; }
+    .test-err {
+      margin-top: 5px;
+      font-size: 0.78rem;
+      color: #b91c1c;
+      background: #fff5f5;
+      border: 1px solid #fecaca;
+      border-radius: 5px;
+      padding: 6px 10px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .test-ms { font-size: 0.72rem; color: #cbd5e1; flex-shrink: 0; margin-top: 2px; }
+
+    footer { text-align: center; padding: 20px; color: #94a3b8; font-size: 0.78rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Unit Tests — SAD Project G6</h1>
+  <p>台東旅遊訂房平台 · 自動化測試報告</p>
+</header>
+
+<div class="summary-bar">
+  <div class="stat total">
+    <span class="stat-num" id="numTotal">—</span>
+    <span class="stat-label">總計</span>
+  </div>
+  <div class="divider"></div>
+  <div class="stat pass">
+    <span class="stat-num" id="numPass">—</span>
+    <span class="stat-label">通過</span>
+  </div>
+  <div class="stat fail">
+    <span class="stat-num" id="numFail">—</span>
+    <span class="stat-label">失敗</span>
+  </div>
+  <div class="divider"></div>
+  <div class="progress-wrap">
+    <div class="progress-label" id="progressLabel">準備執行…</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+  <span class="status-badge badge-running" id="statusBadge">⏳ 執行中</span>
+</div>
+
+<main id="main"></main>
+
+<footer>SAD Project G6 · Unit Test Runner · 135 test cases across 7 modules</footer>
+
+<!-- ═══════════════════════════════════════════
+     載入原始碼（不含 app.js / chat.js / itinerary.js）
+     ═══════════════════════════════════════════ -->
+<script src="js/state.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/rooms.js"></script>
+<script src="js/orders.js"></script>
+<script src="js/pricing.js"></script>
+<script src="js/trains.js"></script>
+<script src="js/bonus.js"></script>
+
+<script>
+'use strict';
+
+/* ─────────────────────────────────────────────
+   覆蓋有副作用的函式（避免測試汙染 DOM / localStorage）
+   ───────────────────────────────────────────── */
+function saveAppData()                   {}
+function loadAppData()                   {}
+function saveAuthState()                 {}
+function renderAll()                     {}
+function renderBonusPointBar()           {}
+function refreshTrainBonusDisplay()      {}
+function renderRoomDetail()              {}
+function showSection()                   {}
+function updateNavigation()              {}
+function updateLoginStatus()             {}
+function addSystemItemToItinerary()      { return null; }
+function integrateLodgingOrderToItinerary() {}
+function integrateTrainOrderToItinerary()   {}
+// trains.js 中呼叫但未在載入檔案中定義的函式
+function escapeAttribute(s)              { return String(s || '').replace(/"/g, '&quot;'); }
+
+/* ─────────────────────────────────────────────
+   全域狀態重置（每個 beforeEach 呼叫）
+   ───────────────────────────────────────────── */
+function __resetState() {
+  isLoggedIn               = false;
+  currentUser              = null;
+  users                    = [{ id: 1, account: 'admin@example.com', type: 'email', role: 'admin', password: 'Admin1234' }];
+  verificationCodes        = {};
+  lastCodeSentAt           = {};
+  favorites                = [];
+  cart                     = [];
+  orders                   = [];
+  selectedRoomTypes        = {};
+  itineraries              = [];
+  activeItineraryId        = null;
+  activeItineraryDay       = 1;
+  itineraryStatusFilter    = '';
+  trainOrders              = [];
+  selectedTrainResultId    = null;
+  lastTrainSearchResults   = [];
+  trainBonusPoints         = 0;
+  trainBonusAwardedMilestones = 0;
+  userBonusPoints          = {};
+  userBonusAwardedMilestones = {};
+  bonusPointRecords        = [];
+  trainWaitingList         = [];
+  rooms                    = [];
+  editingRoomId            = null;
+  currentRoomImageIndex    = 0;
+  adminRoomTypes           = [];
+  pricingRecords           = [];
+}
+
+/* ─────────────────────────────────────────────
+   測試輔助工具
+   ───────────────────────────────────────────── */
+function daysFromToday(n) {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+function makeRoom(overrides = {}) {
+  return {
+    id: 1, name: '測試民宿', location: '台東市',
+    address: '台東縣台東市中山路 1 號',
+    price: 3000, capacity: 2, rating: 4.5, status: 'active',
+    stationDistance: '5 分鐘', desc: '很棒的民宿',
+    facilities: ['WiFi', '停車場'], policies: ['禁煙'],
+    bookingStart: daysFromToday(-30), bookingEnd: daysFromToday(60),
+    images: ['img1.jpg', 'img2.jpg'],
+    roomTypes: [
+      { id: 'type-std-1', name: '標準房', price: 3000, capacity: 2, stock: 5, bedType: '雙人床' },
+      { id: 'type-dlx-1', name: '豪華房', price: 4000, capacity: 3, stock: 3, bedType: '大床'   }
+    ],
+    reviews: [],
+    ...overrides
+  };
+}
+
+function makeOrder(overrides = {}) {
+  return {
+    id: 1001, userId: 2, roomId: 1, roomName: '測試民宿',
+    roomTypeId: 'type-std-1', roomTypeName: '標準房',
+    checkIn: daysFromToday(15), checkOut: daysFromToday(17),
+    nights: 2, people: 2, pricePerNight: 3000, amount: 6000,
+    bookingStatus: '已確認', paymentStatus: '未付款',
+    status: '已確認 / 未付款', refundAmount: 0,
+    ...overrides
+  };
+}
+
+/* ─────────────────────────────────────────────
+   Mini Test Framework
+   ───────────────────────────────────────────── */
+const __suiteStack  = [];
+const __rootSuites  = [];
+
+function describe(name, fn) {
+  const suite = { name, tests: [], suites: [], beforeEach: null };
+  if (__suiteStack.length) {
+    __suiteStack[__suiteStack.length - 1].suites.push(suite);
+  } else {
+    __rootSuites.push(suite);
+  }
+  __suiteStack.push(suite);
+  fn();
+  __suiteStack.pop();
+}
+
+function beforeEach(fn) {
+  if (__suiteStack.length) __suiteStack[__suiteStack.length - 1].beforeEach = fn;
+}
+
+function test(name, fn) {
+  if (__suiteStack.length) __suiteStack[__suiteStack.length - 1].tests.push({ name, fn });
+}
+
+/* expect 匹配器 */
+function expect(actual) {
+  const fail = msg => { throw new Error(msg); };
+  const fmt  = v => {
+    if (v === null)      return 'null';
+    if (v === undefined) return 'undefined';
+    if (typeof v === 'string') return `"${v}"`;
+    return String(v);
+  };
+  return {
+    toBe(exp)            { if (actual !== exp) fail(`期望 ${fmt(actual)} 嚴格等於 ${fmt(exp)}`); },
+    toBeNull()           { if (actual !== null) fail(`期望 ${fmt(actual)} 為 null`); },
+    toBeTruthy()         { if (!actual) fail(`期望 ${fmt(actual)} 為 truthy`); },
+    toBeFalsy()          { if (actual) fail(`期望 ${fmt(actual)} 為 falsy`); },
+    toHaveLength(n)      { if (!actual || actual.length !== n) fail(`期望長度 ${n}，實際 ${actual?.length}`); },
+    toContain(item)      {
+      if (Array.isArray(actual)) {
+        if (!actual.includes(item)) fail(`陣列不包含 ${fmt(item)}`);
+      } else if (typeof actual === 'string') {
+        if (!actual.includes(item)) fail(`字串 "${actual}" 不包含 "${item}"`);
+      } else { fail('toContain 僅支援陣列或字串'); }
+    },
+    toBeGreaterThan(n)   { if (actual <= n) fail(`期望 ${actual} > ${n}`); },
+    toBeGreaterThanOrEqual(n) { if (actual < n) fail(`期望 ${actual} >= ${n}`); },
+    toBeCloseTo(exp, precision = 2) {
+      const threshold = Math.pow(10, -precision) / 2;
+      if (Math.abs(actual - exp) >= threshold)
+        fail(`期望 ${actual} 接近 ${exp}（精度 ${precision}）`);
+    },
+    not: {
+      toBe(exp)    { if (actual === exp) fail(`期望 ${fmt(actual)} 不等於 ${fmt(exp)}`); },
+      toBeNull()   { if (actual === null) fail(`期望值不為 null`); },
+      toBeTruthy() { if (actual) fail(`期望 ${fmt(actual)} 不為 truthy`); },
+    }
+  };
+}
+
+/* 執行器：遞迴執行 suite 並收集結果 */
+function __runSuite(suite, inheritedBeforeEach = []) {
+  const allBE = [...inheritedBeforeEach];
+  if (suite.beforeEach) allBE.push(suite.beforeEach);
+
+  const results = [];
+
+  for (const t of suite.tests) {
+    for (const be of allBE) { try { be(); } catch(e) {} }
+    const t0 = performance.now();
+    let err = null;
+    try { t.fn(); } catch(e) { err = e; }
+    const ms = (performance.now() - t0).toFixed(1);
+    results.push({ name: t.name, pass: !err, err: err ? err.message : null, ms });
+  }
+
+  const childResults = [];
+  for (const child of suite.suites) {
+    childResults.push({ suite: child, results: __runSuite(child, allBE) });
+  }
+
+  return { ownResults: results, children: childResults };
+}
+
+/* ─────────────────────────────────────────────
+   測試定義（與 unit.test.js 一致，適配瀏覽器）
+   ───────────────────────────────────────────── */
+
+// ═══ 一、auth.js ═══
+describe('auth.js — 帳號驗證與使用者管理', () => {
+  beforeEach(() => __resetState());
+
+  describe('isValidEmail()', () => {
+    test('標準 Email 格式應回傳 true', () => {
+      expect(isValidEmail('test@example.com')).toBe(true);
+      expect(isValidEmail('admin@example.com')).toBe(true);
+      expect(isValidEmail('user.name+tag@mail.domain.org')).toBe(true);
+    });
+    test('缺少 @ 符號應回傳 false', () => {
+      expect(isValidEmail('notanemail')).toBe(false);
+    });
+    test('@ 在開頭應回傳 false', () => {
+      expect(isValidEmail('@example.com')).toBe(false);
+    });
+    test('@ 在結尾應回傳 false', () => {
+      expect(isValidEmail('user@')).toBe(false);
+    });
+    test('空字串應回傳 false', () => {
+      expect(isValidEmail('')).toBe(false);
+    });
+    test('含空白字元應回傳 false', () => {
+      expect(isValidEmail('user @example.com')).toBe(false);
+    });
+  });
+
+  describe('isValidPhone()', () => {
+    test('有效台灣手機號碼應回傳 true', () => {
+      expect(isValidPhone('0912345678')).toBe(true);
+      expect(isValidPhone('0987654321')).toBe(true);
+    });
+    test('非 09 開頭應回傳 false', () => {
+      expect(isValidPhone('0812345678')).toBe(false);
+      expect(isValidPhone('1912345678')).toBe(false);
+    });
+    test('位數不足 10 碼應回傳 false', () => {
+      expect(isValidPhone('091234567')).toBe(false);
+    });
+    test('超過 10 碼應回傳 false', () => {
+      expect(isValidPhone('09123456789')).toBe(false);
+    });
+    test('含英文字母應回傳 false', () => {
+      expect(isValidPhone('0912abc678')).toBe(false);
+    });
+    test('空字串應回傳 false', () => {
+      expect(isValidPhone('')).toBe(false);
+    });
+  });
+
+  describe('normalizeAccount()', () => {
+    test('轉換為小寫', () => {
+      expect(normalizeAccount('ADMIN@EXAMPLE.COM')).toBe('admin@example.com');
+    });
+    test('去除前後空白', () => {
+      expect(normalizeAccount('  user@test.com  ')).toBe('user@test.com');
+    });
+    test('null / undefined 應回傳空字串', () => {
+      expect(normalizeAccount(null)).toBe('');
+      expect(normalizeAccount(undefined)).toBe('');
+    });
+  });
+
+  describe('getAccountType()', () => {
+    test('Email 帳號回傳 "email"', () => {
+      expect(getAccountType('user@example.com')).toBe('email');
+    });
+    test('手機號碼回傳 "phone"', () => {
+      expect(getAccountType('0912345678')).toBe('phone');
+    });
+    test('無效格式回傳空字串', () => {
+      expect(getAccountType('invalid')).toBe('');
+      expect(getAccountType('')).toBe('');
+    });
+  });
+
+  describe('getRoleName()', () => {
+    test('admin → "管理員"', () => {
+      expect(getRoleName('admin')).toBe('管理員');
+    });
+    test('customer → "顧客"', () => {
+      expect(getRoleName('customer')).toBe('顧客');
+    });
+    test('未知角色 → "訪客"', () => {
+      expect(getRoleName('unknown')).toBe('訪客');
+      expect(getRoleName('')).toBe('訪客');
+    });
+  });
+
+  describe('getNextUserId()', () => {
+    test('只有一位使用者時回傳 2', () => {
+      expect(getNextUserId()).toBe(2);
+    });
+    test('多位使用者時回傳最大 id + 1', () => {
+      users.push({ id: 5, account: 'x@x.com', role: 'customer' });
+      expect(getNextUserId()).toBe(6);
+    });
+  });
+
+  describe('isAdmin() / isCustomer()', () => {
+    test('未登入時兩者都是 false', () => {
+      expect(isAdmin()).toBe(false);
+      expect(isCustomer()).toBe(false);
+    });
+    test('以管理員登入後 isAdmin() 為 true', () => {
+      setLoginState({ id: 1, account: 'admin@example.com', role: 'admin' });
+      expect(isAdmin()).toBe(true);
+      expect(isCustomer()).toBe(false);
+    });
+    test('以顧客登入後 isCustomer() 為 true', () => {
+      setLoginState({ id: 2, account: 'user@example.com', role: 'customer' });
+      expect(isCustomer()).toBe(true);
+      expect(isAdmin()).toBe(false);
+    });
+  });
+});
+
+// ═══ 二、utils.js ═══
+describe('utils.js — 共用工具函式', () => {
+  beforeEach(() => __resetState());
+
+  describe('formatPrice()', () => {
+    test('千位數加逗號', () => {
+      expect(formatPrice(1000)).toBe('1,000');
+      expect(formatPrice(10000)).toBe('10,000');
+    });
+    test('0 回傳 "0"', () => {
+      expect(formatPrice(0)).toBe('0');
+    });
+    test('null / undefined 回傳 "0"', () => {
+      expect(formatPrice(null)).toBe('0');
+      expect(formatPrice(undefined)).toBe('0');
+    });
+    test('3000 回傳 "3,000"', () => {
+      expect(formatPrice(3000)).toBe('3,000');
+    });
+  });
+
+  describe('formatDate()', () => {
+    test('空值回傳空字串', () => {
+      expect(formatDate('')).toBe('');
+      expect(formatDate(null)).toBe('');
+    });
+    test('有效日期字串包含年份', () => {
+      const result = formatDate('2025-01-15');
+      expect(result).toContain('2025');
+    });
+  });
+
+  describe('getMaxRoomTypeCapacity()', () => {
+    test('有多個房型時回傳最大容納人數', () => {
+      expect(getMaxRoomTypeCapacity(makeRoom())).toBe(3);
+    });
+    test('沒有房型時回退到 room.capacity', () => {
+      expect(getMaxRoomTypeCapacity(makeRoom({ roomTypes: [], capacity: 4 }))).toBe(4);
+    });
+    test('roomTypes 未定義時回退到 room.capacity', () => {
+      expect(getMaxRoomTypeCapacity({ id: 1, capacity: 5 })).toBe(5);
+    });
+  });
+
+  describe('getLowestRoomTypePrice()', () => {
+    test('有多個房型時回傳最低價格', () => {
+      expect(getLowestRoomTypePrice(makeRoom())).toBe(3000);
+    });
+    test('沒有房型時回退到 room.price', () => {
+      expect(getLowestRoomTypePrice(makeRoom({ roomTypes: [], price: 2500 }))).toBe(2500);
+    });
+    test('roomTypes 未定義時回退到 room.price', () => {
+      expect(getLowestRoomTypePrice({ id: 1, price: 1800 })).toBe(1800);
+    });
+  });
+
+  describe('generateDefaultRoomTypes()', () => {
+    test('應產生兩個房型', () => {
+      expect(generateDefaultRoomTypes({ id: 10, price: 2000, capacity: 2 })).toHaveLength(2);
+    });
+    test('標準房價格等於基礎價', () => {
+      expect(generateDefaultRoomTypes({ id: 10, price: 2000, capacity: 2 })[0].price).toBe(2000);
+    });
+    test('豪華房價格為基礎價 × 1.3（四捨五入）', () => {
+      expect(generateDefaultRoomTypes({ id: 10, price: 2000, capacity: 2 })[1].price).toBe(Math.round(2000 * 1.3));
+    });
+  });
+
+  describe('getNextRoomId()', () => {
+    test('無房源時回傳 1', () => {
+      rooms = [];
+      expect(getNextRoomId()).toBe(1);
+    });
+    test('有房源時回傳最大 id + 1', () => {
+      rooms = [{ id: 1 }, { id: 3 }, { id: 2 }];
+      expect(getNextRoomId()).toBe(4);
+    });
+  });
+
+  describe('getRoomImages()', () => {
+    test('應回傳長度為 3 的陣列', () => {
+      expect(getRoomImages(1)).toHaveLength(3);
+    });
+    test('不同 roomId 回傳不同起始圖片', () => {
+      expect(getRoomImages(0)[0]).not.toBe(getRoomImages(1)[0]);
+    });
+  });
+});
+
+// ═══ 三、orders.js ═══
+describe('orders.js — 訂單相關邏輯', () => {
+  beforeEach(() => __resetState());
+
+  describe('isDateRangeOverlap()', () => {
+    test('完全重疊', () => {
+      expect(isDateRangeOverlap('2025-01-01','2025-01-10','2025-01-01','2025-01-10')).toBe(true);
+    });
+    test('部分重疊（前段）', () => {
+      expect(isDateRangeOverlap('2025-01-01','2025-01-05','2025-01-03','2025-01-08')).toBe(true);
+    });
+    test('部分重疊（後段）', () => {
+      expect(isDateRangeOverlap('2025-01-05','2025-01-10','2025-01-01','2025-01-07')).toBe(true);
+    });
+    test('完全不重疊（A 在 B 之前）', () => {
+      expect(isDateRangeOverlap('2025-01-01','2025-01-05','2025-01-06','2025-01-10')).toBe(false);
+    });
+    test('完全不重疊（A 在 B 之後）', () => {
+      expect(isDateRangeOverlap('2025-01-10','2025-01-15','2025-01-01','2025-01-09')).toBe(false);
+    });
+    test('缺少任何日期回傳 false', () => {
+      expect(isDateRangeOverlap('','2025-01-05','2025-01-01','2025-01-10')).toBe(false);
+      expect(isDateRangeOverlap(null,null,null,null)).toBe(false);
+    });
+  });
+
+  describe('isRoomSelectable()', () => {
+    test('正常房源（有庫存）回傳 true', () => {
+      expect(isRoomSelectable(makeRoom())).toBe(true);
+    });
+    test('已下架房源回傳 false', () => {
+      expect(isRoomSelectable(makeRoom({ status: 'inactive' }))).toBe(false);
+    });
+    test('所有房型庫存為 0 回傳 false', () => {
+      expect(isRoomSelectable(makeRoom({ roomTypes: [{ id:'a', name:'標準', price:3000, capacity:2, stock:0 }] }))).toBe(false);
+    });
+    test('null 回傳 false', () => {
+      expect(isRoomSelectable(null)).toBe(false);
+    });
+  });
+
+  describe('getOrderStatusText()', () => {
+    test('有 status 欄位時直接回傳', () => {
+      expect(getOrderStatusText(makeOrder({ status: '已付款' }))).toBe('已付款');
+    });
+    test('無 status 欄位時組合 bookingStatus / paymentStatus', () => {
+      expect(getOrderStatusText(makeOrder({ status: undefined, bookingStatus: '已確認', paymentStatus: '未付款' }))).toBe('已確認 / 未付款');
+    });
+    test('兩者都缺失時使用預設值', () => {
+      expect(getOrderStatusText({ id: 1 })).toBe('已確認 / 未付款');
+    });
+  });
+
+  describe('calculateRoomRating()', () => {
+    test('無評價時回傳原始評分', () => {
+      expect(calculateRoomRating(makeRoom({ rating: 4.2, reviews: [] }))).toBe(4.2);
+    });
+    test('有評價時計算平均並四捨五入到一位小數', () => {
+      expect(calculateRoomRating(makeRoom({ reviews: [{ rating:4 },{ rating:5 },{ rating:3 }] }))).toBe(4);
+    });
+    test('單一評價直接等於那個分數', () => {
+      expect(calculateRoomRating(makeRoom({ reviews: [{ rating: 5 }] }))).toBe(5);
+    });
+  });
+
+  describe('getRoomTypeById()', () => {
+    test('找得到的 typeId 回傳對應房型', () => {
+      const rt = getRoomTypeById(makeRoom(), 'type-std-1');
+      expect(rt).not.toBeNull();
+      expect(rt.name).toBe('標準房');
+    });
+    test('找不到的 typeId 回傳 null', () => {
+      expect(getRoomTypeById(makeRoom(), 'non-exist')).toBeNull();
+    });
+    test('room 為 null 時回傳 null', () => {
+      expect(getRoomTypeById(null, 'type-std-1')).toBeNull();
+    });
+  });
+
+  describe('calculateRefund()', () => {
+    test('未付款的訂單取消時退款為 0', () => {
+      const r = calculateRefund(makeOrder({ checkIn: daysFromToday(20), paymentStatus: '未付款' }));
+      expect(r.cancelable).toBe(true);
+      expect(r.amount).toBe(0);
+    });
+    test('入住前 10 天以上全額退款', () => {
+      const r = calculateRefund(makeOrder({ checkIn: daysFromToday(15), paymentStatus: '已付款', amount: 6000 }));
+      expect(r.cancelable).toBe(true);
+      expect(r.amount).toBe(6000);
+    });
+    test('入住前 4-9 天退款 70%', () => {
+      const r = calculateRefund(makeOrder({ checkIn: daysFromToday(6), paymentStatus: '已付款', amount: 6000 }));
+      expect(r.cancelable).toBe(true);
+      expect(r.amount).toBe(Math.round(6000 * 0.7));
+    });
+    test('入住前 3 天內不予退款', () => {
+      const r = calculateRefund(makeOrder({ checkIn: daysFromToday(2), paymentStatus: '已付款', amount: 6000 }));
+      expect(r.cancelable).toBe(true);
+      expect(r.amount).toBe(0);
+    });
+    test('入住日期已過不可取消', () => {
+      const r = calculateRefund(makeOrder({ checkIn: daysFromToday(-2), paymentStatus: '已付款' }));
+      expect(r.cancelable).toBe(false);
+    });
+  });
+});
+
+// ═══ 四、rooms.js ═══
+describe('rooms.js — 房源相關邏輯', () => {
+  beforeEach(() => __resetState());
+
+  describe('getBookingNights()', () => {
+    test('計算相差天數', () => {
+      expect(getBookingNights('2025-01-01','2025-01-03')).toBe(2);
+    });
+    test('相差一天', () => {
+      expect(getBookingNights('2025-06-01','2025-06-02')).toBe(1);
+    });
+    test('跨月計算', () => {
+      expect(getBookingNights('2025-01-30','2025-02-02')).toBe(3);
+    });
+  });
+
+  describe('getRoomDataIssues()', () => {
+    test('完整房源資料回傳空陣列', () => {
+      expect(getRoomDataIssues(makeRoom())).toHaveLength(0);
+    });
+    test('缺少地址、描述時回傳對應問題', () => {
+      const issues = getRoomDataIssues(makeRoom({ address: '', desc: '' }));
+      expect(issues).toContain('地址');
+      expect(issues).toContain('描述');
+    });
+    test('缺少 facilities、policies、roomTypes 時全部列出', () => {
+      const issues = getRoomDataIssues(makeRoom({ facilities: [], policies: [], roomTypes: [] }));
+      expect(issues).toContain('設備');
+      expect(issues).toContain('住房政策');
+      expect(issues).toContain('房型');
+    });
+  });
+
+  describe('isRoomAvailableForBooking()', () => {
+    test('正常房源在可訂期間內回傳 true', () => {
+      const room = makeRoom();
+      rooms.push(room);
+      expect(isRoomAvailableForBooking(room, daysFromToday(5), daysFromToday(7))).toBe(true);
+    });
+    test('已下架房源回傳 false', () => {
+      expect(isRoomAvailableForBooking(makeRoom({ status:'inactive' }), daysFromToday(5), daysFromToday(7))).toBe(false);
+    });
+    test('null 房源回傳 false', () => {
+      expect(isRoomAvailableForBooking(null, daysFromToday(5), daysFromToday(7))).toBe(false);
+    });
+    test('訂房日期超出可訂期間回傳 false', () => {
+      const room = makeRoom({ bookingEnd: daysFromToday(3) });
+      expect(isRoomAvailableForBooking(room, daysFromToday(2), daysFromToday(10))).toBe(false);
+    });
+  });
+});
+
+// ═══ 五、trains.js ═══
+describe('trains.js — 火車票務邏輯', () => {
+  beforeEach(() => __resetState());
+
+  describe('getTrainDistance()', () => {
+    test('台北到台東的距離', () => {
+      expect(getTrainDistance('台北','台東')).toBe(610);
+    });
+    test('台東到台北（反向）距離相同', () => {
+      expect(getTrainDistance('台東','台北')).toBe(610);
+    });
+    test('未知站名回傳預設值 120', () => {
+      expect(getTrainDistance('未知站','另一站')).toBe(120);
+    });
+    test('相同站名距離不低於 20', () => {
+      expect(getTrainDistance('台北','台北')).toBeGreaterThanOrEqual(20);
+    });
+  });
+
+  describe('calculateTrainDuration()', () => {
+    test('自強號 170km 約 111 分鐘', () => {
+      expect(calculateTrainDuration('自強號', 170, false)).toBeCloseTo(111, -1);
+    });
+    test('有轉乘加 25 分鐘', () => {
+      const without = calculateTrainDuration('自強號', 100, false);
+      const with_   = calculateTrainDuration('自強號', 100, true);
+      expect(with_ - without).toBe(25);
+    });
+    test('區間車比自強號慢', () => {
+      expect(calculateTrainDuration('區間車', 100, false)).toBeGreaterThan(calculateTrainDuration('自強號', 100, false));
+    });
+  });
+
+  describe('matchTrainPeriod()', () => {
+    test('"all" 任何時間都符合', () => {
+      expect(matchTrainPeriod('05:00','all')).toBe(true);
+      expect(matchTrainPeriod('23:00','all')).toBe(true);
+    });
+    test('"morning" 符合 05:00–11:59', () => {
+      expect(matchTrainPeriod('05:00','morning')).toBe(true);
+      expect(matchTrainPeriod('11:59','morning')).toBe(true);
+    });
+    test('"morning" 不符合 12:00 以後', () => {
+      expect(matchTrainPeriod('12:00','morning')).toBe(false);
+    });
+    test('"afternoon" 符合 12:00–17:59', () => {
+      expect(matchTrainPeriod('14:30','afternoon')).toBe(true);
+    });
+    test('"afternoon" 不符合 18:00 以後', () => {
+      expect(matchTrainPeriod('18:00','afternoon')).toBe(false);
+    });
+    test('"night" 符合 18:00 以後與 05:00 以前', () => {
+      expect(matchTrainPeriod('20:00','night')).toBe(true);
+      expect(matchTrainPeriod('03:00','night')).toBe(true);
+    });
+  });
+
+  describe('addMinutesToTime()', () => {
+    test('基本加法', () => {
+      expect(addMinutesToTime('09:00', 30)).toBe('09:30');
+    });
+    test('跨小時', () => {
+      expect(addMinutesToTime('09:45', 30)).toBe('10:15');
+    });
+    test('跨日（超過 24:00）', () => {
+      expect(addMinutesToTime('23:50', 30)).toBe('00:20');
+    });
+    test('加 0 分鐘不變', () => {
+      expect(addMinutesToTime('10:00', 0)).toBe('10:00');
+    });
+  });
+
+  describe('formatTrainDuration()', () => {
+    test('90 分鐘 → "1 小時 30 分"', () => {
+      expect(formatTrainDuration(90)).toBe('1 小時 30 分');
+    });
+    test('60 分鐘 → "1 小時 0 分"', () => {
+      expect(formatTrainDuration(60)).toBe('1 小時 0 分');
+    });
+    test('45 分鐘 → "0 小時 45 分"', () => {
+      expect(formatTrainDuration(45)).toBe('0 小時 45 分');
+    });
+  });
+
+  describe('calculateTrainRefund()', () => {
+    const mkTO = n => ({ id:999, travelDate: daysFromToday(n), payableAmount:1000, finalPrice:1000 });
+    test('乘車 25 天前扣 1% 手續費', () => {
+      const r = calculateTrainRefund(mkTO(30));
+      expect(r.refundable).toBe(true);
+      expect(r.fee).toBe(Math.ceil(1000 * 0.01));
+    });
+    test('乘車 3–24 天前扣 3% 手續費', () => {
+      expect(calculateTrainRefund(mkTO(10)).fee).toBe(Math.ceil(1000 * 0.03));
+    });
+    test('乘車 1–2 天前扣 5% 手續費', () => {
+      expect(calculateTrainRefund(mkTO(1)).fee).toBe(Math.ceil(1000 * 0.05));
+    });
+    test('乘車當日扣 10% 手續費', () => {
+      expect(calculateTrainRefund(mkTO(0)).fee).toBe(Math.ceil(1000 * 0.1));
+    });
+    test('乘車日已過不可退票', () => {
+      expect(calculateTrainRefund(mkTO(-1)).refundable).toBe(false);
+    });
+  });
+
+  describe('getTrainEarlyBirdDiscount()', () => {
+    const mkR = n => ({ travelDate: daysFromToday(n), reservedTrain: true });
+    test('14 天以上享 0.7 折', () => {
+      expect(getTrainEarlyBirdDiscount(mkR(20)).factor).toBe(0.7);
+    });
+    test('7–13 天享 0.8 折', () => {
+      expect(getTrainEarlyBirdDiscount(mkR(10)).factor).toBe(0.8);
+    });
+    test('3–6 天享 0.9 折', () => {
+      expect(getTrainEarlyBirdDiscount(mkR(4)).factor).toBe(0.9);
+    });
+    test('3 天內無早鳥折扣（factor = 1）', () => {
+      expect(getTrainEarlyBirdDiscount(mkR(1)).factor).toBe(1);
+    });
+    test('非對號列車無早鳥折扣', () => {
+      expect(getTrainEarlyBirdDiscount({ travelDate: daysFromToday(30), reservedTrain: false }).factor).toBe(1);
+    });
+  });
+
+  describe('getRemainingTrainSeats()', () => {
+    const baseResult = {
+      travelDate:'2025-08-01', trainNo:'308',
+      fromStation:'台北', toStation:'台東',
+      reservedTrain:true, availableSeats:10
+    };
+    test('無訂單時剩餘等於 availableSeats', () => {
+      expect(getRemainingTrainSeats(baseResult)).toBe(10);
+    });
+    test('有 2 張訂單後剩餘減少', () => {
+      trainOrders = [{ id:1, bookingStatus:'已訂票', travelDate:'2025-08-01', trainNo:'308', fromStation:'台北', toStation:'台東', quantity:2 }];
+      expect(getRemainingTrainSeats(baseResult)).toBe(8);
+    });
+    test('非對號列車回傳 0', () => {
+      expect(getRemainingTrainSeats({ reservedTrain:false, availableSeats:0 })).toBe(0);
+    });
+  });
+
+  describe('assignTrainSeats()', () => {
+    const mkTR = (seats) => ({ travelDate:'2025-08-01', trainNo:'308', fromStation:'台北', toStation:'台東', reservedTrain:true, availableSeats:seats, cabin:'standard' });
+    test('座位充足時正確分配', () => {
+      const r = assignTrainSeats(mkTR(20), 'none', 2);
+      expect(r.seats).toHaveLength(2);
+      expect(r.warning).toBe('');
+    });
+    test('座位不足時回傳警告', () => {
+      const r = assignTrainSeats(mkTR(1), 'none', 3);
+      expect(r.warning).toBeTruthy();
+      expect(r.seats).toHaveLength(0);
+    });
+    test('區間車要求安靜車廂時給出警告', () => {
+      const r = assignTrainSeats({ ...mkTR(20), trainType:'區間車' }, 'quiet', 1);
+      expect(r.warning).toBeTruthy();
+    });
+  });
+});
+
+// ═══ 六、pricing.js ═══
+describe('pricing.js — 定價計算', () => {
+  beforeEach(() => __resetState());
+
+  describe('applyPricingDiscount()', () => {
+    test('discountType 為 "none" 時回傳原價', () => {
+      expect(applyPricingDiscount(3000,'none',0)).toBe(3000);
+      expect(applyPricingDiscount(3000,'none',100)).toBe(3000);
+    });
+    test('百分比折扣 20% 時正確計算', () => {
+      expect(applyPricingDiscount(3000,'percentage',20)).toBe(2400);
+    });
+    test('百分比折扣 10% 四捨五入', () => {
+      expect(applyPricingDiscount(3001,'percentage',10)).toBe(Math.round(3001 * 0.9));
+    });
+    test('固定折扣金額 500 元', () => {
+      expect(applyPricingDiscount(3000,'early_bird',500)).toBe(2500);
+    });
+    test('折扣後不低於 0', () => {
+      expect(applyPricingDiscount(100,'early_bird',200)).toBe(0);
+    });
+    test('折扣百分比為 0 時回傳原價', () => {
+      expect(applyPricingDiscount(3000,'percentage',0)).toBe(3000);
+    });
+  });
+
+  describe('getPricingRoomType()', () => {
+    test('找到對應房型', () => {
+      const t = getPricingRoomType(makeRoom(), 'type-std-1');
+      expect(t).not.toBeNull();
+      expect(t.name).toBe('標準房');
+    });
+    test('找不到的房型回傳 null', () => {
+      expect(getPricingRoomType(makeRoom(), 'no-such-type')).toBeNull();
+    });
+    test('room 為 null 時回傳 null', () => {
+      expect(getPricingRoomType(null, 'type-std-1')).toBeNull();
+    });
+  });
+});
+
+// ═══ 七、bonus.js ═══
+describe('bonus.js — 紅利點數管理', () => {
+  beforeEach(() => {
+    __resetState();
+    const customer = { id: 2, account: 'customer@test.com', role: 'customer' };
+    users.push(customer);
+    setLoginState(customer);
+  });
+
+  describe('getUserBonusPoints()', () => {
+    test('新用戶點數為 0', () => {
+      expect(getUserBonusPoints(2)).toBe(0);
+    });
+    test('已有點數的用戶回傳正確點數', () => {
+      userBonusPoints['2'] = 150;
+      expect(getUserBonusPoints(2)).toBe(150);
+    });
+    test('userId 為空時回傳 0', () => {
+      expect(getUserBonusPoints(null)).toBe(0);
+      expect(getUserBonusPoints('')).toBe(0);
+    });
+  });
+
+  describe('addBonusPoints()', () => {
+    test('成功新增點數並回傳 true', () => {
+      expect(addBonusPoints(100, '測試核發', 'system', 2)).toBe(true);
+      expect(getUserBonusPoints(2)).toBe(100);
+    });
+    test('累積點數正確', () => {
+      addBonusPoints(100, '第一次', 'system', 2);
+      addBonusPoints(50,  '第二次', 'system', 2);
+      expect(getUserBonusPoints(2)).toBe(150);
+    });
+    test('金額為 0 或負數時回傳 false', () => {
+      expect(addBonusPoints(0,   '無效', 'system', 2)).toBe(false);
+      expect(addBonusPoints(-10, '無效', 'system', 2)).toBe(false);
+    });
+    test('不允許的來源回傳 false', () => {
+      expect(addBonusPoints(100, '測試', 'unauthorized-source', 2)).toBe(false);
+    });
+  });
+
+  describe('deductBonusPoints()', () => {
+    beforeEach(() => { userBonusPoints['2'] = 200; });
+
+    test('成功扣除點數並回傳 true', () => {
+      expect(deductBonusPoints(50, '購票扣抵', 'train-payment', 2)).toBe(true);
+      expect(getUserBonusPoints(2)).toBe(150);
+    });
+    test('餘額不足時回傳 false 且不扣除', () => {
+      expect(deductBonusPoints(300, '超額扣抵', 'train-payment', 2)).toBe(false);
+      expect(getUserBonusPoints(2)).toBe(200);
+    });
+    test('不允許的來源回傳 false', () => {
+      expect(deductBonusPoints(50, '測試', 'invalid-source', 2)).toBe(false);
+    });
+    test('扣完後餘額為 0', () => {
+      deductBonusPoints(200, '全部扣抵', 'system', 2);
+      expect(getUserBonusPoints(2)).toBe(0);
+    });
+  });
+});
+
+/* ─────────────────────────────────────────────
+   執行所有測試並渲染結果
+   ───────────────────────────────────────────── */
+(function runAll() {
+  let totalPass = 0, totalFail = 0;
+
+  function countResults(res) {
+    res.ownResults.forEach(r => r.pass ? totalPass++ : totalFail++);
+    res.children.forEach(c => countResults(c.results));
+  }
+
+  function buildTestItem(r) {
+    const item = document.createElement('div');
+    item.className = 'test-item';
+    const icon = document.createElement('span');
+    icon.className = 'test-icon ' + (r.pass ? 'pass' : 'fail');
+    icon.textContent = r.pass ? '✓' : '✗';
+    const body = document.createElement('div');
+    body.className = 'test-body';
+    const name = document.createElement('span');
+    name.className = 'test-name';
+    name.textContent = r.name;
+    body.appendChild(name);
+    if (!r.pass && r.err) {
+      const errBox = document.createElement('pre');
+      errBox.className = 'test-err';
+      errBox.textContent = r.err;
+      body.appendChild(errBox);
+    }
+    const ms = document.createElement('span');
+    ms.className = 'test-ms';
+    ms.textContent = r.ms + ' ms';
+    item.appendChild(icon);
+    item.appendChild(body);
+    item.appendChild(ms);
+    return item;
+  }
+
+  function buildSubSuite(child) {
+    const block = document.createElement('div');
+    block.className = 'subsuite';
+    const label = document.createElement('div');
+    label.className = 'subsuite-name';
+    label.textContent = child.suite.name;
+    block.appendChild(label);
+
+    child.results.ownResults.forEach(r => block.appendChild(buildTestItem(r)));
+    child.results.children.forEach(c => block.appendChild(buildSubSuite(c)));
+    return block;
+  }
+
+  function buildSuiteCard(suite, res) {
+    const ownPass = res.ownResults.filter(r => r.pass).length;
+    const ownFail = res.ownResults.filter(r => !r.pass).length;
+    let childPass = 0, childFail = 0;
+    function sumChild(r) {
+      r.ownResults.forEach(x => x.pass ? childPass++ : childFail++);
+      r.children.forEach(c => sumChild(c.results));
+    }
+    res.children.forEach(c => sumChild(c.results));
+    const totalP = ownPass + childPass, totalF = ownFail + childFail;
+
+    const card = document.createElement('div');
+    card.className = 'suite-card';
+
+    const hdr = document.createElement('div');
+    hdr.className = 'suite-header';
+    hdr.innerHTML = `
+      <span class="suite-icon">${totalF > 0 ? '📂' : '📁'}</span>
+      <span class="suite-name">${suite.name}</span>
+      <span class="suite-stat">
+        <span class="p">${totalP} 通過</span>
+        ${totalF > 0 ? ` / <span class="f">${totalF} 失敗</span>` : ''}
+      </span>
+      <span class="chevron">▾</span>
+    `;
+    hdr.addEventListener('click', () => card.classList.toggle('collapsed'));
+
+    const body = document.createElement('div');
+    body.className = 'suite-body';
+    res.ownResults.forEach(r => body.appendChild(buildTestItem(r)));
+    res.children.forEach(c => body.appendChild(buildSubSuite(c)));
+
+    card.appendChild(hdr);
+    card.appendChild(body);
+    return card;
+  }
+
+  // 執行
+  const main = document.getElementById('main');
+  const allRes = __rootSuites.map(s => ({ suite: s, res: __runSuite(s) }));
+
+  allRes.forEach(({ suite, res }) => {
+    countResults(res);
+    main.appendChild(buildSuiteCard(suite, res));
+  });
+
+  const total = totalPass + totalFail;
+  document.getElementById('numTotal').textContent = total;
+  document.getElementById('numPass').textContent  = totalPass;
+  document.getElementById('numFail').textContent  = totalFail;
+
+  const pct = total > 0 ? Math.round(totalPass / total * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent =
+    `${totalPass} / ${total} 通過（${pct}%）`;
+
+  const badge = document.getElementById('statusBadge');
+  if (totalFail === 0) {
+    badge.textContent = `✅ 全部通過`;
+    badge.className = 'status-badge badge-pass';
+    document.getElementById('progressFill').style.background = '#16a34a';
+  } else {
+    badge.textContent = `❌ ${totalFail} 項失敗`;
+    badge.className = 'status-badge badge-fail';
+    document.getElementById('progressFill').style.background =
+      `linear-gradient(to right, #16a34a ${pct}%, #dc2626 ${pct}%)`;
+  }
+})();
+</script>
+</body>
+</html>

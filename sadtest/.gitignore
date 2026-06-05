@@ -1,0 +1,8 @@
+# 套件本體，執行 npm install 可重建
+node_modules/
+
+# VS Code Todo 插件的個人紀錄
+Todo.json
+
+# Claude Code IDE 設定
+.claude/

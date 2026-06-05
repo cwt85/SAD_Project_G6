@@ -1,0 +1,5641 @@
+/* =========================================================
+   台東民宿訂房平台 index.css
+   風格：
+   1. 高級玻璃感
+   2. 淡彩漸層背景
+   3. 主頁房卡左右排版
+   4. 詳細頁輪播圖片
+   5. 手機版自動改為上下排版
+========================================================= */
+
+
+/* =========================================================
+   01. 全域設定 / 色彩變數
+========================================================= */
+
+:root {
+  --bg-main: #eef4ff;
+  --bg-soft: #f7ecff;
+
+  --glass-bg: rgba(255, 255, 255, 0.30);
+  --glass-bg-light: rgba(255, 255, 255, 0.48);
+  --glass-border: rgba(255, 255, 255, 0.42);
+  --glass-shadow: 0 22px 60px rgba(15, 23, 42, 0.16);
+
+  --text-main: #172033;
+  --text-soft: #5d6475;
+  --text-muted: #64748b;
+
+  --blue: #4f7cff;
+  --cyan: #35d0ff;
+  --purple: #8b5cf6;
+  --pink: #ec4899;
+  --orange: #f97316;
+  --green: #10b981;
+  --red: #ef4444;
+
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 26px;
+  --radius-xl: 32px;
+
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  font-family: "Noto Sans TC", Arial, sans-serif;
+  color: var(--text-main);
+  line-height: 1.6;
+  background:
+    radial-gradient(circle at 8% 10%, rgba(79, 124, 255, 0.25), transparent 28%),
+    radial-gradient(circle at 90% 8%, rgba(236, 72, 153, 0.18), transparent 30%),
+    radial-gradient(circle at 82% 72%, rgba(53, 208, 255, 0.18), transparent 32%),
+    radial-gradient(circle at 14% 86%, rgba(249, 115, 22, 0.13), transparent 26%),
+    linear-gradient(135deg, #eef4ff 0%, #f7ecff 42%, #eafff8 100%);
+  background-attachment: fixed;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.36), transparent 42%),
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.36), transparent 32%);
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ===== Toast 提示 ===== */
+#toastContainer {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.toast {
+  padding: 12px 20px;
+  border-radius: 14px;
+  background: rgba(17, 24, 39, 0.88);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.28);
+  backdrop-filter: blur(10px);
+  max-width: 300px;
+  opacity: 0;
+  transform: translateY(10px) scale(0.97);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.toast.toast-show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.toast.toast-error {
+  background: rgba(185, 28, 28, 0.90);
+}
+
+img {
+  max-width: 100%;
+}
+
+
+/* =========================================================
+   02. Header 頁首
+========================================================= */
+
+header {
+  position: relative;
+  overflow: hidden;
+  color: white;
+  padding: 42px 8%;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(79, 124, 255, 0.82),
+      rgba(139, 92, 246, 0.72),
+      rgba(236, 72, 153, 0.58)
+    );
+  box-shadow: 0 24px 70px rgba(79, 70, 229, 0.22);
+}
+
+header::before {
+  content: "";
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  right: -90px;
+  top: -140px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.20);
+  filter: blur(4px);
+}
+
+header::after {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  left: 18%;
+  bottom: -120px;
+  border-radius: 50%;
+  background: rgba(53, 208, 255, 0.22);
+  filter: blur(3px);
+}
+
+header h1,
+header p {
+  position: relative;
+  z-index: 1;
+}
+
+header h1 {
+  margin-bottom: 8px;
+  font-size: 38px;
+  letter-spacing: 1px;
+  text-shadow: 0 8px 24px rgba(15, 23, 42, 0.24);
+}
+
+header p {
+  font-size: 16px;
+  opacity: 0.94;
+}
+
+
+/* =========================================================
+   03. Navigation 導覽列
+========================================================= */
+
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 8%;
+  background: rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.10);
+}
+
+nav button,
+.primary-btn,
+.secondary-btn,
+.danger-btn {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+nav button::before,
+.primary-btn::before,
+.secondary-btn::before,
+.danger-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.38),
+    transparent
+  );
+  transform: translateX(-120%);
+  transition: transform 0.5s ease;
+}
+
+nav button:hover::before,
+.primary-btn:hover::before,
+.secondary-btn:hover::before,
+.danger-btn:hover::before {
+  transform: translateX(120%);
+}
+
+nav button {
+  color: #334155;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+nav button:hover,
+nav button.active {
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(79, 70, 229, 0.20);
+}
+
+.bonus-point-bar {
+  padding: 10px 8%;
+  background: rgba(255, 255, 255, 0.64);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.48);
+}
+
+.bonus-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.bonus-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
+}
+
+.bonus-summary span {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.bonus-summary strong {
+  color: #1e3a8a;
+  font-size: 22px;
+}
+
+.bonus-summary small {
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.bonus-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.bonus-history {
+  position: relative;
+}
+
+.bonus-history summary {
+  min-height: 42px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  cursor: pointer;
+  font-weight: 900;
+  list-style: none;
+}
+
+.bonus-history summary::-webkit-details-marker {
+  display: none;
+}
+
+.bonus-history-list {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  z-index: 30;
+  display: grid;
+  gap: 8px;
+  width: min(340px, 86vw);
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.bonus-record {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(241, 245, 249, 0.72);
+}
+
+.bonus-record.add strong {
+  color: #047857;
+}
+
+.bonus-record.deduct strong {
+  color: #b91c1c;
+}
+
+.bonus-record span,
+.bonus-record small,
+.bonus-history-empty {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   04. Main / Section
+========================================================= */
+
+main {
+  width: 84%;
+  margin: 28px auto;
+  position: relative;
+}
+
+section {
+  display: none;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+section.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* =========================================================
+   05. Panel / Grid / Summary
+========================================================= */
+
+.panel {
+  margin-bottom: 24px;
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.auth-panel .grid {
+  grid-template-columns: 1fr;
+}
+
+.auth-panel #registerPasswordFields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.auth-panel .actions {
+  flex-direction: column;
+}
+
+.auth-panel .actions button {
+  width: 100%;
+}
+
+.panel h2 {
+  margin-bottom: 16px;
+  color: #111827;
+  font-size: 26px;
+  letter-spacing: 0.5px;
+}
+
+.panel h3 {
+  margin: 22px 0 12px;
+  color: #1f2937;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.10);
+}
+
+.auth-tab {
+  flex: 1;
+  height: 42px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-weight: 900;
+  letter-spacing: 0;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.80);
+  border: 1px solid rgba(148, 163, 184, 0.30);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.auth-tab.active {
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+  border-color: transparent;
+  box-shadow: 0 16px 30px rgba(79, 70, 229, 0.22);
+}
+
+.auth-tab:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 26px rgba(15, 23, 42, 0.12);
+}
+
+.auth-tab:active {
+  transform: translateY(0);
+}
+
+.auth-form {
+  display: none;
+}
+
+.auth-form.active {
+  display: block;
+}
+
+.summary-box {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.auth-summary {
+  width: 84%;
+  margin: -18px auto 0;
+  padding: 0;
+  position: relative;
+  z-index: 25;
+}
+
+.summary-item {
+  padding: 18px;
+  border-radius: 22px;
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.38);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.auth-summary .summary-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.74);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.auth-summary .summary-item span {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.summary-item strong {
+  display: block;
+  font-size: 26px;
+  color: transparent;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.auth-summary .summary-item strong {
+  max-width: 60%;
+  overflow: hidden;
+  font-size: 20px;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   06. Form 表單
+========================================================= */
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  color: #263047;
+  font-weight: 700;
+}
+
+.auth-panel .radio-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--glass-border);
+}
+
+.auth-panel .radio-row label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  margin: 0;
+  font-weight: 800;
+  color: #1f2a44;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.auth-panel .radio-row label:last-child {
+  border-bottom: none;
+}
+
+.auth-panel .radio-row input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--blue);
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 12px 13px;
+  font-size: 15px;
+  color: #1f2937;
+  background: rgba(255, 255, 255, 0.56);
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  border-radius: 16px;
+  outline: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  transition: var(--transition-fast);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  background: rgba(255, 255, 255, 0.76);
+  border-color: rgba(79, 124, 255, 0.65);
+  box-shadow:
+    0 0 0 4px rgba(79, 124, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+
+/* =========================================================
+   07. Buttons 按鈕
+========================================================= */
+
+.primary-btn {
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  box-shadow: 0 10px 24px rgba(79, 70, 229, 0.18);
+}
+
+.secondary-btn {
+  color: #075985;
+  background: linear-gradient(
+    135deg,
+    rgba(224, 242, 254, 0.92),
+    rgba(207, 250, 254, 0.78)
+  );
+  box-shadow: 0 10px 24px rgba(14, 116, 144, 0.10);
+}
+
+.danger-btn {
+  color: white;
+  background: linear-gradient(135deg, #fb7185, var(--red));
+  box-shadow: 0 10px 24px rgba(239, 68, 68, 0.16);
+}
+
+.primary-btn:hover,
+.secondary-btn:hover,
+.danger-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.16);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  padding-right: 76px;
+}
+
+.toggle-pw-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  color: #334155;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.10);
+}
+
+.toggle-pw-btn:hover {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.auth-action-btn {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 28px;
+}
+
+
+/* =========================================================
+   08. Notice 提示訊息
+========================================================= */
+
+.notice {
+  margin: 14px 0;
+  padding: 14px 16px;
+  border-radius: 18px;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.success {
+  color: #166534;
+  background: rgba(220, 252, 231, 0.72);
+}
+
+.warning {
+  color: #92400e;
+  background: rgba(254, 243, 199, 0.76);
+}
+
+.error {
+  color: #991b1b;
+  background: rgba(254, 226, 226, 0.76);
+}
+
+.info {
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.76);
+}
+
+.notice-dialog {
+  width: min(420px, calc(100vw - 32px));
+  padding: 0;
+  color: var(--text-main);
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.notice-dialog::backdrop {
+  background: rgba(15, 23, 42, 0.38);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.notice-dialog-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 16px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.68);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 28px 70px rgba(15, 23, 42, 0.24);
+}
+
+.room-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(79, 124, 255, 0.18),
+    rgba(53, 208, 255, 0.15),
+    rgba(236, 72, 153, 0.14),
+    rgba(249, 115, 22, 0.12)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.notice-dialog-accent {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  box-shadow: 0 14px 30px rgba(79, 124, 255, 0.24);
+}
+
+
+.notice-dialog.success .notice-dialog-accent {
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+}
+
+.notice-dialog.warning .notice-dialog-accent {
+  background: linear-gradient(135deg, #d97706, #f59e0b);
+}
+
+.notice-dialog.error .notice-dialog-accent {
+  background: linear-gradient(135deg, #dc2626, #fb7185);
+}
+
+.notice-dialog-content {
+  min-width: 0;
+  padding-right: 26px;
+}
+
+.notice-dialog-label {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.notice-dialog-title {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.notice-dialog-message {
+  color: var(--text-soft);
+  font-weight: 700;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.notice-dialog-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  color: #475569;
+  font-size: 22px;
+  line-height: 1;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 8px;
+  background: rgba(248, 250, 252, 0.82);
+}
+
+.notice-dialog-action {
+  grid-column: 2;
+  width: fit-content;
+  min-width: 108px;
+  margin-top: 2px;
+}
+
+.order-confirm-dialog {
+  width: min(560px, calc(100vw - 32px));
+  padding: 0;
+  color: var(--text-main);
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.order-confirm-dialog::backdrop {
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.order-confirm-card {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  padding: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(241, 245, 249, 0.92));
+  box-shadow: 0 32px 80px rgba(15, 23, 42, 0.30);
+}
+
+.order-confirm-heading {
+  padding-right: 36px;
+}
+
+.order-confirm-heading span {
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.order-confirm-heading h3 {
+  margin: 6px 0;
+  font-size: 24px;
+}
+
+.order-confirm-heading p {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.order-confirm-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: #475569;
+  font-size: 24px;
+  line-height: 1;
+  border: 1px solid rgba(148, 163, 184, 0.36);
+  border-radius: 8px;
+  background: rgba(248, 250, 252, 0.88);
+}
+
+.order-confirm-stay {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.order-confirm-date-card,
+.order-confirm-detail-grid > div,
+.order-confirm-total {
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.order-confirm-date-card {
+  display: grid;
+  gap: 4px;
+  min-height: 96px;
+  padding: 14px;
+  border-color: rgba(79, 124, 255, 0.22);
+}
+
+.order-confirm-date-card.checkout {
+  border-color: rgba(139, 92, 246, 0.22);
+}
+
+.order-confirm-date-card span,
+.order-confirm-detail-grid span,
+.order-confirm-total span {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.order-confirm-date-card strong {
+  color: #0f172a;
+  font-size: 18px;
+}
+
+.order-confirm-date-card small {
+  color: #2563eb;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.order-confirm-date-divider {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  color: white;
+  font-size: 13px;
+  font-weight: 900;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  box-shadow: 0 10px 22px rgba(79, 70, 229, 0.22);
+}
+
+.order-confirm-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.order-confirm-detail-grid > div {
+  display: grid;
+  gap: 4px;
+  min-height: 72px;
+  padding: 12px 14px;
+}
+
+.order-confirm-detail-grid strong {
+  color: #0f172a;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.order-confirm-total {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 10px;
+  padding: 14px;
+  background: linear-gradient(135deg, rgba(219, 234, 254, 0.82), rgba(224, 242, 254, 0.68));
+}
+
+.order-confirm-total > div {
+  display: grid;
+  gap: 3px;
+}
+
+.order-confirm-total strong {
+  color: #1e3a8a;
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}
+
+.order-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.order-confirm-actions button {
+  min-width: 112px;
+}
+
+.bank-transfer-dialog {
+  width: min(520px, calc(100vw - 32px));
+  padding: 0;
+  color: var(--text-main);
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.bank-transfer-dialog::backdrop {
+  background: rgba(15, 23, 42, 0.44);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.bank-transfer-card {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  padding: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(240, 253, 250, 0.92));
+  box-shadow: 0 32px 80px rgba(15, 23, 42, 0.30);
+}
+
+.bank-transfer-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: #475569;
+  font-size: 24px;
+  line-height: 1;
+  border: 1px solid rgba(148, 163, 184, 0.36);
+  border-radius: 8px;
+  background: rgba(248, 250, 252, 0.88);
+}
+
+.bank-transfer-heading {
+  padding-right: 38px;
+}
+
+.bank-transfer-heading span,
+.bank-transfer-summary span,
+.bank-transfer-account span,
+.bank-transfer-input-label {
+  color: #0f766e;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.bank-transfer-heading h3 {
+  margin: 6px 0;
+  font-size: 24px;
+}
+
+.bank-transfer-heading p,
+.bank-transfer-helper {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.bank-transfer-summary,
+.bank-transfer-account {
+  display: grid;
+  gap: 10px;
+}
+
+.bank-transfer-summary {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+}
+
+.bank-transfer-summary > div,
+.bank-transfer-account > div {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  border: 1px solid rgba(20, 184, 166, 0.22);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.bank-transfer-summary strong {
+  color: #0f172a;
+  font-size: 18px;
+  overflow-wrap: anywhere;
+}
+
+.bank-transfer-summary small {
+  color: var(--text-muted);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.bank-transfer-account {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  padding: 14px;
+  border: 1px solid rgba(15, 118, 110, 0.18);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(204, 251, 241, 0.72), rgba(219, 234, 254, 0.56));
+}
+
+.bank-transfer-account > div {
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.bank-transfer-account strong {
+  color: #134e4a;
+  font-size: 18px;
+  overflow-wrap: anywhere;
+}
+
+.bank-transfer-input-label {
+  display: block;
+  margin-bottom: -8px;
+}
+
+.bank-transfer-input-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(20, 184, 166, 0.28);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.bank-transfer-input-row span {
+  color: #0f766e;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.bank-transfer-input-row input {
+  padding: 6px 0;
+  color: #0f172a;
+  font-size: 22px;
+  font-weight: 900;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.bank-transfer-input-row input:focus {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.bank-transfer-helper {
+  margin-top: -8px;
+  font-size: 13px;
+}
+
+.bank-transfer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.bank-transfer-actions button {
+  min-width: 112px;
+}
+
+
+/* =========================================================
+   09. Room List 主頁 / 搜尋頁房卡
+========================================================= */
+
+.card-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+}
+
+.room-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  align-items: stretch;
+  min-height: 240px;
+  overflow: hidden;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.34);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  transform: translateZ(0);
+  transition:
+    transform var(--transition-normal),
+    box-shadow var(--transition-normal);
+}
+
+.room-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(79, 124, 255, 0.18),
+    rgba(53, 208, 255, 0.15),
+    rgba(236, 72, 153, 0.14),
+    rgba(249, 115, 22, 0.12)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.room-card:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 30px 72px rgba(79, 70, 229, 0.18);
+}
+
+.room-image {
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+  overflow: hidden;
+  border-radius: 28px 0 0 28px;
+  background:
+    linear-gradient(135deg, rgba(79, 124, 255, 0.26), rgba(236, 72, 153, 0.18)),
+    rgba(255, 255, 255, 0.30);
+}
+
+.room-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(1.08) contrast(1.03);
+  transition:
+    transform 0.45s ease,
+    filter 0.45s ease;
+}
+
+.room-card:hover .room-image img {
+  transform: scale(1.06);
+  filter: saturate(1.16) contrast(1.06);
+}
+
+.room-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 26px 30px;
+}
+
+.room-body h3 {
+  margin-bottom: 10px;
+  color: #111827;
+  font-size: 24px;
+}
+
+.room-body p {
+  margin-bottom: 6px;
+  color: #334155;
+}
+
+.price {
+  margin: 12px 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: transparent;
+  background: linear-gradient(135deg, #ef4444, #f97316, #ec4899);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.room-card .actions {
+  margin-top: auto;
+}
+
+
+/* =========================================================
+   10. Detail Page 詳細頁
+========================================================= */
+
+.detail-card {
+  display: block;
+  max-width: 980px;
+  margin: 0 auto;
+  border-radius: var(--radius-xl);
+}
+
+.detail-card .room-body {
+  display: block;
+  padding: 26px 30px 32px;
+}
+
+.detail-card .room-body h2 {
+  margin: 18px 0 12px;
+  color: #111827;
+  font-size: 30px;
+}
+
+.detail-card .room-body h3 {
+  margin: 22px 0 10px;
+  color: #1f2937;
+}
+
+.detail-card .room-body p {
+  margin-bottom: 8px;
+}
+
+.detail-slider {
+  position: relative;
+  width: 100%;
+  height: 460px;
+  overflow: hidden;
+  border-radius: 30px;
+  margin-bottom: 14px;
+  background: rgba(255, 255, 255, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.46);
+  box-shadow: 0 26px 70px rgba(15, 23, 42, 0.20);
+}
+
+.slider-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.35s ease;
+}
+
+.slider-item {
+  min-width: 100%;
+  height: 100%;
+}
+
+.slider-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(1.10) contrast(1.03);
+}
+
+/* =========================================================
+   詳細頁輪播控制按鈕 / 圓點
+   淡色玻璃版
+========================================================= */
+
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+
+  width: 46px;
+  height: 46px;
+
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  border-radius: 50%;
+
+  transform: translateY(-50%);
+
+  font-size: 30px;
+  line-height: 42px;
+  text-align: center;
+
+  color: rgba(17, 24, 39, 0.72);
+  background: rgba(255, 255, 255, 0.34);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 12px 26px rgba(15, 23, 42, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+
+  cursor: pointer;
+
+  transition:
+    transform 0.22s ease,
+    background 0.22s ease,
+    color 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.slider-btn:hover {
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    rgba(79, 124, 255, 0.58),
+    rgba(139, 92, 246, 0.48),
+    rgba(236, 72, 153, 0.42)
+  );
+
+  box-shadow:
+    0 16px 34px rgba(79, 70, 229, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.slider-btn:active {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.slider-prev {
+top: 50%;
+  left: clamp(14px, 3vw, 34px);
+}
+
+.slider-next {
+top: 50%;
+  right: clamp(14px, 3vw, 34px);
+}
+
+/* 下方圓點 */
+.slider-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 24px;
+}
+
+/* 一般圓點 */
+.slider-dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.46);
+
+  box-shadow:
+    0 6px 14px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+
+  cursor: pointer;
+
+  transition:
+    width 0.22s ease,
+    background 0.22s ease,
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.slider-dot:hover {
+  transform: scale(1.2);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+/* 目前圖片的圓點 */
+.slider-dot.active {
+  width: 26px;
+  background: linear-gradient(
+    135deg,
+    rgba(79, 124, 255, 0.62),
+    rgba(139, 92, 246, 0.52),
+    rgba(236, 72, 153, 0.46)
+  );
+
+  box-shadow:
+    0 8px 18px rgba(79, 70, 229, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.62);
+}
+
+/* 手機版 */
+@media (max-width: 768px) {
+  .slider-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 26px;
+    line-height: 34px;
+  }
+
+  .slider-prev {
+    left: 10px;
+  }
+
+  .slider-next {
+    right: 10px;
+  }
+
+  .slider-dots {
+    gap: 7px;
+  }
+
+  .slider-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .slider-dot.active {
+    width: 22px;
+  }
+}
+
+
+/* =========================================================
+   11. Tags 詳細頁設備標籤
+   主頁房卡 JS 已不輸出 tag；這裡主要給詳細頁使用
+========================================================= */
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.tag {
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.50);
+  border: 1px solid rgba(255, 255, 255, 0.54);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+}
+
+.tag:nth-child(3n + 1) {
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.70);
+}
+
+.tag:nth-child(3n + 2) {
+  color: #7e22ce;
+  background: rgba(243, 232, 255, 0.70);
+}
+
+.tag:nth-child(3n + 3) {
+  color: #be123c;
+  background: rgba(255, 228, 230, 0.70);
+}
+
+
+/* =========================================================
+   12. Table 表格：收藏、購物車、訂單、管理員列表
+========================================================= */
+
+table {
+  width: 100%;
+  margin-top: 12px;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+th,
+td {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(203, 213, 225, 0.3);
+  text-align: left;
+  vertical-align: middle;
+}
+
+th {
+  color: #1e3a8a;
+  background: linear-gradient(135deg, rgba(219, 234, 254, 0.8), rgba(191, 219, 254, 0.6));
+  font-weight: 600;
+  font-size: 14px;
+}
+
+td {
+  color: #334155;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+tbody tr:hover {
+  background: rgba(241, 245, 249, 0.5);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+.favorite-card-list,
+.cart-card-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.favorite-item-card,
+.cart-item-card {
+  display: grid;
+  gap: 14px;
+  align-items: start;
+  padding: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.favorite-item-card {
+  grid-template-columns: minmax(260px, 1fr) minmax(180px, 0.35fr) minmax(150px, auto);
+}
+
+.cart-item-card {
+  grid-template-columns: minmax(220px, 0.8fr) minmax(220px, 0.75fr) minmax(360px, 1.3fr) minmax(170px, 0.5fr);
+}
+
+.favorite-item-card.unavailable,
+.cart-item-card.unavailable {
+  grid-template-columns: 1fr auto;
+}
+
+.cart-room-summary-card {
+  min-width: 0;
+}
+
+.cart-room-copy {
+  min-width: 0;
+}
+
+.saved-list-eyebrow,
+.cart-room-eyebrow {
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.favorite-item-card h3,
+.cart-room-copy h3 {
+  margin: 4px 0 6px;
+  color: #0f172a;
+  font-size: 20px;
+}
+
+.favorite-item-card p,
+.cart-room-copy p {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.saved-list-meta,
+.cart-room-mini-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.saved-list-meta span,
+.cart-room-mini-meta span {
+  padding: 5px 8px;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 900;
+  border-radius: 999px;
+  background: rgba(241, 245, 249, 0.88);
+}
+
+.saved-list-price,
+.saved-list-actions,
+.cart-room-type-container,
+.cart-booking-fields,
+.cart-checkout-panel {
+  border: 1px solid rgba(148, 163, 184, 0.20);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.64);
+}
+
+.saved-list-price {
+  display: grid;
+  gap: 5px;
+  padding: 14px;
+  background: rgba(248, 250, 252, 0.74);
+}
+
+.saved-list-price span,
+.saved-list-price small {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.saved-list-price strong {
+  color: #0f766e;
+  font-size: 22px;
+}
+
+.saved-list-actions {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(248, 250, 252, 0.54);
+}
+
+.cart-room-type-container {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 14px;
+}
+
+.cart-room-type-container label {
+  margin: 0;
+  color: #1e3a8a;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.cart-room-type-select {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 16px;
+  border: 2px solid rgba(79, 70, 229, 0.2);
+  border-radius: 8px;
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 14px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.75));
+  outline: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.06);
+}
+
+.cart-room-type-select:hover {
+  border-color: rgba(79, 70, 229, 0.4);
+  box-shadow: 0 4px 8px rgba(79, 70, 229, 0.1);
+}
+
+.cart-room-type-select:focus {
+  border-color: rgba(79, 70, 229, 0.8);
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15), 0 4px 12px rgba(79, 70, 229, 0.15);
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+}
+
+.cart-room-type-info {
+  font-size: 13px;
+  color: #475569;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, rgba(226, 232, 240, 0.4), rgba(203, 213, 225, 0.2));
+  border-radius: 6px;
+  line-height: 1.5;
+  border-left: 3px solid rgba(79, 70, 229, 0.3);
+  font-weight: 500;
+}
+
+.cart-booking-fields {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px;
+  background: rgba(248, 250, 252, 0.72);
+}
+
+.cart-booking-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cart-booking-heading span {
+  display: block;
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.cart-booking-heading strong {
+  display: block;
+  margin-top: 2px;
+  color: #0f172a;
+  font-size: 15px;
+}
+
+.cart-booking-heading small {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.cart-stay-block {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 10px;
+  align-items: stretch;
+  padding: 10px 12px;
+  border: 1px solid rgba(79, 124, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.cart-stay-block.checkout {
+  border-color: rgba(236, 72, 153, 0.18);
+}
+
+.cart-stay-badge {
+  display: grid;
+  place-items: center;
+  grid-row: 1 / span 2;
+  color: white;
+  font-size: 13px;
+  font-weight: 900;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+}
+
+.cart-stay-block.checkout .cart-stay-badge {
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+}
+
+.cart-stay-block > div,
+.cart-guest-control {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.cart-stay-connector {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.cart-stay-connector::before,
+.cart-stay-connector::after {
+  content: "";
+  height: 1px;
+  background: rgba(148, 163, 184, 0.34);
+}
+
+.cart-booking-fields label,
+.cart-guest-control label {
+  margin: 0;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.cart-booking-fields input,
+.cart-guest-control input {
+  min-height: 44px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.90);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.cart-guest-control {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.cart-booking-summary {
+  padding: 8px 10px;
+  color: #1e3a8a;
+  font-size: 13px;
+  font-weight: 900;
+  border-radius: 8px;
+  background: rgba(219, 234, 254, 0.62);
+}
+
+.cart-booking-summary.is-warning {
+  color: #92400e;
+  background: rgba(254, 243, 199, 0.78);
+}
+
+.cart-checkout-panel {
+  display: grid;
+  align-content: start;
+  gap: 9px;
+  padding: 16px;
+  background: rgba(248, 250, 252, 0.74);
+}
+
+.cart-checkout-panel span,
+.cart-checkout-panel small {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.cart-checkout-panel strong {
+  color: #0f766e;
+  font-size: 24px;
+  line-height: 1.15;
+}
+
+.cart-checkout-actions {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.order-admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.order-admin-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+  transform: none;
+  box-shadow: none;
+}
+
+/* =========================================================
+   13. Admin 後台管理
+========================================================= */
+
+.admin-shell {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.admin-sidebar {
+  position: sticky;
+  top: 92px;
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+}
+
+.admin-sidebar-title {
+  padding: 8px 8px 12px;
+}
+
+.admin-sidebar-title span {
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.admin-sidebar-title h2 {
+  margin: 6px 0;
+  color: #111827;
+  font-size: 24px;
+}
+
+.admin-sidebar-title p {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.admin-nav-btn {
+  width: 100%;
+  min-height: 74px;
+  padding: 14px 16px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 18px;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+  text-align: left;
+}
+
+.admin-nav-btn strong,
+.admin-nav-btn span {
+  display: block;
+}
+
+.admin-nav-btn strong {
+  color: inherit;
+  font-size: 15px;
+}
+
+.admin-nav-btn span {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.admin-nav-btn:hover,
+.admin-nav-btn.active {
+  transform: translateY(-1px);
+}
+
+.admin-nav-btn.active {
+  border-color: transparent;
+  color: white;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  box-shadow: 0 16px 32px rgba(37, 99, 235, 0.22);
+}
+
+.admin-nav-btn.active span {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.admin-workspace {
+  min-width: 0;
+}
+
+.admin-section-panel {
+  display: none;
+}
+
+.admin-section-panel.active {
+  display: grid;
+  gap: 18px;
+  animation: adminPanelIn 0.18s ease-out;
+}
+
+.admin-section-panel > .panel {
+  margin: 0;
+}
+
+@keyframes adminPanelIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.admin-accordion {
+  padding: 0;
+}
+
+.admin-accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 26px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.admin-accordion-header::-webkit-details-marker {
+  display: none;
+}
+
+.admin-accordion-header::after {
+  content: "展開";
+  flex: 0 0 auto;
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.78);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-accordion[open] .admin-accordion-header::after {
+  content: "收合";
+}
+
+.admin-accordion-header span {
+  color: #111827;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.admin-accordion-header small {
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.admin-accordion-body {
+  padding: 0 26px 26px;
+}
+
+.admin-room-summary,
+.admin-chat-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 14px 0 18px;
+}
+
+.admin-room-summary div,
+.admin-chat-stats div {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.54);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.admin-room-summary span,
+.admin-chat-stats span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-room-summary strong,
+.admin-chat-stats strong {
+  display: block;
+  margin-top: 4px;
+  color: #1e3a8a;
+  font-size: 24px;
+}
+
+.admin-room-filter-bar {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.2fr) repeat(3, minmax(140px, 1fr)) auto;
+  gap: 12px;
+  align-items: end;
+  margin: 0 0 18px;
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.46);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+}
+
+.admin-room-filter-bar label {
+  margin-bottom: 6px;
+}
+
+.admin-room-filter-actions {
+  margin: 0;
+}
+
+.admin-room-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-room-card {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 18px;
+  padding: 16px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.10);
+}
+
+.admin-room-cover {
+  min-height: 180px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.48);
+}
+
+.admin-room-cover img {
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.admin-room-content {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-room-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-room-title-row h4 {
+  margin-bottom: 4px;
+  color: #111827;
+  font-size: 20px;
+}
+
+.admin-room-title-row p,
+.admin-room-desc {
+  color: var(--text-muted);
+}
+
+.admin-room-status {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: #047857;
+  background: rgba(209, 250, 229, 0.78);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.admin-room-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.admin-room-meta div,
+.admin-room-type-pill {
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.52);
+  border: 1px solid rgba(255, 255, 255, 0.56);
+}
+
+.admin-room-meta span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.admin-room-meta strong {
+  color: #1f2937;
+}
+
+.admin-room-type-list,
+.admin-room-tags,
+.admin-room-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-room-type-pill strong,
+.admin-room-type-pill span {
+  display: block;
+}
+
+.admin-room-type-pill span {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.admin-room-tags span {
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.70);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-room-tags.policy span {
+  color: #7e22ce;
+  background: rgba(243, 232, 255, 0.72);
+}
+
+.policy-tag-row .policy-tag {
+  color: #7e22ce;
+  background: rgba(243, 232, 255, 0.72);
+}
+
+.pricing-preview {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.54);
+  border: 1px solid var(--glass-border);
+}
+
+.pricing-preview p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.price-diff {
+  color: #dc2626;
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   14. Chat 聊天室
+========================================================= */
+
+.chat-box {
+  height: 260px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+  padding: 14px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.36);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+#chat .panel {
+  max-width: 920px;
+  margin-inline: auto;
+  padding: 0;
+  overflow: hidden;
+}
+
+#chat .panel h2 {
+  margin: 0;
+  padding: 22px 26px 4px;
+}
+
+.chat-subtitle {
+  padding: 0 26px 18px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.chat-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 0 22px 18px;
+}
+
+.chat-tab {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 999px;
+  padding: 10px 16px;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.66);
+  font-weight: 900;
+}
+
+.chat-tab.active {
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  border-color: transparent;
+}
+
+.chat-category-panel {
+  display: none;
+}
+
+.chat-category-panel.active {
+  display: block;
+}
+
+.chat-linked-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 22px 16px;
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.56);
+  border: 1px solid var(--glass-border);
+}
+
+.chat-linked-header h3 {
+  margin: 6px 0 2px;
+  font-size: 20px;
+}
+
+.chat-category-panel .itinerary-comment-box,
+.chat-category-panel .itinerary-comments,
+.chat-category-panel .grid,
+.chat-category-panel .actions,
+.chat-category-panel .vote-list {
+  margin: 0 22px 18px;
+}
+
+.chat-category-panel .itinerary-chat-shell {
+  margin: 0;
+}
+
+#chat .itinerary-discussion-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 430px;
+  margin: 0 22px;
+}
+
+#chat .itinerary-discussion-message {
+  margin-bottom: 0;
+}
+
+#chat .itinerary-chat-input-row {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+}
+
+#chat .itinerary-chat-input-row textarea {
+  min-height: 48px;
+  max-height: 120px;
+  resize: vertical;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+#chat .chat-box {
+  height: 430px;
+  margin: 0 22px;
+  padding: 22px;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0.28)),
+    radial-gradient(circle at 0% 0%, rgba(219, 234, 254, 0.72), transparent 36%),
+    radial-gradient(circle at 100% 100%, rgba(243, 232, 255, 0.68), transparent 34%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+#chat .chat-input-row {
+  padding: 18px 22px 22px;
+  background: rgba(255, 255, 255, 0.30);
+  border-top: 1px solid var(--glass-border);
+}
+
+#chat .chat-input-row input {
+  min-height: 48px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+#chat .chat-send-btn {
+  min-width: 96px;
+}
+
+.message {
+  max-width: 78%;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.user-msg {
+  margin-left: auto;
+  color: #1e3a8a;
+  background: linear-gradient(
+    135deg,
+    rgba(219, 234, 254, 0.90),
+    rgba(207, 250, 254, 0.78)
+  );
+}
+
+.admin-msg {
+  color: #475569;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.message-customer {
+  margin-right: auto;
+  color: #1e3a8a;
+  background: linear-gradient(135deg, rgba(219, 234, 254, 0.92), rgba(207, 250, 254, 0.76));
+}
+
+.message-admin {
+  margin-left: auto;
+  color: #475569;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+#chat .message {
+  max-width: min(76%, 560px);
+  padding: 13px 15px;
+  border-radius: 20px;
+}
+
+#chat .message-customer {
+  margin-left: auto;
+  margin-right: 0;
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+}
+
+#chat .message-admin {
+  margin-left: 0;
+  margin-right: auto;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+}
+
+#chat .message-customer .message-time {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.chat-empty-state {
+  display: grid;
+  place-items: center;
+  min-height: 170px;
+  color: var(--text-muted);
+  text-align: center;
+  font-weight: 800;
+}
+
+.chat-empty-icon {
+  margin-bottom: 8px;
+  font-size: 34px;
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.message-time {
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.admin-chat-container {
+  display: grid;
+  grid-template-columns: minmax(280px, 34%) 1fr;
+  gap: 16px;
+}
+
+.admin-chat-users,
+.admin-chat-conversation {
+  min-height: 430px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.40);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.admin-chat-users-header,
+.admin-chat-conv-header {
+  padding: 14px 16px;
+  color: #1e3a8a;
+  background: rgba(219, 234, 254, 0.70);
+  font-weight: 900;
+}
+
+.admin-chat-users-body {
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.admin-chat-user-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.admin-chat-user-item:hover,
+.admin-chat-user-item.active {
+  background: rgba(255, 255, 255, 0.72);
+  transform: translateY(-1px);
+}
+
+.admin-chat-user-info,
+.admin-chat-conv-header-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.admin-chat-user-avatar {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+  font-weight: 900;
+}
+
+.admin-chat-user-avatar.small {
+  width: 34px;
+  height: 34px;
+  font-size: 14px;
+}
+
+.admin-chat-user-detail {
+  min-width: 0;
+}
+
+.admin-chat-user-name,
+.admin-chat-user-account,
+.admin-chat-user-preview,
+.admin-chat-user-footnote {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-chat-user-name {
+  color: #111827;
+  font-weight: 900;
+}
+
+.admin-chat-user-account,
+.admin-chat-user-footnote {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-chat-user-preview {
+  color: #334155;
+  font-size: 13px;
+}
+
+.admin-chat-user-meta {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.unread-badge {
+  display: grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  color: white;
+  background: var(--red);
+}
+
+.admin-chat-conv-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-chat-conv-header-info span {
+  display: block;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-chat-conv-body {
+  height: 360px;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.admin-chat-thread-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.admin-chat-thread-meta span {
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: #475569;
+  background: rgba(255, 255, 255, 0.70);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.admin-chat-conv-input,
+.chat-input-row {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+}
+
+.admin-chat-conv-input input,
+.chat-input-row input {
+  flex: 1;
+}
+
+#search .grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#search .grid > div {
+  width: 100%;
+}
+
+#search label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+#search input,
+#search select {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.booking-search-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+  align-items: start;
+  gap: 22px;
+}
+
+.booking-search-panel {
+  position: sticky;
+  top: 88px;
+  max-height: calc(100vh - 110px);
+  overflow: auto;
+}
+
+.booking-search-heading {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.booking-search-heading span,
+.booking-filter-title {
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.booking-search-heading h2 {
+  margin: 0;
+}
+
+.booking-search-heading p {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.booking-filter-section {
+  padding: 14px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.booking-filter-title {
+  margin-bottom: 12px;
+}
+
+.booking-date-picker {
+  display: grid;
+  gap: 10px;
+}
+
+.date-range-item {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  align-items: stretch;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid rgba(79, 124, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.56);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.66);
+}
+
+.date-range-marker {
+  display: grid;
+  place-items: center;
+  min-height: 76px;
+  color: white;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+}
+
+.date-range-item:nth-of-type(3) .date-range-marker {
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+}
+
+.date-range-fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  min-width: 0;
+}
+
+.date-range-fields label,
+.booking-guests-field label {
+  margin-bottom: 5px;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.date-range-fields input,
+.booking-guests-field input {
+  min-height: 48px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.82);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.date-range-fields input[type="date"],
+.date-range-fields input[type="time"] {
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.date-range-fields input[type="date"]::-webkit-calendar-picker-indicator,
+.date-range-fields input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.72;
+}
+
+.date-range-connector {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.date-range-connector::before,
+.date-range-connector::after {
+  content: "";
+  height: 1px;
+  background: rgba(148, 163, 184, 0.34);
+}
+
+.booking-date-summary {
+  padding: 11px 12px;
+  color: #1e3a8a;
+  font-size: 14px;
+  font-weight: 900;
+  border: 1px solid rgba(79, 124, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(219, 234, 254, 0.62);
+}
+
+.booking-date-summary.is-warning {
+  color: #92400e;
+  border-color: rgba(245, 158, 11, 0.28);
+  background: rgba(254, 243, 199, 0.72);
+}
+
+.booking-guests-field {
+  padding: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 8px;
+  background: rgba(248, 250, 252, 0.72);
+}
+
+.booking-filter-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.booking-filter-grid.two-columns {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.booking-filter-grid .full-width {
+  grid-column: 1 / -1;
+}
+
+.booking-filter-actions {
+  position: sticky;
+  bottom: 0;
+  padding-top: 10px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(248, 250, 252, 0.92) 30%);
+}
+
+.booking-results-panel {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.room-list-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.room-list-toolbar h2 {
+  margin-bottom: 4px;
+}
+
+.room-list-toolbar p {
+  color: var(--text-muted);
+  font-weight: 800;
+}
+
+.room-page-size-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 170px;
+}
+
+.room-page-size-control label {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.room-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.room-page-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+/* =========================================================
+   15. Footer / Helper
+========================================================= */
+
+.hidden {
+  display: none;
+}
+
+footer {
+  padding: 24px;
+  text-align: center;
+  color: #475569;
+}
+
+
+/* =========================================================
+   16. Scrollbar
+========================================================= */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+}
+
+
+/* =========================================================
+   17. Responsive 響應式
+========================================================= */
+
+@media (max-width: 900px) {
+  main {
+    width: 90%;
+  }
+
+  .booking-search-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-search-panel {
+    position: static;
+    max-height: none;
+  }
+
+  .cart-item-card {
+    grid-template-columns: 1fr;
+  }
+
+  .favorite-item-card {
+    grid-template-columns: 1fr;
+  }
+
+  .cart-checkout-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-sidebar {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-sidebar-title {
+    grid-column: 1 / -1;
+  }
+
+  .admin-nav-btn {
+    min-height: 84px;
+  }
+
+  .admin-nav-btn strong,
+  .admin-nav-btn span {
+    overflow-wrap: anywhere;
+  }
+
+  .admin-room-filter-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-room-filter-actions {
+    align-self: stretch;
+  }
+
+  .admin-room-filter-actions button {
+    width: 100%;
+  }
+
+  .room-card {
+    grid-template-columns: 280px 1fr;
+  }
+
+  .room-body {
+    padding: 24px;
+  }
+
+  .admin-room-card,
+  .admin-chat-container {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-room-cover,
+  .admin-room-cover img {
+    min-height: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  header,
+  .auth-summary,
+  .bonus-point-bar,
+  nav,
+  main {
+    width: 100%;
+  }
+
+  header {
+    padding: 34px 18px;
+  }
+
+  header h1 {
+    font-size: 28px;
+  }
+
+  nav {
+    padding: 12px 18px;
+  }
+
+  .room-list-toolbar {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .booking-filter-grid.two-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .date-range-item,
+  .notice-dialog-card {
+    grid-template-columns: 1fr;
+  }
+
+  .date-range-marker {
+    min-height: 36px;
+  }
+
+  .date-range-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .notice-dialog-action {
+    grid-column: 1;
+  }
+
+  .order-confirm-card {
+    padding: 22px;
+  }
+
+  .order-confirm-stay,
+  .order-confirm-detail-grid,
+  .order-confirm-total {
+    grid-template-columns: 1fr;
+  }
+
+  .order-confirm-date-divider {
+    justify-self: center;
+  }
+
+  .order-confirm-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .bank-transfer-card {
+    padding: 22px;
+  }
+
+  .bank-transfer-summary,
+  .bank-transfer-account,
+  .bank-transfer-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .bank-transfer-actions {
+    display: grid;
+  }
+
+  .cart-booking-heading {
+    display: grid;
+  }
+
+  .cart-stay-block {
+    grid-template-columns: 42px minmax(0, 1fr);
+  }
+
+  .cart-stay-badge {
+    min-height: 86px;
+  }
+
+  .saved-list-actions,
+  .cart-checkout-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .room-page-size-control {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .bonus-point-bar {
+    padding: 10px 18px;
+  }
+
+  .bonus-bar-inner,
+  .bonus-actions {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .bonus-bar-inner {
+    flex-direction: column;
+  }
+
+  .auth-summary {
+    margin: -14px auto 0;
+    padding: 0 18px;
+  }
+
+  main {
+    padding: 0 18px;
+    margin: 22px auto;
+  }
+
+  .panel {
+    padding: 20px;
+    border-radius: 22px;
+  }
+
+  .panel h2 {
+    font-size: 22px;
+  }
+
+  .admin-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-nav-btn {
+    min-height: auto;
+  }
+
+  .admin-room-filter-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-accordion-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-accordion-body {
+    padding: 0 20px 20px;
+  }
+
+  .admin-room-title-row,
+  .admin-chat-conv-header {
+    flex-direction: column;
+  }
+
+  .room-card {
+    display: block;
+    min-height: auto;
+    border-radius: 24px;
+  }
+
+  .room-image {
+    height: 210px;
+    min-height: 210px;
+    border-radius: 24px 24px 0 0;
+  }
+
+  .room-body,
+  .detail-card .room-body {
+    display: block;
+    padding: 22px;
+  }
+
+  .room-body h3 {
+    font-size: 22px;
+  }
+
+  .room-card .actions {
+    margin-top: 14px;
+  }
+
+  .detail-slider {
+    height: 280px;
+    border-radius: 24px;
+  }
+
+  .slider-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 28px;
+    line-height: 38px;
+  }
+
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .cart-booking-fields {
+    white-space: normal;
+  }
+
+  .message {
+    max-width: 88%;
+  }
+}
+
+@media (max-width: 480px) {
+  nav button,
+  .primary-btn,
+  .secondary-btn,
+  .danger-btn {
+    width: 100%;
+  }
+
+  .actions {
+    width: 100%;
+  }
+
+  .summary-box {
+    grid-template-columns: 1fr;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-slider {
+    height: 230px;
+  }
+}
+
+
+/* =========================================================
+   房型選擇區
+========================================================= */
+
+.room-type-list {
+  display: grid;
+  gap: 14px;
+  margin: 14px 0 24px;
+}
+
+.room-type-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  align-items: center;
+
+  padding: 18px 20px;
+  border-radius: 22px;
+
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.56);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+
+  cursor: pointer;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    background 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.room-type-card:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.12);
+}
+
+.room-type-card.active {
+  border-color: rgba(79, 124, 255, 0.65);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(219, 234, 254, 0.72),
+      rgba(243, 232, 255, 0.64),
+      rgba(255, 228, 230, 0.52)
+    );
+  box-shadow:
+    0 18px 42px rgba(79, 70, 229, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.68);
+}
+
+.room-type-card h4 {
+  margin-bottom: 6px;
+  color: #111827;
+  font-size: 18px;
+}
+
+.room-type-card p {
+  margin-bottom: 4px;
+  color: #475569;
+}
+
+.room-type-price {
+  min-width: 140px;
+  text-align: right;
+  font-size: 20px;
+  font-weight: 800;
+
+  color: transparent;
+  background: linear-gradient(135deg, #ef4444, #f97316, #ec4899);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* 訂單房型小字 */
+td small {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.order-status {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 999px;
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.76);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.room-reviews {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 18px;
+}
+
+.review-item {
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.52);
+  border: 1px solid var(--glass-border);
+}
+
+.review-item strong {
+  color: #0f172a;
+}
+
+.review-item strong,
+.review-item span {
+  display: block;
+}
+
+.review-item span {
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.review-item p {
+  margin-top: 8px;
+  color: #334155;
+}
+
+.order-action-stack {
+  display: grid;
+  gap: 8px;
+  min-width: 180px;
+}
+
+.order-review-form {
+  display: grid;
+  gap: 8px;
+  min-width: 220px;
+  padding: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.order-review-form.hidden {
+  display: none;
+}
+
+.order-review-form label {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.order-review-form textarea {
+  min-height: 82px;
+  resize: vertical;
+}
+
+.review-submitted-chip,
+.manual-review-note {
+  color: #92400e;
+  font-weight: 900;
+}
+
+.review-submitted-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(254, 243, 199, 0.78);
+}
+
+.back-to-top-btn {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 50;
+  display: none;
+  width: 46px;
+  height: 46px;
+  border: 0;
+  border-radius: 50%;
+  color: white;
+  background: linear-gradient(135deg, #2563eb, #0f766e);
+  box-shadow: 0 16px 38px rgba(15, 23, 42, 0.26);
+  font-size: 22px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.back-to-top-btn.visible {
+  display: grid;
+  place-items: center;
+}
+
+/* 手機版 */
+@media (max-width: 768px) {
+  .room-type-card {
+    grid-template-columns: 1fr;
+  }
+
+  .room-type-price {
+    min-width: auto;
+    text-align: left;
+  }
+}
+
+/* =========================================================
+   18. Itinerary 行程規劃
+========================================================= */
+
+.readonly-mode > .panel:not(.readonly-itinerary) {
+  display: none;
+}
+
+.readonly-mode .itinerary-workspace,
+.readonly-mode .itinerary-list-view,
+.readonly-mode .itinerary-detail-view {
+  display: none !important;
+}
+
+.itinerary-command-panel {
+  padding-bottom: 22px;
+}
+
+/* Hero 標題列（圖示 + 大標題 + 按鈕） */
+.itinerary-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.itinerary-hero-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.itinerary-hero-title h2 {
+  font-size: 28px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.itinerary-hero-icon {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.itinerary-hero > div > p {
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+/* 狀態篩選 Pill Tabs */
+.itinerary-tab-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.itinerary-tab-btn {
+  padding: 8px 22px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(148, 163, 184, 0.30);
+  background: rgba(255, 255, 255, 0.70);
+  color: #334155;
+  font-size: 14px;
+  font-weight: 800;
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.itinerary-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.90);
+  border-color: rgba(79, 124, 255, 0.35);
+}
+
+.itinerary-tab-btn.active {
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  border-color: transparent;
+  color: #fff;
+}
+
+/* 行程卡片格線 */
+.itinerary-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+/* 行程卡片 */
+.itinerary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.60);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.itinerary-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.13);
+}
+
+.itinerary-card.active {
+  background: linear-gradient(135deg, rgba(219, 234, 254, 0.72), rgba(243, 232, 255, 0.58)), rgba(255, 255, 255, 0.42);
+  border-color: rgba(79, 124, 255, 0.42);
+}
+
+.itinerary-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.itinerary-card-head h3 {
+  font-size: 17px;
+  font-weight: 900;
+  color: #111827;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 卡片狀態標籤 */
+.itinerary-card-status {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.itinerary-card-status.planning {
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.86);
+}
+
+.itinerary-card-status.done {
+  color: #065f46;
+  background: rgba(209, 250, 229, 0.86);
+}
+
+.itinerary-card-status.cancelled {
+  color: #6b7280;
+  background: rgba(243, 244, 246, 0.86);
+}
+
+/* 卡片 metadata 列 */
+.itinerary-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  font-size: 13px;
+  color: var(--text-soft);
+  font-weight: 700;
+}
+
+/* 卡片底部（協作人數 + 費用） */
+.itinerary-card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.itinerary-card-expense {
+  color: var(--blue);
+  font-weight: 900;
+}
+
+/* 卡片操作列 */
+.itinerary-card-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.itinerary-card-actions select {
+  font-size: 13px;
+  flex: 1;
+}
+
+.itinerary-panel-title,
+.itinerary-detail-header,
+.itinerary-item-main,
+.vote-header,
+.conflict-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.itinerary-panel-title.compact h2 {
+  margin-bottom: 4px;
+  font-size: 22px;
+}
+
+.itinerary-panel-title p,
+.itinerary-detail-header p,
+.attraction-card p,
+.itinerary-item-card p,
+.readonly-item p {
+  color: var(--text-muted);
+}
+
+.itinerary-stepper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.itinerary-stepper span {
+  padding: 10px 12px;
+  border-radius: 16px;
+  color: #1e3a8a;
+  background: rgba(219, 234, 254, 0.66);
+  border: 1px solid var(--glass-border);
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.itinerary-create-drawer,
+.itinerary-search-drawer {
+  margin-top: 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.32);
+  border: 1px solid var(--glass-border);
+  overflow: hidden;
+}
+
+.itinerary-create-drawer summary,
+.itinerary-search-drawer summary {
+  padding: 13px 16px;
+  color: #1e3a8a;
+  background: rgba(219, 234, 254, 0.58);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.itinerary-create-drawer .grid,
+.itinerary-create-drawer .actions,
+.itinerary-search-drawer .itinerary-search-row,
+.itinerary-search-drawer #attractionResults {
+  margin: 16px;
+}
+
+/* 篩選列（複製來源 + 狀態篩選） */
+.itinerary-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: end;
+  margin-top: 18px;
+}
+
+.itinerary-filter-row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 180px;
+}
+
+/* 行程卡片列表：響應式格線 */
+#itineraryOverview {
+  margin-bottom: 4px;
+}
+
+#itineraryOverview .itinerary-overview-list {
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+}
+
+#itineraryOverview .itinerary-overview-card {
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+#itineraryOverview .itinerary-overview-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.13);
+}
+
+/* 編輯頁返回導航列 */
+.itinerary-detail-nav {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px !important;
+}
+
+.itinerary-back-btn {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+/* 編輯頁內容（快速加入 + 詳情）的間距 */
+.itinerary-detail-view {
+  display: grid;
+  gap: 20px;
+}
+
+/* 工作區（保留相容）*/
+.itinerary-workspace {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.itinerary-main {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+
+.itinerary-quick-add {
+  margin-bottom: 0;
+}
+
+.itinerary-quick-add.is-cancelled {
+  opacity: 0.5;
+  pointer-events: none;
+  user-select: none;
+}
+
+.itinerary-quick-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.7fr) minmax(110px, 0.7fr) minmax(220px, 1.5fr) minmax(130px, 0.8fr) minmax(120px, 0.8fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.quick-name-field {
+  min-width: 0;
+}
+
+.quick-add-btn {
+  height: 48px;
+  min-width: 86px;
+}
+
+.quick-preset-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.quick-preset-row button {
+  padding: 8px 12px;
+}
+
+.lodging-picker {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.38);
+  border: 1px solid var(--glass-border);
+}
+
+.lodging-picker-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.lodging-picker-header strong,
+.lodging-picker-header span {
+  display: block;
+}
+
+.lodging-picker-header strong {
+  color: #111827;
+  font-size: 18px;
+}
+
+.lodging-picker-header span {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.lodging-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.lodging-card {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 12px;
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+}
+
+.lodging-card img {
+  width: 104px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.lodging-card h4 {
+  margin-bottom: 4px;
+  color: #111827;
+}
+
+.lodging-card p,
+.lodging-card span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.lodging-card strong {
+  display: block;
+  margin-top: 6px;
+  color: #dc2626;
+  font-size: 16px;
+}
+
+.lodging-card .actions {
+  margin-top: 10px;
+}
+
+.itinerary-search-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(150px, 0.6fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.inline-control {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.inline-control.compact input {
+  min-width: 220px;
+}
+
+.itinerary-copy-row {
+  margin-top: 18px;
+}
+
+.attraction-grid,
+.itinerary-overview-list,
+.vote-list,
+.expense-list,
+.conflict-list,
+.log-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.attraction-card,
+.itinerary-overview-card,
+.vote-card,
+.expense-item,
+.conflict-card,
+.log-item,
+.readonly-day,
+.readonly-item {
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.46);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.attraction-card,
+.itinerary-overview-card,
+.vote-option,
+.expense-split-list div,
+.budget-summary {
+  display: grid;
+  gap: 10px;
+}
+
+.attraction-card {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.attraction-card strong,
+.itinerary-overview-card h3,
+.itinerary-detail-header h2,
+.itinerary-item-card h4 {
+  color: #111827;
+}
+
+.attraction-card span,
+.itinerary-overview-card small,
+.expense-item span,
+.log-item small,
+.conflict-card small,
+.readonly-item span,
+.vote-option span {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.itinerary-overview-card {
+  grid-template-columns: minmax(240px, 1fr) auto;
+  align-items: center;
+}
+
+.itinerary-sidebar .itinerary-overview-list {
+  margin-top: 0;
+}
+
+.itinerary-sidebar .itinerary-overview-card {
+  grid-template-columns: 1fr;
+  cursor: pointer;
+}
+
+.itinerary-overview-card .actions {
+  align-items: center;
+}
+
+.itinerary-overview-card select {
+  min-width: 130px;
+}
+
+.itinerary-overview-card.active {
+  background:
+    linear-gradient(135deg, rgba(219, 234, 254, 0.72), rgba(243, 232, 255, 0.58)),
+    rgba(255, 255, 255, 0.42);
+  border-color: rgba(79, 124, 255, 0.42);
+}
+
+.status-pill,
+.type-pill,
+.must-pill {
+  display: inline-block;
+  width: fit-content;
+  margin-bottom: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.status-pill {
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.76);
+}
+
+.type-pill {
+  color: #047857;
+  background: rgba(209, 250, 229, 0.78);
+}
+
+.must-pill {
+  color: #be123c;
+  background: rgba(255, 228, 230, 0.78);
+}
+
+.itinerary-cost-box {
+  min-width: 210px;
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid var(--glass-border);
+  text-align: right;
+}
+
+.itinerary-cost-box.warning {
+  background: rgba(254, 242, 242, 0.78);
+  border-color: rgba(248, 113, 113, 0.38);
+}
+
+.itinerary-cost-box span,
+.itinerary-cost-box small,
+.budget-summary span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.itinerary-cost-box strong,
+.budget-summary strong {
+  color: transparent;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-size: 26px;
+}
+
+.itinerary-subsection {
+  margin-top: 14px;
+  padding: 0;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.28);
+  border: 1px solid var(--glass-border);
+  overflow: hidden;
+}
+
+.itinerary-subsection summary {
+  padding: 16px 18px;
+  cursor: pointer;
+  color: #1e3a8a;
+  background: rgba(219, 234, 254, 0.62);
+  font-weight: 900;
+}
+
+.itinerary-subsection > *:not(summary) {
+  margin: 16px;
+}
+
+.day-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.day-tabs button {
+  padding: 9px 14px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 999px;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.68);
+  font-weight: 800;
+}
+
+.day-tabs button.active {
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  border-color: transparent;
+}
+
+.day-plan-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.itinerary-item-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.itinerary-item-card {
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.50);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.itinerary-item-card.must-go {
+  border-color: rgba(236, 72, 153, 0.42);
+  background:
+    linear-gradient(135deg, rgba(255, 228, 230, 0.52), rgba(243, 232, 255, 0.44)),
+    rgba(255, 255, 255, 0.50);
+}
+
+/* 拖曳視覺狀態 */
+.itinerary-item-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease, border-color 0.15s ease;
+  cursor: grab;
+}
+
+/* 被拿起的瞬間（ghost image 截圖用） */
+.itinerary-item-card.is-lifting {
+  transform: scale(1.04) rotate(1deg);
+  box-shadow: 0 28px 60px rgba(15, 23, 42, 0.30);
+  opacity: 0.92;
+  cursor: grabbing;
+}
+
+/* 拖曳中的實際卡片（ghost 已接管，原位半透明） */
+.itinerary-item-card.is-dragging {
+  opacity: 0.30;
+  transform: scale(0.97);
+}
+
+/* 準備交換的目標卡片 */
+.itinerary-item-card.drag-target {
+  border-color: rgba(79, 124, 255, 0.55);
+  background:
+    linear-gradient(135deg, rgba(219, 234, 254, 0.65), rgba(243, 232, 255, 0.50)),
+    rgba(255, 255, 255, 0.50);
+  transform: scale(1.02);
+  box-shadow: 0 16px 40px rgba(79, 124, 255, 0.20);
+}
+
+.itinerary-item-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.itinerary-item-controls input[type="time"] {
+  width: 130px;
+}
+
+.itinerary-note-panel {
+  display: none;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.itinerary-note-panel.open {
+  display: grid;
+}
+
+.must-go-toggle {
+  justify-self: start;
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(236, 72, 153, 0.35);
+  background: transparent;
+  color: #be123c;
+  font-size: 13px;
+  font-weight: 800;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.must-go-toggle:hover:not(:disabled) {
+  background: rgba(255, 228, 230, 0.55);
+}
+
+.must-go-toggle.is-must-go {
+  background: rgba(255, 228, 230, 0.72);
+  border-color: rgba(236, 72, 153, 0.6);
+}
+
+.member-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.member-list span,
+.expense-split-list div {
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid var(--glass-border);
+  font-weight: 800;
+}
+
+.readonly-share-box {
+  display: grid;
+  gap: 8px;
+}
+
+.vote-option {
+  grid-template-columns: minmax(220px, 1fr) auto;
+  align-items: center;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.itinerary-comment-box,
+.itinerary-comments {
+  display: grid;
+  gap: 10px;
+}
+
+.itinerary-comment {
+  max-width: min(78%, 620px);
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.70);
+  border: 1px solid var(--glass-border);
+}
+
+.itinerary-comment.mine {
+  justify-self: end;
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+}
+
+.itinerary-comment span {
+  display: block;
+  color: inherit;
+  opacity: 0.76;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.budget-summary {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-bottom: 14px;
+}
+
+.budget-summary div {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.56);
+  border: 1px solid var(--glass-border);
+}
+
+.expense-split-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.expense-split-list div {
+  border-radius: 18px;
+}
+
+.expense-split-list span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.readonly-itinerary .readonly-day {
+  margin-top: 12px;
+}
+
+/* --- 系統推薦面板 --- */
+.itinerary-rec-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.rec-controls {
+  display: grid;
+  gap: 12px;
+}
+
+.rec-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.rec-slider-row label {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-soft);
+  white-space: nowrap;
+  min-width: 140px;
+}
+
+.rec-slider-row label strong {
+  color: var(--blue);
+  font-size: 16px;
+}
+
+#recDistanceSlider {
+  flex: 1;
+  min-width: 160px;
+  height: 6px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 999px;
+  outline: none;
+  background: rgba(148, 163, 184, 0.28);
+  transition: background 0.1s linear;
+}
+
+#recDistanceSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--blue);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(79, 124, 255, 0.40);
+}
+
+#recDistanceSlider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--blue);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 8px rgba(79, 124, 255, 0.40);
+}
+
+.rec-filter-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.rec-filter-row input {
+  flex: 1;
+  min-width: 140px;
+}
+
+.rec-filter-row select {
+  min-width: 120px;
+}
+
+/* --- 景點推薦卡片縮圖 --- */
+.attraction-card {
+  grid-template-columns: 1fr auto;
+  padding: 14px 16px;
+}
+
+.attraction-card-info {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.attraction-thumb {
+  width: 88px;
+  height: 66px;
+  object-fit: cover;
+  border-radius: 10px;
+  flex-shrink: 0;
+  background: var(--bg-main);
+}
+
+/* --- 行程總覽標籤 --- */
+.overview-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.owner-badge,
+.member-badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.owner-badge {
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.86);
+}
+
+.member-badge {
+  color: #6d28d9;
+  background: rgba(237, 233, 254, 0.86);
+}
+
+/* --- 側邊欄兩欄直排 --- */
+.itinerary-sidebar-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* --- 必去候選面板 --- */
+.candidate-panel {
+  padding: 18px !important;
+}
+
+.candidate-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.candidate-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 228, 230, 0.38);
+  border: 1px solid rgba(236, 72, 153, 0.22);
+}
+
+.candidate-item-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.candidate-item-info strong {
+  display: block;
+  color: #111827;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+.candidate-item-info small {
+  display: block;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   16. Home / Train 整合模組
+========================================================= */
+
+.home-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 24px;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(219, 234, 254, 0.72), rgba(240, 253, 250, 0.62)),
+    rgba(255, 255, 255, 0.42);
+}
+
+.home-hero h2 {
+  margin: 10px 0;
+  color: #172033;
+  font-size: 44px;
+  line-height: 1.12;
+}
+
+.home-hero p,
+.home-module-card p {
+  color: var(--text-soft);
+  font-weight: 700;
+}
+
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.home-module-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin: 22px 0;
+}
+
+.home-module-card {
+  display: grid;
+  align-content: space-between;
+  min-height: 180px;
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.54);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.10);
+}
+
+.home-module-card strong {
+  color: #1e3a8a;
+  font-size: 20px;
+}
+
+.home-module-card button {
+  width: fit-content;
+  margin-top: 16px;
+}
+
+.home-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+}
+
+.home-dashboard-grid .summary-item,
+.train-bonus-box {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid var(--glass-border);
+}
+
+.home-dashboard-grid .summary-item span,
+.train-bonus-box span,
+.train-meta-grid span,
+.train-price-card span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.home-dashboard-grid .summary-item strong,
+.train-bonus-box strong {
+  display: block;
+  margin-top: 4px;
+  color: #172033;
+  font-size: 22px;
+}
+
+.train-search-grid,
+.train-booking-grid,
+.train-meta-grid,
+.train-price-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.train-result-list,
+.train-order-list {
+  display: grid;
+  gap: 14px;
+}
+
+.train-empty-panel p,
+.train-panel p,
+.train-booking-panel p {
+  color: var(--text-soft);
+  font-weight: 700;
+}
+
+.train-result-card,
+.train-order-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.56);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+}
+
+.train-result-card.unavailable {
+  opacity: 0.72;
+  background: rgba(241, 245, 249, 0.72);
+}
+
+.train-result-card.selected {
+  border-color: rgba(79, 124, 255, 0.62);
+  box-shadow: 0 18px 40px rgba(79, 124, 255, 0.18);
+}
+
+.train-result-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.train-result-head h3 {
+  margin: 8px 0 2px;
+  color: #172033;
+  font-size: 22px;
+}
+
+.train-result-head p {
+  color: var(--text-muted);
+  font-weight: 800;
+}
+
+.train-result-head > strong {
+  color: #1e3a8a;
+  font-size: 24px;
+  white-space: nowrap;
+}
+
+.train-status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  color: #075985;
+  background: rgba(224, 242, 254, 0.86);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.train-meta-grid > div,
+.train-price-card > div {
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.54);
+}
+
+.train-meta-grid strong,
+.train-price-card strong {
+  color: #172033;
+  font-size: 16px;
+}
+
+.train-result-actions,
+.train-check-row {
+  margin-top: 4px;
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #334155;
+  font-weight: 900;
+}
+
+.check-row input {
+  width: auto;
+}
+
+.train-price-preview {
+  margin-top: 16px;
+}
+
+.train-bonus-box {
+  min-width: 130px;
+  text-align: right;
+}
+
+.train-order-card .actions,
+.train-result-card .actions,
+.train-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 1100px) {
+  .home-hero,
+  .home-module-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-actions {
+    justify-content: flex-start;
+  }
+
+  .itinerary-quick-row,
+  .itinerary-search-row {
+    grid-template-columns: 1fr;
+  }
+
+  #itineraryOverview .itinerary-overview-list {
+    grid-template-columns: 1fr;
+  }
+
+  .itinerary-filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .itinerary-sidebar {
+    position: static;
+    max-height: none;
+  }
+
+  .quick-add-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .itinerary-panel-title,
+  .itinerary-detail-header,
+  .itinerary-item-main,
+  .chat-linked-header,
+  .train-result-head,
+  .vote-header,
+  .conflict-card,
+  .itinerary-overview-card,
+  .attraction-card,
+  .vote-option,
+  .inline-control {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .itinerary-cost-box {
+    min-width: 0;
+    text-align: left;
+  }
+
+  .itinerary-item-controls {
+    justify-content: flex-start;
+  }
+
+  .train-result-head > strong,
+  .train-bonus-box {
+    text-align: left;
+  }
+
+  .home-hero h2 {
+    font-size: 32px;
+  }
+
+  .itinerary-stepper {
+    grid-template-columns: 1fr;
+  }
+
+  .lodging-picker-header,
+  .lodging-card {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .lodging-card img {
+    width: 100%;
+    height: 180px;
+  }
+
+  .itinerary-create-drawer .grid,
+  .itinerary-create-drawer .actions,
+  .itinerary-search-drawer .itinerary-search-row,
+  .itinerary-search-drawer #attractionResults {
+    margin: 12px;
+  }
+}
+#bonusPointBar {
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+/* =========================================================
+   結算建議
+========================================================= */
+
+.settlement-list {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.settlement-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background: rgba(79, 124, 255, 0.07);
+  border: 1px solid rgba(79, 124, 255, 0.18);
+  flex-wrap: wrap;
+}
+
+.settlement-from {
+  font-weight: 600;
+  color: var(--red);
+}
+
+.settlement-arrow {
+  color: var(--text-muted);
+  font-size: 18px;
+}
+
+.settlement-to {
+  font-weight: 600;
+  color: var(--green);
+}
+
+.settlement-amount {
+  margin-left: auto;
+  font-size: 15px;
+  color: var(--blue);
+}
+
+/* =========================================================
+   投票結果與加入行程
+========================================================= */
+
+.vote-card-ended {
+  opacity: 0.88;
+}
+
+.vote-status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--text-muted);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+.vote-option-winner {
+  background: rgba(251, 191, 36, 0.18) !important;
+  border: 1.5px solid rgba(251, 191, 36, 0.55);
+}
+
+.vote-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.vote-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--blue);
+  transition: width 0.4s ease;
+}
+
+.vote-bar-fill.vote-bar-winner {
+  background: #f59e0b;
+}
+
+.vote-add-itinerary-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  margin-top: 10px;
+  background: rgba(79, 124, 255, 0.08);
+  border: 1.5px solid rgba(79, 124, 255, 0.25);
+  border-radius: var(--radius-sm);
+}
+
+.vote-add-itinerary-row span {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.vote-add-itinerary-row select,
+.vote-add-itinerary-row input[type="time"] {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .vote-add-itinerary-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+/* =========================================================
+   手動選座位系統
+========================================================= */
+
+.train-seat-map-section {
+  grid-column: 1 / -1;
+  padding: 14px 0 4px;
+}
+
+.train-seat-map {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  background: rgba(255,255,255,0.45);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+}
+
+.train-seat-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.train-seat {
+  width: 44px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(79,124,255,0.35);
+  background: rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+  user-select: none;
+}
+
+.train-seat:hover:not(.booked) {
+  background: rgba(79,124,255,0.15);
+  border-color: var(--blue);
+}
+
+.train-seat.selected {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+
+.train-seat.booked {
+  background: rgba(0,0,0,0.08);
+  border-color: rgba(0,0,0,0.12);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.train-seat-aisle {
+  width: 20px;
+}
+
+.train-seat-selected-text {
+  font-size: 13px;
+  font-weight: 500;
+  margin-left: 8px;
+  color: var(--text-muted);
+}
+
+/* =========================================================
+   17. 火車票務 — 功能分頁列 & 步驟列
+========================================================= */
+
+/* --- 功能分頁 Tab Bar --- */
+.train-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  margin-bottom: 20px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  overflow-x: auto;
+}
+
+.train-tab {
+  flex: 1;
+  min-width: 0;
+  padding: 13px 16px;
+  border: none;
+  border-radius: 14px;
+  background: transparent;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.15s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.train-tab:hover:not(.active) {
+  background: rgba(79, 124, 255, 0.08);
+  color: #334155;
+}
+
+.train-tab.active {
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  box-shadow: 0 6px 20px rgba(79, 124, 255, 0.28);
+  transform: translateY(-1px);
+}
+
+.train-tab-icon {
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.18);
+  flex-shrink: 0;
+}
+
+.train-tab.active .train-tab-icon {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* --- 分頁內容區 --- */
+.train-tab-content {
+  display: none;
+}
+
+.train-tab-content.active {
+  display: block;
+  animation: trainFadeIn 0.3s ease;
+}
+
+@keyframes trainFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* --- 步驟列 Stepper --- */
+.train-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  overflow-x: auto;
+}
+
+.train-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: default;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.train-step.clickable {
+  cursor: pointer;
+}
+
+.train-step-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 900;
+  border: 2.5px solid #cbd5e1;
+  background: rgba(255, 255, 255, 0.72);
+  color: #94a3b8;
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.train-step-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: #94a3b8;
+  transition: color 0.3s ease;
+}
+
+/* Active step */
+.train-step.active .train-step-circle {
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 14px rgba(79, 124, 255, 0.38);
+  transform: scale(1.08);
+}
+
+.train-step.active .train-step-label {
+  color: #1e3a8a;
+}
+
+/* Done step */
+.train-step.done .train-step-circle {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.28);
+}
+
+.train-step.done .train-step-label {
+  color: #047857;
+}
+
+/* Connector line */
+.train-step-connector {
+  flex-shrink: 0;
+  width: 48px;
+  height: 3px;
+  margin: 0 6px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  transition: background 0.3s ease;
+}
+
+.train-step-connector.done {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.train-step-connector.active {
+  background: linear-gradient(90deg, #10b981, var(--blue));
+}
+
+/* --- 步驟導航 --- */
+.train-step-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.train-step-nav .spacer {
+  flex: 1;
+}
+
+/* --- 站間時間表 --- */
+.train-station-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 16px 18px;
+  margin-top: 10px;
+  border-radius: 16px;
+  background: rgba(248, 250, 252, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.train-timeline-stop {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  padding: 8px 0;
+}
+
+.train-timeline-dot-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 24px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.train-timeline-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  border: 2.5px solid white;
+  box-shadow: 0 0 0 2px #cbd5e1;
+  z-index: 1;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.train-timeline-stop.origin .train-timeline-dot {
+  background: var(--blue);
+  box-shadow: 0 0 0 2px var(--blue), 0 0 8px rgba(79, 124, 255, 0.35);
+}
+
+.train-timeline-stop.destination .train-timeline-dot {
+  background: #ec4899;
+  box-shadow: 0 0 0 2px #ec4899, 0 0 8px rgba(236, 72, 153, 0.35);
+}
+
+.train-timeline-stop.transfer-stop .train-timeline-dot {
+  background: #f59e0b;
+  box-shadow: 0 0 0 2px #f59e0b, 0 0 8px rgba(245, 158, 11, 0.35);
+}
+
+.train-timeline-line {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2.5px;
+  height: calc(100% + 16px);
+  background: #e2e8f0;
+  z-index: 0;
+}
+
+.train-timeline-stop:last-child .train-timeline-line {
+  display: none;
+}
+
+.train-timeline-info {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+.train-timeline-station {
+  font-weight: 800;
+  font-size: 14px;
+  color: #172033;
+}
+
+.train-timeline-time {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.train-timeline-duration {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 28px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.train-timeline-duration::before {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 1px;
+  background: #cbd5e1;
+}
+
+/* 轉乘標記 */
+.train-transfer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  color: #92400e;
+  background: rgba(254, 243, 199, 0.82);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* --- 訂單確認頁面 --- */
+.train-order-confirm {
+  display: grid;
+  gap: 20px;
+}
+
+.train-confirm-card {
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.train-confirm-card h3 {
+  margin-bottom: 14px;
+  color: #172033;
+  font-size: 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.train-confirm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.train-confirm-item {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(248, 250, 252, 0.72);
+}
+
+.train-confirm-item span {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.train-confirm-item strong {
+  font-size: 15px;
+  color: #172033;
+}
+
+.train-confirm-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(219, 234, 254, 0.72), rgba(243, 232, 255, 0.58)),
+    rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(79, 124, 255, 0.22);
+}
+
+.train-confirm-total span {
+  font-size: 16px;
+  font-weight: 800;
+  color: #334155;
+}
+
+.train-confirm-total strong {
+  font-size: 28px;
+  color: transparent;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* --- 步驟內容面板 --- */
+.train-step-panel {
+  animation: trainFadeIn 0.35s ease;
+}
+
+.train-step-panel .panel {
+  margin-bottom: 16px;
+}
+
+/* --- 付款成功提示 --- */
+.train-payment-success {
+  text-align: center;
+  padding: 40px 24px;
+}
+
+.train-payment-success-icon {
+  font-size: 56px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.train-payment-success h3 {
+  font-size: 24px;
+  color: #172033;
+  margin-bottom: 8px;
+}
+
+.train-payment-success p {
+  color: var(--text-soft);
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* --- 空狀態提示 --- */
+.train-empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-muted);
+}
+
+.train-empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  display: block;
+  opacity: 0.5;
+}
+
+.train-empty-state h3 {
+  font-size: 18px;
+  color: #475569;
+  margin-bottom: 6px;
+}
+
+.train-empty-state p {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+/* --- 分頁內容面板標題 --- */
+.train-section-header {
+  margin-bottom: 16px;
+}
+
+.train-section-header h2 {
+  color: #172033;
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.train-section-header p {
+  color: var(--text-soft);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* --- 響應式 --- */
+@media (max-width: 768px) {
+  .train-tabs {
+    gap: 4px;
+    padding: 6px;
+    border-radius: 14px;
+  }
+
+  .train-tab {
+    padding: 10px 10px;
+    font-size: 12px;
+    gap: 4px;
+  }
+
+  .train-tab-icon {
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+
+  .train-stepper {
+    padding: 14px 12px;
+    gap: 0;
+    border-radius: 14px;
+  }
+
+  .train-step-circle {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+
+  .train-step-label {
+    font-size: 11px;
+  }
+
+  .train-step-connector {
+    width: 24px;
+    margin: 0 3px;
+  }
+
+  .train-step-nav {
+    flex-wrap: wrap;
+  }
+
+  .train-confirm-total strong {
+    font-size: 22px;
+  }
+
+  .train-station-timeline {
+    padding: 12px 14px;
+  }
+}

@@ -1,0 +1,2712 @@
+[
+  {
+    "id": 1,
+    "name": "微光會館",
+    "location": "臺東縣",
+    "address": "臺東縣卑南鄉溫泉路380號",
+    "price": 5500,
+    "rating": 4.4,
+    "capacity": 2,
+    "stationDistance": "距離知本車站步行 10 分鐘",
+    "facilities": [
+      "電梯",
+      "烤肉區",
+      "導覽解說",
+      "早餐",
+      "近車站"
+    ],
+    "desc": "鄰近知本車站，適合安排台東慢旅行與短期住宿。",
+    "icon": "🚉",
+    "roomTypes": [
+      {
+        "id": "1-standard",
+        "name": "標準雙人房",
+        "price": 5500,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "1-view",
+        "name": "景觀四人房",
+        "price": 7425,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "1-family",
+        "name": "家庭六人房",
+        "price": 9350,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "鹿鳴小院",
+    "location": "臺東縣",
+    "address": "臺東縣關山鎮和平路288號",
+    "price": 2700,
+    "rating": 4.3,
+    "capacity": 4,
+    "stationDistance": "距離關山車站步行 16 分鐘",
+    "facilities": [
+      "國民旅遊卡",
+      "親子友善",
+      "WiFi",
+      "洗衣服務",
+      "咖啡吧",
+      "寵物友善",
+      "烤肉區",
+      "近車站"
+    ],
+    "desc": "鄰近關山車站，適合安排台東慢旅行與短期住宿。",
+    "icon": "🌾",
+    "roomTypes": [
+      {
+        "id": "2-standard",
+        "name": "標準雙人房",
+        "price": 2700,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "2-view",
+        "name": "景觀四人房",
+        "price": 3645,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "2-family",
+        "name": "家庭六人房",
+        "price": 4590,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "嵐山旅店",
+    "location": "臺東縣",
+    "address": "臺東縣成功鎮中山路184號",
+    "price": 5400,
+    "rating": 4.3,
+    "capacity": 2,
+    "stationDistance": "距離成功車站步行 11 分鐘",
+    "facilities": [
+      "導覽解說",
+      "接送服務",
+      "餐廳",
+      "早餐",
+      "近車站",
+      "家庭房",
+      "禁菸"
+    ],
+    "desc": "鄰近成功車站，適合安排台東慢旅行與短期住宿。",
+    "icon": "🌙",
+    "roomTypes": [
+      {
+        "id": "3-standard",
+        "name": "標準雙人房",
+        "price": 5400,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "3-view",
+        "name": "景觀四人房",
+        "price": 7290,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "3-family",
+        "name": "家庭六人房",
+        "price": 9180,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "嵐山會館",
+    "location": "臺東縣",
+    "address": "臺東縣關山鎮民權路41號",
+    "price": 3100,
+    "rating": 4.6,
+    "capacity": 8,
+    "stationDistance": "距離關山車站開車 3 分鐘",
+    "facilities": [
+      "庭園",
+      "共用廚房",
+      "禁菸",
+      "洗衣服務",
+      "無障礙空間",
+      "烤肉區",
+      "近車站"
+    ],
+    "desc": "靠近關山車站，適合搭乘火車旅行的旅客入住。",
+    "icon": "🌙",
+    "roomTypes": [
+      {
+        "id": "4-standard",
+        "name": "標準雙人房",
+        "price": 3100,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "4-view",
+        "name": "景觀四人房",
+        "price": 4185,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "4-family",
+        "name": "家庭六人房",
+        "price": 5270,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      },
+      {
+        "id": "4-villa",
+        "name": "包棟房型",
+        "price": 7130,
+        "capacity": 8,
+        "stock": 1,
+        "bedType": "多房多床",
+        "breakfast": true,
+        "desc": "適合團體、家庭聚會或多人入住。"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "映月會館",
+    "location": "臺東縣",
+    "address": "臺東縣卑南鄉龍泉路274號",
+    "price": 3200,
+    "rating": 4.8,
+    "capacity": 4,
+    "stationDistance": "距離知本車站開車 4 分鐘",
+    "facilities": [
+      "親子友善",
+      "共用廚房",
+      "無障礙空間",
+      "導覽解說",
+      "自行車友善旅宿",
+      "寵物友善",
+      "停車場",
+      "近車站"
+    ],
+    "desc": "適合喜歡田園景觀、單車旅行與安靜住宿的旅客。",
+    "icon": "✨",
+    "roomTypes": [
+      {
+        "id": "5-standard",
+        "name": "標準雙人房",
+        "price": 3200,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "5-view",
+        "name": "景觀四人房",
+        "price": 4320,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "5-family",
+        "name": "家庭六人房",
+        "price": 5440,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "花見小院",
+    "location": "臺東縣",
+    "address": "臺東縣卑南鄉龍泉路291號",
+    "price": 6500,
+    "rating": 4.5,
+    "capacity": 4,
+    "stationDistance": "距離知本車站步行 13 分鐘",
+    "facilities": [
+      "餐廳",
+      "共用廚房",
+      "庭園",
+      "自助洗衣",
+      "親子友善",
+      "電梯",
+      "自行車友善旅宿",
+      "近車站"
+    ],
+    "desc": "靠近知本車站，適合搭乘火車旅行的旅客入住。",
+    "icon": "🌊",
+    "roomTypes": [
+      {
+        "id": "6-standard",
+        "name": "標準雙人房",
+        "price": 6500,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "6-view",
+        "name": "景觀四人房",
+        "price": 8775,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "6-family",
+        "name": "家庭六人房",
+        "price": 11050,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "旅人小屋",
+    "location": "臺東縣",
+    "address": "臺東縣成功鎮三民路186號",
+    "price": 6800,
+    "rating": 4.6,
+    "capacity": 6,
+    "stationDistance": "距離成功車站步行 18 分鐘",
+    "facilities": [
+      "接送服務",
+      "自助洗衣",
+      "共用廚房",
+      "洗衣服務",
+      "近車站"
+    ],
+    "desc": "鄰近成功車站，適合安排台東慢旅行與短期住宿。",
+    "icon": "🎈",
+    "roomTypes": [
+      {
+        "id": "7-standard",
+        "name": "標準雙人房",
+        "price": 6800,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "7-view",
+        "name": "景觀四人房",
+        "price": 9180,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "7-family",
+        "name": "家庭六人房",
+        "price": 11560,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "name": "微光行館",
+    "location": "臺東縣",
+    "address": "臺東縣成功鎮三民路271號",
+    "price": 6700,
+    "rating": 4.6,
+    "capacity": 2,
+    "stationDistance": "距離成功車站騎車 3 分鐘",
+    "facilities": [
+      "電梯",
+      "導覽解說",
+      "近車站",
+      "親子友善"
+    ],
+    "desc": "以舒適簡潔為主，鄰近車站與在地景點。",
+    "icon": "🎈",
+    "roomTypes": [
+      {
+        "id": "8-standard",
+        "name": "標準雙人房",
+        "price": 6700,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "8-view",
+        "name": "景觀四人房",
+        "price": 9045,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "8-family",
+        "name": "家庭六人房",
+        "price": 11390,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "name": "映月休閒館",
+    "location": "臺東縣",
+    "address": "臺東縣池上鄉福原路2號",
+    "price": 3000,
+    "rating": 4.2,
+    "capacity": 2,
+    "stationDistance": "距離池上車站騎車 5 分鐘",
+    "facilities": [
+      "溫泉",
+      "接送服務",
+      "共用廚房",
+      "家庭房",
+      "行李寄放",
+      "近車站"
+    ],
+    "desc": "提供放鬆的住宿空間，方便前往台東周邊景點。",
+    "icon": "☀️",
+    "roomTypes": [
+      {
+        "id": "9-standard",
+        "name": "標準雙人房",
+        "price": 3000,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "9-view",
+        "name": "景觀四人房",
+        "price": 4050,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "9-family",
+        "name": "家庭六人房",
+        "price": 5100,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "name": "月影客棧",
+    "location": "臺東縣",
+    "address": "臺東縣海端鄉山平路307號",
+    "price": 2300,
+    "rating": 4.7,
+    "capacity": 2,
+    "stationDistance": "距離海端車站步行 3 分鐘",
+    "facilities": [
+      "家庭房",
+      "自行車友善旅宿",
+      "停車場",
+      "烤肉區",
+      "國民旅遊卡",
+      "早餐",
+      "近車站"
+    ],
+    "desc": "結合台東自然風景與生活機能，適合慢遊假期。",
+    "icon": "🌻",
+    "roomTypes": [
+      {
+        "id": "10-standard",
+        "name": "標準雙人房",
+        "price": 2300,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "10-view",
+        "name": "景觀四人房",
+        "price": 3105,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "10-family",
+        "name": "家庭六人房",
+        "price": 3910,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "name": "小徑行館",
+    "location": "臺東縣",
+    "address": "臺東縣池上鄉新興路338號",
+    "price": 4600,
+    "rating": 4.8,
+    "capacity": 4,
+    "stationDistance": "距離池上車站開車 4 分鐘",
+    "facilities": [
+      "行李寄放",
+      "咖啡吧",
+      "自行車租借",
+      "導覽解說",
+      "無障礙空間",
+      "家庭房",
+      "餐廳",
+      "禁菸",
+      "近車站"
+    ],
+    "desc": "鄰近池上車站，適合安排台東慢旅行與短期住宿。",
+    "icon": "🚉",
+    "roomTypes": [
+      {
+        "id": "11-standard",
+        "name": "標準雙人房",
+        "price": 4600,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "11-view",
+        "name": "景觀四人房",
+        "price": 6210,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "11-family",
+        "name": "家庭六人房",
+        "price": 7820,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "name": "山海寓所",
+    "location": "臺東縣",
+    "address": "臺東縣關山鎮和平路174號",
+    "price": 3200,
+    "rating": 4.2,
+    "capacity": 2,
+    "stationDistance": "距離關山車站騎車 5 分鐘",
+    "facilities": [
+      "WiFi",
+      "早餐",
+      "無障礙空間",
+      "共用廚房",
+      "停車場",
+      "近車站"
+    ],
+    "desc": "結合台東自然風景與生活機能，適合慢遊假期。",
+    "icon": "♨️",
+    "roomTypes": [
+      {
+        "id": "12-standard",
+        "name": "標準雙人房",
+        "price": 3200,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "12-view",
+        "name": "景觀四人房",
+        "price": 4320,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "12-family",
+        "name": "家庭六人房",
+        "price": 5440,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "name": "晴嵐客棧",
+    "location": "臺東縣",
+    "address": "臺東縣卑南鄉龍泉路143號",
+    "price": 3000,
+    "rating": 4.2,
+    "capacity": 8,
+    "stationDistance": "距離知本車站騎車 4 分鐘",
+    "facilities": [
+      "烤肉區",
+      "國民旅遊卡",
+      "景觀陽台",
+      "自行車友善旅宿",
+      "咖啡吧",
+      "近車站"
+    ],
+    "desc": "適合喜歡田園景觀、單車旅行與安靜住宿的旅客。",
+    "icon": "♨️",
+    "roomTypes": [
+      {
+        "id": "13-standard",
+        "name": "標準雙人房",
+        "price": 3000,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "13-view",
+        "name": "景觀四人房",
+        "price": 4050,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "13-family",
+        "name": "家庭六人房",
+        "price": 5100,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      },
+      {
+        "id": "13-villa",
+        "name": "包棟房型",
+        "price": 6900,
+        "capacity": 8,
+        "stock": 1,
+        "bedType": "多房多床",
+        "breakfast": true,
+        "desc": "適合團體、家庭聚會或多人入住。"
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "name": "嵐山小院",
+    "location": "臺東縣",
+    "address": "臺東縣成功鎮三民路240號",
+    "price": 6900,
+    "rating": 4.8,
+    "capacity": 2,
+    "stationDistance": "距離成功車站騎車 3 分鐘",
+    "facilities": [
+      "停車場",
+      "餐廳",
+      "烤肉區",
+      "寵物友善",
+      "近車站"
+    ],
+    "desc": "位於成功鎮，交通便利，適合家庭、朋友或自由行旅客。",
+    "icon": "🚉",
+    "roomTypes": [
+      {
+        "id": "14-standard",
+        "name": "標準雙人房",
+        "price": 6900,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "14-view",
+        "name": "景觀四人房",
+        "price": 9315,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "14-family",
+        "name": "家庭六人房",
+        "price": 11730,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "name": "海風小屋",
+    "location": "臺東縣",
+    "address": "臺東縣海端鄉初來路72號",
+    "price": 5900,
+    "rating": 4.9,
+    "capacity": 2,
+    "stationDistance": "距離海端車站開車 5 分鐘",
+    "facilities": [
+      "早餐",
+      "庭園",
+      "導覽解說",
+      "接送服務",
+      "停車場",
+      "近車站"
+    ],
+    "desc": "鄰近海端車站，適合安排台東慢旅行與短期住宿。",
+    "icon": "🛏️",
+    "roomTypes": [
+      {
+        "id": "15-standard",
+        "name": "標準雙人房",
+        "price": 5900,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "15-view",
+        "name": "景觀四人房",
+        "price": 7965,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "15-family",
+        "name": "家庭六人房",
+        "price": 10030,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "name": "小徑客棧",
+    "location": "臺東縣",
+    "address": "臺東縣關山鎮中華路209號",
+    "price": 6800,
+    "rating": 4.7,
+    "capacity": 4,
+    "stationDistance": "距離關山車站開車 4 分鐘",
+    "facilities": [
+      "洗衣服務",
+      "餐廳",
+      "WiFi",
+      "親子友善",
+      "近車站"
+    ],
+    "desc": "適合喜歡田園景觀、單車旅行與安靜住宿的旅客。",
+    "icon": "⛰️",
+    "roomTypes": [
+      {
+        "id": "16-standard",
+        "name": "標準雙人房",
+        "price": 6800,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "16-view",
+        "name": "景觀四人房",
+        "price": 9180,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "16-family",
+        "name": "家庭六人房",
+        "price": 11560,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "name": "小徑小屋",
+    "location": "臺東縣",
+    "address": "臺東縣海端鄉錦屏路368號",
+    "price": 2100,
+    "rating": 4.1,
+    "capacity": 4,
+    "stationDistance": "距離海端車站開車 4 分鐘",
+    "facilities": [
+      "停車場",
+      "國民旅遊卡",
+      "烤肉區",
+      "導覽解說",
+      "寵物友善",
+      "近車站"
+    ],
+    "desc": "提供放鬆的住宿空間，方便前往台東周邊景點。",
+    "icon": "🛏️",
+    "roomTypes": [
+      {
+        "id": "17-standard",
+        "name": "標準雙人房",
+        "price": 2100,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "17-view",
+        "name": "景觀四人房",
+        "price": 2835,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "17-family",
+        "name": "家庭六人房",
+        "price": 3570,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "name": "暖宿旅宿",
+    "location": "臺東縣",
+    "address": "臺東縣海端鄉山平路30號",
+    "price": 5700,
+    "rating": 4.2,
+    "capacity": 8,
+    "stationDistance": "距離海端車站步行 8 分鐘",
+    "facilities": [
+      "早餐",
+      "電梯",
+      "自行車友善旅宿",
+      "餐廳",
+      "接送服務",
+      "國民旅遊卡",
+      "無障礙空間",
+      "停車場",
+      "近車站"
+    ],
+    "desc": "提供放鬆的住宿空間，方便前往台東周邊景點。",
+    "icon": "🌊",
+    "roomTypes": [
+      {
+        "id": "18-standard",
+        "name": "標準雙人房",
+        "price": 5700,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "18-view",
+        "name": "景觀四人房",
+        "price": 7695,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "18-family",
+        "name": "家庭六人房",
+        "price": 9690,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      },
+      {
+        "id": "18-villa",
+        "name": "包棟房型",
+        "price": 13110,
+        "capacity": 8,
+        "stock": 1,
+        "bedType": "多房多床",
+        "breakfast": true,
+        "desc": "適合團體、家庭聚會或多人入住。"
+      }
+    ]
+  },
+  {
+    "id": 19,
+    "name": "鹿鳴Villa",
+    "location": "臺東縣",
+    "address": "臺東縣海端鄉初來路134號",
+    "price": 3800,
+    "rating": 4.8,
+    "capacity": 2,
+    "stationDistance": "距離海端車站步行 13 分鐘",
+    "facilities": [
+      "餐廳",
+      "自助洗衣",
+      "電梯",
+      "共用廚房",
+      "家庭房",
+      "庭園",
+      "近車站"
+    ],
+    "desc": "鄰近海端車站，適合安排台東慢旅行與短期住宿。",
+    "icon": "🏨",
+    "roomTypes": [
+      {
+        "id": "19-standard",
+        "name": "標準雙人房",
+        "price": 3800,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "19-view",
+        "name": "景觀四人房",
+        "price": 5130,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "19-family",
+        "name": "家庭六人房",
+        "price": 6460,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "name": "晨曦行館",
+    "location": "臺東縣",
+    "address": "臺東縣鹿野鄉文化路52號",
+    "price": 2800,
+    "rating": 4.5,
+    "capacity": 6,
+    "stationDistance": "距離瑞源車站騎車 4 分鐘",
+    "facilities": [
+      "自助洗衣",
+      "禁菸",
+      "早餐",
+      "自行車友善旅宿",
+      "烤肉區",
+      "家庭房",
+      "近車站"
+    ],
+    "desc": "靠近瑞源車站，適合搭乘火車旅行的旅客入住。",
+    "icon": "✨",
+    "roomTypes": [
+      {
+        "id": "20-standard",
+        "name": "標準雙人房",
+        "price": 2800,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "20-view",
+        "name": "景觀四人房",
+        "price": 3780,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "20-family",
+        "name": "家庭六人房",
+        "price": 4760,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "name": "山海Villa",
+    "location": "臺東縣",
+    "address": "臺東縣鹿野鄉文化路271號",
+    "price": 5300,
+    "rating": 4.2,
+    "capacity": 4,
+    "stationDistance": "距離瑞源車站騎車 6 分鐘",
+    "facilities": [
+      "自助洗衣",
+      "親子友善",
+      "接送服務",
+      "烤肉區",
+      "近車站"
+    ],
+    "desc": "提供放鬆的住宿空間，方便前往台東周邊景點。",
+    "icon": "🚉",
+    "roomTypes": [
+      {
+        "id": "21-standard",
+        "name": "標準雙人房",
+        "price": 5300,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "21-view",
+        "name": "景觀四人房",
+        "price": 7155,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "21-family",
+        "name": "家庭六人房",
+        "price": 9010,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 22,
+    "name": "拾光旅居",
+    "location": "臺東縣",
+    "address": "臺東縣太麻里鄉太麻里街352號",
+    "price": 1800,
+    "rating": 4.4,
+    "capacity": 2,
+    "stationDistance": "距離太麻里車站騎車 5 分鐘",
+    "facilities": [
+      "親子友善",
+      "停車場",
+      "早餐",
+      "共用廚房",
+      "咖啡吧",
+      "近車站",
+      "烤肉區"
+    ],
+    "desc": "靠近太麻里車站，適合搭乘火車旅行的旅客入住。",
+    "icon": "✨",
+    "roomTypes": [
+      {
+        "id": "22-standard",
+        "name": "標準雙人房",
+        "price": 1800,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "22-view",
+        "name": "景觀四人房",
+        "price": 2430,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "22-family",
+        "name": "家庭六人房",
+        "price": 3060,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "name": "青禾山莊",
+    "location": "臺東縣",
+    "address": "臺東縣池上鄉福原路283號",
+    "price": 7100,
+    "rating": 4.4,
+    "capacity": 6,
+    "stationDistance": "距離池上車站步行 3 分鐘",
+    "facilities": [
+      "無障礙空間",
+      "自助洗衣",
+      "導覽解說",
+      "停車場",
+      "近車站"
+    ],
+    "desc": "位於池上鄉，交通便利，適合家庭、朋友或自由行旅客。",
+    "icon": "🎈",
+    "roomTypes": [
+      {
+        "id": "23-standard",
+        "name": "標準雙人房",
+        "price": 7100,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "23-view",
+        "name": "景觀四人房",
+        "price": 9585,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "23-family",
+        "name": "家庭六人房",
+        "price": 12070,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "name": "雲起休閒館",
+    "location": "臺東縣",
+    "address": "臺東縣池上鄉中山路158號",
+    "price": 5300,
+    "rating": 4.8,
+    "capacity": 4,
+    "stationDistance": "距離池上車站開車 3 分鐘",
+    "facilities": [
+      "電梯",
+      "自行車友善旅宿",
+      "接送服務",
+      "禁菸",
+      "近車站"
+    ],
+    "desc": "提供放鬆的住宿空間，方便前往台東周邊景點。",
+    "icon": "⛰️",
+    "roomTypes": [
+      {
+        "id": "24-standard",
+        "name": "標準雙人房",
+        "price": 5300,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "24-view",
+        "name": "景觀四人房",
+        "price": 7155,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "24-family",
+        "name": "家庭六人房",
+        "price": 9010,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "name": "沐野居",
+    "location": "臺東縣",
+    "address": "臺東縣池上鄉新興路84號",
+    "price": 6900,
+    "rating": 4.6,
+    "capacity": 8,
+    "stationDistance": "距離池上車站開車 4 分鐘",
+    "facilities": [
+      "洗衣服務",
+      "烤肉區",
+      "寵物友善",
+      "咖啡吧",
+      "近車站"
+    ],
+    "desc": "結合台東自然風景與生活機能，適合慢遊假期。",
+    "icon": "🚉",
+    "roomTypes": [
+      {
+        "id": "25-standard",
+        "name": "標準雙人房",
+        "price": 6900,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "25-view",
+        "name": "景觀四人房",
+        "price": 9315,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "25-family",
+        "name": "家庭六人房",
+        "price": 11730,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      },
+      {
+        "id": "25-villa",
+        "name": "包棟房型",
+        "price": 15870,
+        "capacity": 8,
+        "stock": 1,
+        "bedType": "多房多床",
+        "breakfast": true,
+        "desc": "適合團體、家庭聚會或多人入住。"
+      }
+    ]
+  },
+  {
+    "id": 26,
+    "name": "星光山莊",
+    "location": "臺東縣",
+    "address": "臺東縣鹿野鄉高台路360號",
+    "price": 3200,
+    "rating": 4.1,
+    "capacity": 2,
+    "stationDistance": "距離鹿野車站開車 3 分鐘",
+    "facilities": [
+      "自行車租借",
+      "庭園",
+      "禁菸",
+      "家庭房",
+      "自行車友善旅宿",
+      "近車站"
+    ],
+    "desc": "適合喜歡田園景觀、單車旅行與安靜住宿的旅客。",
+    "icon": "♨️",
+    "roomTypes": [
+      {
+        "id": "26-standard",
+        "name": "標準雙人房",
+        "price": 3200,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "26-view",
+        "name": "景觀四人房",
+        "price": 4320,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "26-family",
+        "name": "家庭六人房",
+        "price": 5440,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "name": "微光旅店",
+    "location": "臺東縣",
+    "address": "臺東縣鹿野鄉中華路396號",
+    "price": 2400,
+    "rating": 4.6,
+    "capacity": 4,
+    "stationDistance": "距離鹿野車站騎車 7 分鐘",
+    "facilities": [
+      "寵物友善",
+      "WiFi",
+      "接送服務",
+      "親子友善",
+      "洗衣服務",
+      "國民旅遊卡",
+      "電梯",
+      "停車場",
+      "近車站"
+    ],
+    "desc": "靠近鹿野車站，適合搭乘火車旅行的旅客入住。",
+    "icon": "☀️",
+    "roomTypes": [
+      {
+        "id": "27-standard",
+        "name": "標準雙人房",
+        "price": 2400,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "27-view",
+        "name": "景觀四人房",
+        "price": 3240,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "27-family",
+        "name": "家庭六人房",
+        "price": 4080,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 28,
+    "name": "森活休閒館75",
+    "location": "臺東縣",
+    "address": "臺東縣太麻里鄉香蘭路311號",
+    "price": 6900,
+    "rating": 4.5,
+    "capacity": 8,
+    "stationDistance": "距離太麻里車站開車 4 分鐘",
+    "facilities": [
+      "無障礙空間",
+      "咖啡吧",
+      "WiFi",
+      "溫泉",
+      "近車站"
+    ],
+    "desc": "靠近太麻里車站，適合搭乘火車旅行的旅客入住。",
+    "icon": "⛰️",
+    "roomTypes": [
+      {
+        "id": "28-standard",
+        "name": "標準雙人房",
+        "price": 6900,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "28-view",
+        "name": "景觀四人房",
+        "price": 9315,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "28-family",
+        "name": "家庭六人房",
+        "price": 11730,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      },
+      {
+        "id": "28-villa",
+        "name": "包棟房型",
+        "price": 15870,
+        "capacity": 8,
+        "stock": 1,
+        "bedType": "多房多床",
+        "breakfast": true,
+        "desc": "適合團體、家庭聚會或多人入住。"
+      }
+    ]
+  },
+  {
+    "id": 29,
+    "name": "晨曦Villa",
+    "location": "臺東縣",
+    "address": "臺東縣關山鎮民權路221號",
+    "price": 3800,
+    "rating": 4.4,
+    "capacity": 4,
+    "stationDistance": "距離關山車站騎車 6 分鐘",
+    "facilities": [
+      "電梯",
+      "接送服務",
+      "家庭房",
+      "溫泉",
+      "無障礙空間",
+      "咖啡吧",
+      "近車站"
+    ],
+    "desc": "提供放鬆的住宿空間，方便前往台東周邊景點。",
+    "icon": "🚲",
+    "roomTypes": [
+      {
+        "id": "29-standard",
+        "name": "標準雙人房",
+        "price": 3800,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "29-view",
+        "name": "景觀四人房",
+        "price": 5130,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "29-family",
+        "name": "家庭六人房",
+        "price": 6460,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 30,
+    "name": "森活Villa",
+    "location": "臺東縣",
+    "address": "臺東縣關山鎮親水路341號",
+    "price": 6800,
+    "rating": 4.6,
+    "capacity": 8,
+    "stationDistance": "距離關山車站騎車 4 分鐘",
+    "facilities": [
+      "家庭房",
+      "餐廳",
+      "導覽解說",
+      "WiFi",
+      "近車站",
+      "共用廚房",
+      "自行車租借",
+      "咖啡吧"
+    ],
+    "desc": "以舒適簡潔為主，鄰近車站與在地景點。",
+    "icon": "🏨",
+    "roomTypes": [
+      {
+        "id": "30-standard",
+        "name": "標準雙人房",
+        "price": 6800,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "30-view",
+        "name": "景觀四人房",
+        "price": 9180,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "30-family",
+        "name": "家庭六人房",
+        "price": 11560,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      },
+      {
+        "id": "30-villa",
+        "name": "包棟房型",
+        "price": 15640,
+        "capacity": 8,
+        "stock": 1,
+        "bedType": "多房多床",
+        "breakfast": true,
+        "desc": "適合團體、家庭聚會或多人入住。"
+      }
+    ]
+  },
+  {
+    "id": 99,
+    "name": "稻香小屋",
+    "location": "臺東縣",
+    "address": "臺東縣池上鄉福原路79號",
+    "price": 6600,
+    "rating": 4.7,
+    "capacity": 4,
+    "stationDistance": "距離池上車站騎車 4 分鐘",
+    "facilities": [
+      "停車場",
+      "咖啡吧",
+      "禁菸",
+      "電梯",
+      "自行車友善旅宿",
+      "庭園",
+      "家庭房",
+      "近車站"
+    ],
+    "desc": "位於池上鄉，交通便利，適合家庭、朋友或自由行旅客。",
+    "icon": "🌻",
+    "roomTypes": [
+      {
+        "id": "99-standard",
+        "name": "標準雙人房",
+        "price": 6600,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "99-view",
+        "name": "景觀四人房",
+        "price": 8910,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "99-family",
+        "name": "家庭六人房",
+        "price": 11220,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 100,
+    "name": "花見旅居",
+    "location": "臺東縣",
+    "address": "臺東縣關山鎮民權路241號",
+    "price": 7000,
+    "rating": 4.3,
+    "capacity": 6,
+    "stationDistance": "距離關山車站開車 4 分鐘",
+    "facilities": [
+      "庭園",
+      "近車站",
+      "家庭房",
+      "餐廳",
+      "溫泉",
+      "共用廚房",
+      "咖啡吧",
+      "洗衣服務"
+    ],
+    "desc": "位於關山鎮，交通便利，適合家庭、朋友或自由行旅客。",
+    "icon": "🌿",
+    "roomTypes": [
+      {
+        "id": "100-standard",
+        "name": "標準雙人房",
+        "price": 7000,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "100-view",
+        "name": "景觀四人房",
+        "price": 9450,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "100-family",
+        "name": "家庭六人房",
+        "price": 11900,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 101,
+    "name": "雲起行館15",
+    "location": "臺東縣",
+    "address": "臺東縣鹿野鄉中華路329號",
+    "price": 5000,
+    "rating": 4.2,
+    "capacity": 4,
+    "stationDistance": "距離鹿野車站開車 3 分鐘",
+    "facilities": [
+      "近車站",
+      "洗衣服務",
+      "親子友善",
+      "庭園"
+    ],
+    "desc": "鄰近鹿野車站，適合安排台東慢旅行與短期住宿。",
+    "icon": "🛏️",
+    "roomTypes": [
+      {
+        "id": "101-standard",
+        "name": "標準雙人房",
+        "price": 5000,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "101-view",
+        "name": "景觀四人房",
+        "price": 6750,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "101-family",
+        "name": "家庭六人房",
+        "price": 8500,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 102,
+    "name": "禾田民宿",
+    "location": "臺東縣",
+    "address": "臺東縣關山鎮親水路179號",
+    "price": 1900,
+    "rating": 4.4,
+    "capacity": 2,
+    "stationDistance": "距離關山車站步行 16 分鐘",
+    "facilities": [
+      "溫泉",
+      "禁菸",
+      "自行車友善旅宿",
+      "餐廳",
+      "早餐",
+      "烤肉區",
+      "無障礙空間",
+      "近車站"
+    ],
+    "desc": "結合台東自然風景與生活機能，適合慢遊假期。",
+    "icon": "⛰️",
+    "roomTypes": [
+      {
+        "id": "102-standard",
+        "name": "標準雙人房",
+        "price": 1900,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "102-view",
+        "name": "景觀四人房",
+        "price": 2565,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "102-family",
+        "name": "家庭六人房",
+        "price": 3230,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 103,
+    "name": "慢旅莊園",
+    "location": "臺東縣",
+    "address": "臺東縣太麻里鄉太麻里街71號",
+    "price": 1800,
+    "rating": 4.8,
+    "capacity": 2,
+    "stationDistance": "距離太麻里車站騎車 9 分鐘",
+    "facilities": [
+      "近車站",
+      "無障礙空間",
+      "景觀陽台",
+      "庭園",
+      "行李寄放"
+    ],
+    "desc": "以舒適簡潔為主，鄰近車站與在地景點。",
+    "icon": "🚉",
+    "roomTypes": [
+      {
+        "id": "103-standard",
+        "name": "標準雙人房",
+        "price": 1800,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "103-view",
+        "name": "景觀四人房",
+        "price": 2430,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "103-family",
+        "name": "家庭六人房",
+        "price": 3060,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 104,
+    "name": "風禾莊園",
+    "location": "臺東縣",
+    "address": "臺東縣池上鄉福原路57號",
+    "price": 6800,
+    "rating": 4.6,
+    "capacity": 2,
+    "stationDistance": "距離池上車站開車 5 分鐘",
+    "facilities": [
+      "停車場",
+      "自行車友善旅宿",
+      "咖啡吧",
+      "共用廚房",
+      "近車站"
+    ],
+    "desc": "鄰近池上車站，適合安排台東慢旅行與短期住宿。",
+    "icon": "🌿",
+    "roomTypes": [
+      {
+        "id": "104-standard",
+        "name": "標準雙人房",
+        "price": 6800,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "104-view",
+        "name": "景觀四人房",
+        "price": 9180,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "104-family",
+        "name": "家庭六人房",
+        "price": 11560,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 105,
+    "name": "旅人小院20",
+    "location": "臺東縣",
+    "address": "臺東縣大武鄉大武街324號",
+    "price": 4400,
+    "rating": 4.2,
+    "capacity": 8,
+    "stationDistance": "距離大武車站開車 6 分鐘",
+    "facilities": [
+      "行李寄放",
+      "禁菸",
+      "自行車友善旅宿",
+      "國民旅遊卡",
+      "近車站"
+    ],
+    "desc": "鄰近大武車站，適合安排台東慢旅行與短期住宿。",
+    "icon": "🌻",
+    "roomTypes": [
+      {
+        "id": "105-standard",
+        "name": "標準雙人房",
+        "price": 4400,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "105-view",
+        "name": "景觀四人房",
+        "price": 5940,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "105-family",
+        "name": "家庭六人房",
+        "price": 7480,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      },
+      {
+        "id": "105-villa",
+        "name": "包棟房型",
+        "price": 10120,
+        "capacity": 8,
+        "stock": 1,
+        "bedType": "多房多床",
+        "breakfast": true,
+        "desc": "適合團體、家庭聚會或多人入住。"
+      }
+    ]
+  },
+  {
+    "id": 106,
+    "name": "南島行館",
+    "location": "臺東縣",
+    "address": "臺東縣太麻里鄉金崙路270號",
+    "price": 6800,
+    "rating": 4.2,
+    "capacity": 2,
+    "stationDistance": "距離太麻里車站開車 3 分鐘",
+    "facilities": [
+      "停車場",
+      "共用廚房",
+      "餐廳",
+      "禁菸",
+      "親子友善",
+      "WiFi",
+      "電梯",
+      "近車站"
+    ],
+    "desc": "靠近太麻里車站，適合搭乘火車旅行的旅客入住。",
+    "icon": "🌙",
+    "roomTypes": [
+      {
+        "id": "106-standard",
+        "name": "標準雙人房",
+        "price": 6800,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "106-view",
+        "name": "景觀四人房",
+        "price": 9180,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "106-family",
+        "name": "家庭六人房",
+        "price": 11560,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 107,
+    "name": "慢旅旅店",
+    "location": "臺東縣",
+    "address": "臺東縣卑南鄉知本路69號",
+    "price": 5800,
+    "rating": 4.2,
+    "capacity": 2,
+    "stationDistance": "距離知本車站騎車 6 分鐘",
+    "facilities": [
+      "近車站",
+      "電梯",
+      "庭園",
+      "無障礙空間",
+      "景觀陽台"
+    ],
+    "desc": "鄰近知本車站，適合安排台東慢旅行與短期住宿。",
+    "icon": "⛰️",
+    "roomTypes": [
+      {
+        "id": "107-standard",
+        "name": "標準雙人房",
+        "price": 5800,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "107-view",
+        "name": "景觀四人房",
+        "price": 7830,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "107-family",
+        "name": "家庭六人房",
+        "price": 9860,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 108,
+    "name": "鹿鳴民宿",
+    "location": "臺東縣",
+    "address": "臺東縣大武鄉大武街151號",
+    "price": 2000,
+    "rating": 4.7,
+    "capacity": 2,
+    "stationDistance": "距離大武車站步行 9 分鐘",
+    "facilities": [
+      "家庭房",
+      "溫泉",
+      "餐廳",
+      "導覽解說",
+      "景觀陽台",
+      "親子友善",
+      "近車站"
+    ],
+    "desc": "以舒適簡潔為主，鄰近車站與在地景點。",
+    "icon": "♨️",
+    "roomTypes": [
+      {
+        "id": "108-standard",
+        "name": "標準雙人房",
+        "price": 2000,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "108-view",
+        "name": "景觀四人房",
+        "price": 2700,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "108-family",
+        "name": "家庭六人房",
+        "price": 3400,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 109,
+    "name": "星光居",
+    "location": "臺東縣",
+    "address": "臺東縣臺東市更生路140號",
+    "price": 4100,
+    "rating": 4.8,
+    "capacity": 6,
+    "stationDistance": "距離台東車站開車 7 分鐘",
+    "facilities": [
+      "烤肉區",
+      "庭園",
+      "餐廳",
+      "寵物友善",
+      "洗衣服務",
+      "景觀陽台",
+      "行李寄放",
+      "近車站"
+    ],
+    "desc": "以舒適簡潔為主，鄰近車站與在地景點。",
+    "icon": "☀️",
+    "roomTypes": [
+      {
+        "id": "109-standard",
+        "name": "標準雙人房",
+        "price": 4100,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "109-view",
+        "name": "景觀四人房",
+        "price": 5535,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "109-family",
+        "name": "家庭六人房",
+        "price": 6970,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 110,
+    "name": "望海小屋71",
+    "location": "臺東縣",
+    "address": "臺東縣卑南鄉東園路41號",
+    "price": 3700,
+    "rating": 4.5,
+    "capacity": 8,
+    "stationDistance": "距離知本車站開車 6 分鐘",
+    "facilities": [
+      "早餐",
+      "寵物友善",
+      "電梯",
+      "家庭房",
+      "近車站"
+    ],
+    "desc": "適合喜歡田園景觀、單車旅行與安靜住宿的旅客。",
+    "icon": "🚲",
+    "roomTypes": [
+      {
+        "id": "110-standard",
+        "name": "標準雙人房",
+        "price": 3700,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "110-view",
+        "name": "景觀四人房",
+        "price": 4995,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "110-family",
+        "name": "家庭六人房",
+        "price": 6290,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      },
+      {
+        "id": "110-villa",
+        "name": "包棟房型",
+        "price": 8510,
+        "capacity": 8,
+        "stock": 1,
+        "bedType": "多房多床",
+        "breakfast": true,
+        "desc": "適合團體、家庭聚會或多人入住。"
+      }
+    ]
+  },
+  {
+    "id": 111,
+    "name": "慢旅小院",
+    "location": "臺東縣",
+    "address": "臺東縣大武鄉尚武路229號",
+    "price": 5000,
+    "rating": 4.7,
+    "capacity": 8,
+    "stationDistance": "距離大武車站騎車 7 分鐘",
+    "facilities": [
+      "親子友善",
+      "共用廚房",
+      "停車場",
+      "早餐",
+      "烤肉區",
+      "餐廳",
+      "禁菸",
+      "近車站"
+    ],
+    "desc": "位於大武鄉，交通便利，適合家庭、朋友或自由行旅客。",
+    "icon": "🏡",
+    "roomTypes": [
+      {
+        "id": "111-standard",
+        "name": "標準雙人房",
+        "price": 5000,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "111-view",
+        "name": "景觀四人房",
+        "price": 6750,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "111-family",
+        "name": "家庭六人房",
+        "price": 8500,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      },
+      {
+        "id": "111-villa",
+        "name": "包棟房型",
+        "price": 11500,
+        "capacity": 8,
+        "stock": 1,
+        "bedType": "多房多床",
+        "breakfast": true,
+        "desc": "適合團體、家庭聚會或多人入住。"
+      }
+    ]
+  },
+  {
+    "id": 112,
+    "name": "藍海旅宿",
+    "location": "臺東縣",
+    "address": "臺東縣池上鄉福原路18號",
+    "price": 6100,
+    "rating": 4.5,
+    "capacity": 4,
+    "stationDistance": "距離池上車站騎車 5 分鐘",
+    "facilities": [
+      "禁菸",
+      "餐廳",
+      "國民旅遊卡",
+      "停車場",
+      "行李寄放",
+      "自助洗衣",
+      "近車站"
+    ],
+    "desc": "以舒適簡潔為主，鄰近車站與在地景點。",
+    "icon": "🏨",
+    "roomTypes": [
+      {
+        "id": "112-standard",
+        "name": "標準雙人房",
+        "price": 6100,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "112-view",
+        "name": "景觀四人房",
+        "price": 8235,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "112-family",
+        "name": "家庭六人房",
+        "price": 10370,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 113,
+    "name": "月影Villa37",
+    "location": "臺東縣",
+    "address": "臺東縣卑南鄉龍泉路272號",
+    "price": 4200,
+    "rating": 4.8,
+    "capacity": 2,
+    "stationDistance": "距離知本車站步行 10 分鐘",
+    "facilities": [
+      "烤肉區",
+      "洗衣服務",
+      "景觀陽台",
+      "溫泉",
+      "近車站"
+    ],
+    "desc": "以舒適簡潔為主，鄰近車站與在地景點。",
+    "icon": "☀️",
+    "roomTypes": [
+      {
+        "id": "113-standard",
+        "name": "標準雙人房",
+        "price": 4200,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "113-view",
+        "name": "景觀四人房",
+        "price": 5670,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "113-family",
+        "name": "家庭六人房",
+        "price": 7140,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 114,
+    "name": "自在莊園",
+    "location": "臺東縣",
+    "address": "臺東縣鹿野鄉光榮路110號",
+    "price": 6300,
+    "rating": 4.5,
+    "capacity": 2,
+    "stationDistance": "距離鹿野車站步行 18 分鐘",
+    "facilities": [
+      "自助洗衣",
+      "早餐",
+      "庭園",
+      "洗衣服務",
+      "近車站"
+    ],
+    "desc": "結合台東自然風景與生活機能，適合慢遊假期。",
+    "icon": "🌙",
+    "roomTypes": [
+      {
+        "id": "114-standard",
+        "name": "標準雙人房",
+        "price": 6300,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "114-view",
+        "name": "景觀四人房",
+        "price": 8505,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "114-family",
+        "name": "家庭六人房",
+        "price": 10710,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 115,
+    "name": "南島莊園40",
+    "location": "臺東縣",
+    "address": "臺東縣太麻里鄉大王路364號",
+    "price": 6800,
+    "rating": 4.2,
+    "capacity": 4,
+    "stationDistance": "距離太麻里車站騎車 4 分鐘",
+    "facilities": [
+      "禁菸",
+      "溫泉",
+      "自行車友善旅宿",
+      "接送服務",
+      "自行車租借",
+      "近車站"
+    ],
+    "desc": "鄰近太麻里車站，適合安排台東慢旅行與短期住宿。",
+    "icon": "♨️",
+    "roomTypes": [
+      {
+        "id": "115-standard",
+        "name": "標準雙人房",
+        "price": 6800,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "115-view",
+        "name": "景觀四人房",
+        "price": 9180,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "115-family",
+        "name": "家庭六人房",
+        "price": 11560,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 116,
+    "name": "田園居",
+    "location": "臺東縣",
+    "address": "臺東縣海端鄉錦屏路189號",
+    "price": 6400,
+    "rating": 4.5,
+    "capacity": 4,
+    "stationDistance": "距離海端車站騎車 3 分鐘",
+    "facilities": [
+      "早餐",
+      "家庭房",
+      "餐廳",
+      "無障礙空間",
+      "近車站"
+    ],
+    "desc": "結合台東自然風景與生活機能，適合慢遊假期。",
+    "icon": "🎈",
+    "roomTypes": [
+      {
+        "id": "116-standard",
+        "name": "標準雙人房",
+        "price": 6400,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "116-view",
+        "name": "景觀四人房",
+        "price": 8640,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "116-family",
+        "name": "家庭六人房",
+        "price": 10880,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 117,
+    "name": "月影Villa",
+    "location": "臺東縣",
+    "address": "臺東縣鹿野鄉瑞景路65號",
+    "price": 6700,
+    "rating": 4.9,
+    "capacity": 4,
+    "stationDistance": "距離瑞源車站開車 3 分鐘",
+    "facilities": [
+      "電梯",
+      "溫泉",
+      "禁菸",
+      "自助洗衣",
+      "導覽解說",
+      "國民旅遊卡",
+      "洗衣服務",
+      "近車站"
+    ],
+    "desc": "提供放鬆的住宿空間，方便前往台東周邊景點。",
+    "icon": "🛏️",
+    "roomTypes": [
+      {
+        "id": "117-standard",
+        "name": "標準雙人房",
+        "price": 6700,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "117-view",
+        "name": "景觀四人房",
+        "price": 9045,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "117-family",
+        "name": "家庭六人房",
+        "price": 11390,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  },
+  {
+    "id": 118,
+    "name": "藍海莊園",
+    "location": "臺東縣",
+    "address": "臺東縣臺東市新站路266號",
+    "price": 3400,
+    "rating": 4.3,
+    "capacity": 6,
+    "stationDistance": "距離台東車站步行 8 分鐘",
+    "facilities": [
+      "無障礙空間",
+      "自行車友善旅宿",
+      "禁菸",
+      "溫泉",
+      "家庭房",
+      "早餐",
+      "近車站"
+    ],
+    "desc": "以舒適簡潔為主，鄰近車站與在地景點。",
+    "icon": "🚲",
+    "roomTypes": [
+      {
+        "id": "118-standard",
+        "name": "標準雙人房",
+        "price": 3400,
+        "capacity": 2,
+        "stock": 3,
+        "bedType": "1 張雙人床",
+        "breakfast": true,
+        "desc": "適合情侶、朋友或單人旅行入住。"
+      },
+      {
+        "id": "118-view",
+        "name": "景觀四人房",
+        "price": 4590,
+        "capacity": 4,
+        "stock": 2,
+        "bedType": "2 張雙人床",
+        "breakfast": true,
+        "desc": "空間較大，適合家庭或朋友同行。"
+      },
+      {
+        "id": "118-family",
+        "name": "家庭六人房",
+        "price": 5780,
+        "capacity": 6,
+        "stock": 1,
+        "bedType": "3 張雙人床",
+        "breakfast": true,
+        "desc": "適合多人家庭旅遊，提供更完整的住宿空間。"
+      }
+    ]
+  }
+]

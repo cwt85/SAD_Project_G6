@@ -1,0 +1,24 @@
+{
+  "name": "sad-project-g6",
+  "version": "1.0.0",
+  "private": true,
+  "description": "台東旅遊訂房平台 - SAD Project G6",
+  "scripts": {
+    "test": "jest",
+    "test:verbose": "jest --verbose",
+    "test:coverage": "jest --coverage"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "js/**/*.js"
+    ]
+  }
+}
