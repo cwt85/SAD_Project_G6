@@ -548,7 +548,7 @@ function renderItineraryChatPanel() {
 
   const itinerary = getChatItinerary();
   if (!itinerary) {
-    panel.innerHTML = buildChatItineraryEmptyState("請先登入並選擇一個行程，才能使用行程討論。");
+    panel.innerHTML = buildChatItineraryEmptyState("請先建立或選擇一個行程，才能使用行程討論。");
     return;
   }
 
@@ -572,7 +572,7 @@ function renderPollChatPanel() {
 
   const itinerary = getChatItinerary();
   if (!itinerary) {
-    panel.innerHTML = buildChatItineraryEmptyState("請先登入並選擇一個行程，才能建立投票。");
+    panel.innerHTML = buildChatItineraryEmptyState("請先建立或選擇一個行程，才能建立投票。");
     return;
   }
 
