@@ -1,0 +1,102 @@
+/* 01. Settings - Design Tokens / Custom Properties
+   SMACSS Layer: Settings */
+
+/* =========================================================
+   台東民宿訂房平台 index.css
+   風格：
+   1. 高級玻璃感
+   2. 淡彩漸層背景
+   3. 主頁房卡左右排版
+   4. 詳細頁輪播圖片
+   5. 手機版自動改為上下排版
+========================================================= */
+
+
+/* =========================================================
+   01. 全域設定 / 色彩變數
+========================================================= */
+
+:root {
+  --bg-main: #eef4ff;
+  --bg-soft: #f7ecff;
+
+  --glass-bg: rgba(255, 255, 255, 0.30);
+  --glass-bg-light: rgba(255, 255, 255, 0.48);
+  --glass-border: rgba(255, 255, 255, 0.42);
+  --glass-shadow: 0 22px 60px rgba(15, 23, 42, 0.16);
+
+  --text-main: #172033;
+  --text-soft: #5d6475;
+  --text-muted: #64748b;
+
+  --blue: #4f7cff;
+  --cyan: #35d0ff;
+  --purple: #8b5cf6;
+  --pink: #ec4899;
+  --orange: #f97316;
+  --green: #10b981;
+  --red: #ef4444;
+
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 26px;
+  --radius-xl: 32px;
+
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  font-family: "Noto Sans TC", Arial, sans-serif;
+  color: var(--text-main);
+  line-height: 1.6;
+  background:
+    radial-gradient(circle at 8% 10%, rgba(79, 124, 255, 0.25), transparent 28%),
+    radial-gradient(circle at 90% 8%, rgba(236, 72, 153, 0.18), transparent 30%),
+    radial-gradient(circle at 82% 72%, rgba(53, 208, 255, 0.18), transparent 32%),
+    radial-gradient(circle at 14% 86%, rgba(249, 115, 22, 0.13), transparent 26%),
+    linear-gradient(135deg, #eef4ff 0%, #f7ecff 42%, #eafff8 100%);
+  background-attachment: fixed;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.36), transparent 42%),
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.36), transparent 32%);
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+

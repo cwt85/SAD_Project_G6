@@ -1,0 +1,327 @@
+/* 12. Responsive - Global Breakpoints
+   SMACSS Layer: Theme/Utility */
+
+/* =========================================================
+   17. Responsive 響應式
+========================================================= */
+
+@media (max-width: 900px) {
+  main {
+    width: 90%;
+  }
+
+  .booking-search-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-search-panel {
+    position: static;
+    max-height: none;
+  }
+
+  .cart-item-card {
+    grid-template-columns: 1fr;
+  }
+
+  .favorite-item-card {
+    grid-template-columns: 1fr;
+  }
+
+  .cart-checkout-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-sidebar {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-sidebar-title {
+    grid-column: 1 / -1;
+  }
+
+  .admin-nav-btn {
+    min-height: 84px;
+  }
+
+  .admin-nav-btn strong,
+  .admin-nav-btn span {
+    overflow-wrap: anywhere;
+  }
+
+  .admin-room-filter-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-room-filter-actions {
+    align-self: stretch;
+  }
+
+  .admin-room-filter-actions button {
+    width: 100%;
+  }
+
+  .room-card {
+    grid-template-columns: 280px 1fr;
+  }
+
+  .room-body {
+    padding: 24px;
+  }
+
+  .admin-room-card,
+  .admin-chat-container {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-room-cover,
+  .admin-room-cover img {
+    min-height: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  header,
+  .auth-summary,
+  .bonus-point-bar,
+  nav,
+  main {
+    width: 100%;
+  }
+
+  header {
+    padding: 34px 18px;
+  }
+
+  header h1 {
+    font-size: 28px;
+  }
+
+  nav {
+    padding: 12px 18px;
+  }
+
+  .room-list-toolbar {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .booking-filter-grid.two-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .date-range-item,
+  .notice-dialog-card {
+    grid-template-columns: 1fr;
+  }
+
+  .date-range-marker {
+    min-height: 36px;
+  }
+
+  .date-range-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .notice-dialog-action {
+    grid-column: 1;
+  }
+
+  .order-confirm-card {
+    padding: 22px;
+  }
+
+  .order-confirm-stay,
+  .order-confirm-detail-grid,
+  .order-confirm-total {
+    grid-template-columns: 1fr;
+  }
+
+  .order-confirm-date-divider {
+    justify-self: center;
+  }
+
+  .order-confirm-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .bank-transfer-card {
+    padding: 22px;
+  }
+
+  .bank-transfer-summary,
+  .bank-transfer-account,
+  .bank-transfer-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .bank-transfer-actions {
+    display: grid;
+  }
+
+  .cart-booking-heading {
+    display: grid;
+  }
+
+  .cart-stay-block {
+    grid-template-columns: 42px minmax(0, 1fr);
+  }
+
+  .cart-stay-badge {
+    min-height: 86px;
+  }
+
+  .saved-list-actions,
+  .cart-checkout-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .room-page-size-control {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .bonus-point-bar {
+    padding: 10px 18px;
+  }
+
+  .bonus-bar-inner,
+  .bonus-actions {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .bonus-bar-inner {
+    flex-direction: column;
+  }
+
+  .auth-summary {
+    margin: -14px auto 0;
+    padding: 0 18px;
+  }
+
+  main {
+    padding: 0 18px;
+    margin: 22px auto;
+  }
+
+  .panel {
+    padding: 20px;
+    border-radius: 22px;
+  }
+
+  .panel h2 {
+    font-size: 22px;
+  }
+
+  .admin-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-nav-btn {
+    min-height: auto;
+  }
+
+  .admin-room-filter-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-accordion-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-accordion-body {
+    padding: 0 20px 20px;
+  }
+
+  .admin-room-title-row,
+  .admin-chat-conv-header {
+    flex-direction: column;
+  }
+
+  .room-card {
+    display: block;
+    min-height: auto;
+    border-radius: 24px;
+  }
+
+  .room-image {
+    height: 210px;
+    min-height: 210px;
+    border-radius: 24px 24px 0 0;
+  }
+
+  .room-body,
+  .detail-card .room-body {
+    display: block;
+    padding: 22px;
+  }
+
+  .room-body h3 {
+    font-size: 22px;
+  }
+
+  .room-card .actions {
+    margin-top: 14px;
+  }
+
+  .detail-slider {
+    height: 280px;
+    border-radius: 24px;
+  }
+
+  .slider-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 28px;
+    line-height: 38px;
+  }
+
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .cart-booking-fields {
+    white-space: normal;
+  }
+
+  .message {
+    max-width: 88%;
+  }
+}
+
+@media (max-width: 480px) {
+  nav button,
+  .primary-btn,
+  .secondary-btn,
+  .danger-btn {
+    width: 100%;
+  }
+
+  .actions {
+    width: 100%;
+  }
+
+  .summary-box {
+    grid-template-columns: 1fr;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-slider {
+    height: 230px;
+  }
+}
+
+
