@@ -165,7 +165,7 @@
 
 <main id="main"></main>
 
-<footer>SAD Project G6 · Unit Test Runner · 135 test cases across 7 modules</footer>
+<footer>SAD Project G6 · Unit Test Runner · 178 test cases across 11 modules</footer>
 
 <!-- ═══════════════════════════════════════════
      載入原始碼（不含 app.js / chat.js / itinerary.js）
@@ -994,6 +994,266 @@ describe('bonus.js — 紅利點數管理', () => {
     test('扣完後餘額為 0', () => {
       deductBonusPoints(200, '全部扣抵', 'system', 2);
       expect(getUserBonusPoints(2)).toBe(0);
+    });
+  });
+});
+
+// ═══ 八、trains.js — 補充測試 ═══
+describe('trains.js — 補充測試', () => {
+  beforeEach(() => __resetState());
+
+  // 建立測試用車次結果物件
+  function mkResult(trainType, distance, overrides = {}) {
+    return {
+      trainType,
+      distance,
+      cabin: 'standard',
+      travelDate: '2030-01-01',   // 遠期日期，早鳥折扣 0.7 必然成立
+      departTime: '09:00',
+      reservedTrain: trainType !== '區間車',
+      availableSeats: 50,
+      status: '準點',
+      ...overrides
+    };
+  }
+
+  describe('compareTime()', () => {
+    test('前者較早回傳負數', () => {
+      expect(compareTime('09:00', '10:00') < 0).toBe(true);
+    });
+    test('前者較晚回傳正數', () => {
+      expect(compareTime('10:00', '09:00') > 0).toBe(true);
+    });
+    test('相同時間回傳 0', () => {
+      expect(compareTime('09:30', '09:30')).toBe(0);
+    });
+    test('跨小時計算正確（差 30 分）', () => {
+      expect(compareTime('09:45', '10:15')).toBe(-30);
+    });
+  });
+
+  describe('calculateTrainPrice()', () => {
+    test('自強號標準車廂計算基礎票價', () => {
+      const result = mkResult('自強號', 100);
+      const price = calculateTrainPrice(result, 'general', false);
+      // rate=2.8, distance=100, basePrice=Math.round(280)=280
+      expect(price.basePrice).toBe(Math.max(15, Math.round(100 * 2.8)));
+    });
+    test('商務車廂票價為標準的 1.3 倍', () => {
+      const std = calculateTrainPrice(mkResult('自強號', 100), 'general', false);
+      const biz = calculateTrainPrice(mkResult('自強號', 100, { cabin: 'business' }), 'general', false);
+      expect(biz.basePrice).toBe(Math.max(15, Math.round(100 * 2.8 * 1.3)));
+    });
+    test('學生票折扣低於一般票', () => {
+      // 使用 2 天後日期：早鳥折扣 factor=1（不觸發），學生票 factor=0.88 才是最優惠
+      const nearResult = mkResult('自強號', 200, { travelDate: daysFromToday(2) });
+      const general = calculateTrainPrice(nearResult, 'general', false);
+      const student = calculateTrainPrice(nearResult, 'student', false);
+      expect(student.finalPrice < general.finalPrice).toBe(true);
+    });
+    test('遠期日期享早鳥折扣，discountLabel 包含折扣文字', () => {
+      const price = calculateTrainPrice(mkResult('自強號', 100), 'general', false);
+      expect(price.discountLabel).toContain('折');
+    });
+  });
+
+  describe('getTrainAvailability()', () => {
+    test('正常班次回傳 reservable: true', () => {
+      const r = getTrainAvailability(mkResult('自強號', 100));
+      expect(r.reservable).toBe(true);
+    });
+    test('停駛班次不可訂', () => {
+      const r = getTrainAvailability(mkResult('自強號', 100, { status: '停駛' }));
+      expect(r.reservable).toBe(false);
+    });
+    test('區間車（非對號）不可訂', () => {
+      const r = getTrainAvailability(mkResult('區間車', 100, { reservedTrain: false }));
+      expect(r.reservable).toBe(false);
+    });
+    test('座位為 0 不可訂', () => {
+      const r = getTrainAvailability(mkResult('自強號', 100, { availableSeats: 0 }));
+      expect(r.reservable).toBe(false);
+    });
+  });
+
+  describe('getTrainDateTime()', () => {
+    test('日期時間正確解析', () => {
+      const dt = getTrainDateTime('2025-08-15', '09:30');
+      expect(dt instanceof Date).toBe(true);
+      expect(dt.getHours()).toBe(9);
+      expect(dt.getMinutes()).toBe(30);
+    });
+    test('無時間參數時預設為 00:00', () => {
+      const dt = getTrainDateTime('2025-08-15', '');
+      expect(dt.getHours()).toBe(0);
+      expect(dt.getMinutes()).toBe(0);
+    });
+  });
+});
+
+// ═══ 九、rooms.js — 補充測試 ═══
+describe('rooms.js — 補充測試', () => {
+  beforeEach(() => __resetState());
+
+  describe('parseStationDistanceMinutes()', () => {
+    test('解析「5 分鐘」回傳 5', () => {
+      expect(parseStationDistanceMinutes('5 分鐘')).toBe(5);
+    });
+    test('解析「約 8.5 分鐘」回傳 8.5', () => {
+      expect(parseStationDistanceMinutes('約 8.5 分鐘')).toBe(8.5);
+    });
+    test('無法解析時回傳 Infinity', () => {
+      expect(parseStationDistanceMinutes('步行可達')).toBe(Infinity);
+      expect(parseStationDistanceMinutes('')).toBe(Infinity);
+    });
+    test('數值愈小代表愈近', () => {
+      expect(parseStationDistanceMinutes('3 分鐘') < parseStationDistanceMinutes('10 分鐘')).toBe(true);
+    });
+  });
+
+  describe('normalizeRoomTextList()', () => {
+    test('陣列原樣回傳（過濾空值）', () => {
+      expect(normalizeRoomTextList(['WiFi', '停車場', ''])).toHaveLength(2);
+    });
+    test('逗號分隔字串轉陣列', () => {
+      expect(normalizeRoomTextList('WiFi,停車場')).toHaveLength(2);
+    });
+    test('中文頓號分隔字串轉陣列', () => {
+      expect(normalizeRoomTextList('WiFi、停車場')).toHaveLength(2);
+    });
+    test('空字串回傳空陣列', () => {
+      expect(normalizeRoomTextList('')).toHaveLength(0);
+    });
+    test('null 回傳空陣列', () => {
+      expect(normalizeRoomTextList(null)).toHaveLength(0);
+    });
+  });
+
+  describe('getRoomCheckInTime() / getRoomCheckOutTime()', () => {
+    test('有設定時回傳設定值', () => {
+      expect(getRoomCheckInTime({ checkInTime: '16:00' })).toBe('16:00');
+      expect(getRoomCheckOutTime({ checkOutTime: '12:00' })).toBe('12:00');
+    });
+    test('未設定時回傳預設值 15:00 / 11:00', () => {
+      expect(getRoomCheckInTime({})).toBe('15:00');
+      expect(getRoomCheckOutTime({})).toBe('11:00');
+    });
+    test('null 房源時回傳預設值', () => {
+      expect(getRoomCheckInTime(null)).toBe('15:00');
+      expect(getRoomCheckOutTime(null)).toBe('11:00');
+    });
+  });
+
+  describe('getDateInputOffset()', () => {
+    test('日期加一天', () => {
+      expect(getDateInputOffset('2025-01-01', 1)).toBe('2025-01-02');
+    });
+    test('跨月計算', () => {
+      expect(getDateInputOffset('2025-01-31', 1)).toBe('2025-02-01');
+    });
+    test('無效日期回傳空字串', () => {
+      expect(getDateInputOffset('invalid', 1)).toBe('');
+    });
+  });
+});
+
+// ═══ 十、orders.js — 補充測試 ═══
+describe('orders.js — 補充測試', () => {
+  beforeEach(() => {
+    __resetState();
+    // getReviewEligibility 內部呼叫 canOperateOrder，需要登入狀態
+    setLoginState({ id: 2, account: 'user@test.com', role: 'customer' });
+  });
+
+  describe('formatOrderStayPeriod()', () => {
+    test('包含入住與退房日期', () => {
+      const result = formatOrderStayPeriod(makeOrder());
+      expect(result).toContain(makeOrder().checkIn);
+      expect(result).toContain(makeOrder().checkOut);
+    });
+    test('有入退房時間時也包含在內', () => {
+      const result = formatOrderStayPeriod(makeOrder({ checkInTime: '15:00', checkOutTime: '11:00' }));
+      expect(result).toContain('15:00');
+      expect(result).toContain('11:00');
+    });
+    test('缺少日期時顯示「未指定」', () => {
+      const result = formatOrderStayPeriod({ checkIn: '', checkOut: '' });
+      expect(result).toContain('未指定');
+    });
+  });
+
+  describe('getAvailableRoomTypeStock()', () => {
+    test('無訂單時回傳完整庫存', () => {
+      const room = makeRoom();
+      rooms.push(room);
+      const stock = getAvailableRoomTypeStock(1, 'type-std-1', daysFromToday(5), daysFromToday(7));
+      expect(stock).toBe(5);
+    });
+    test('有重疊訂單時庫存減少', () => {
+      const room = makeRoom();
+      rooms.push(room);
+      orders.push(makeOrder({ roomId: 1, roomTypeId: 'type-std-1', bookingStatus: '已確認' }));
+      const stock = getAvailableRoomTypeStock(1, 'type-std-1', daysFromToday(14), daysFromToday(18));
+      expect(stock).toBe(4);
+    });
+    test('找不到房源時回傳 0', () => {
+      expect(getAvailableRoomTypeStock(999, 'type-std-1', daysFromToday(5), daysFromToday(7))).toBe(0);
+    });
+  });
+
+  describe('getReviewEligibility()', () => {
+    test('已取消訂單不可評價', () => {
+      const result = getReviewEligibility(makeOrder({ bookingStatus: '已取消' }));
+      expect(result.valid).toBe(false);
+    });
+    test('未付款訂單不可評價', () => {
+      const result = getReviewEligibility(makeOrder({ paymentStatus: '未付款' }));
+      expect(result.valid).toBe(false);
+    });
+    test('已退房可評價', () => {
+      const result = getReviewEligibility(makeOrder({
+        bookingStatus: '已退房',
+        paymentStatus: '已付款',
+        checkOut: daysFromToday(-1)
+      }));
+      expect(result.valid).toBe(true);
+    });
+    test('已評價過的訂單不可再評', () => {
+      const result = getReviewEligibility(makeOrder({
+        bookingStatus: '已退房',
+        paymentStatus: '已付款',
+        checkOut: daysFromToday(-1),
+        review: { rating: 5 }
+      }));
+      expect(result.valid).toBe(false);
+    });
+  });
+});
+
+// ═══ 十一、bonus.js — 補充測試 ═══
+describe('bonus.js — 補充測試', () => {
+  beforeEach(() => {
+    __resetState();
+    const customer = { id: 2, account: 'customer@test.com', role: 'customer' };
+    users.push(customer);
+    setLoginState(customer);
+  });
+
+  describe('getVisibleBonusRecords()', () => {
+    test('未登入時回傳空陣列', () => {
+      isLoggedIn = false;
+      currentUser = null;
+      expect(getVisibleBonusRecords()).toHaveLength(0);
+    });
+    test('登入後新增紀錄可查到', () => {
+      addBonusPoints(100, '測試', 'system', 2);
+      expect(getVisibleBonusRecords().length).toBeGreaterThan(0);
+    });
+    test('limit 參數控制回傳筆數', () => {
+      addBonusPoints(10, '第1次', 'system', 2);
+      addBonusPoints(20, '第2次', 'system', 2);
+      addBonusPoints(30, '第3次', 'system', 2);
+      expect(getVisibleBonusRecords(2)).toHaveLength(2);
     });
   });
 });
