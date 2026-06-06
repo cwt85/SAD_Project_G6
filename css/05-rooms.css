@@ -1,0 +1,545 @@
+/* 05. Rooms - Room List, Detail, Slider, Room Types
+   SMACSS Layer: Module */
+
+/* =========================================================
+   09. Room List 主頁 / 搜尋頁房卡
+========================================================= */
+
+.card-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+}
+
+.room-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  align-items: stretch;
+  min-height: 240px;
+  overflow: hidden;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.34);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  transform: translateZ(0);
+  transition:
+    transform var(--transition-normal),
+    box-shadow var(--transition-normal);
+}
+
+.room-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(79, 124, 255, 0.18),
+    rgba(53, 208, 255, 0.15),
+    rgba(236, 72, 153, 0.14),
+    rgba(249, 115, 22, 0.12)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.room-card:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 30px 72px rgba(79, 70, 229, 0.18);
+}
+
+.room-image {
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+  overflow: hidden;
+  border-radius: 28px 0 0 28px;
+  background:
+    linear-gradient(135deg, rgba(79, 124, 255, 0.26), rgba(236, 72, 153, 0.18)),
+    rgba(255, 255, 255, 0.30);
+}
+
+.room-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(1.08) contrast(1.03);
+  transition:
+    transform 0.45s ease,
+    filter 0.45s ease;
+}
+
+.room-card:hover .room-image img {
+  transform: scale(1.06);
+  filter: saturate(1.16) contrast(1.06);
+}
+
+.room-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 26px 30px;
+}
+
+.room-body h3 {
+  margin-bottom: 10px;
+  color: #111827;
+  font-size: 24px;
+}
+
+.room-body p {
+  margin-bottom: 6px;
+  color: #334155;
+}
+
+.price {
+  margin: 12px 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: transparent;
+  background: linear-gradient(135deg, #ef4444, #f97316, #ec4899);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.room-card .actions {
+  margin-top: auto;
+}
+
+
+/* =========================================================
+   10. Detail Page 詳細頁
+========================================================= */
+
+.detail-card {
+  display: block;
+  max-width: 980px;
+  margin: 0 auto;
+  border-radius: var(--radius-xl);
+}
+
+.detail-card .room-body {
+  display: block;
+  padding: 26px 30px 32px;
+}
+
+.detail-card .room-body h2 {
+  margin: 18px 0 12px;
+  color: #111827;
+  font-size: 30px;
+}
+
+.detail-card .room-body h3 {
+  margin: 22px 0 10px;
+  color: #1f2937;
+}
+
+.detail-card .room-body p {
+  margin-bottom: 8px;
+}
+
+.detail-slider {
+  position: relative;
+  width: 100%;
+  height: 460px;
+  overflow: hidden;
+  border-radius: 30px;
+  margin-bottom: 14px;
+  background: rgba(255, 255, 255, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.46);
+  box-shadow: 0 26px 70px rgba(15, 23, 42, 0.20);
+}
+
+.slider-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.35s ease;
+}
+
+.slider-item {
+  min-width: 100%;
+  height: 100%;
+}
+
+.slider-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(1.10) contrast(1.03);
+}
+
+/* =========================================================
+   詳細頁輪播控制按鈕 / 圓點
+   淡色玻璃版
+========================================================= */
+
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+
+  width: 46px;
+  height: 46px;
+
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  border-radius: 50%;
+
+  transform: translateY(-50%);
+
+  font-size: 30px;
+  line-height: 42px;
+  text-align: center;
+
+  color: rgba(17, 24, 39, 0.72);
+  background: rgba(255, 255, 255, 0.34);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 12px 26px rgba(15, 23, 42, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+
+  cursor: pointer;
+
+  transition:
+    transform 0.22s ease,
+    background 0.22s ease,
+    color 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.slider-btn:hover {
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    rgba(79, 124, 255, 0.58),
+    rgba(139, 92, 246, 0.48),
+    rgba(236, 72, 153, 0.42)
+  );
+
+  box-shadow:
+    0 16px 34px rgba(79, 70, 229, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.slider-btn:active {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.slider-prev {
+top: 50%;
+  left: clamp(14px, 3vw, 34px);
+}
+
+.slider-next {
+top: 50%;
+  right: clamp(14px, 3vw, 34px);
+}
+
+/* 下方圓點 */
+.slider-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 24px;
+}
+
+/* 一般圓點 */
+.slider-dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.46);
+
+  box-shadow:
+    0 6px 14px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+
+  cursor: pointer;
+
+  transition:
+    width 0.22s ease,
+    background 0.22s ease,
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.slider-dot:hover {
+  transform: scale(1.2);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+/* 目前圖片的圓點 */
+.slider-dot.active {
+  width: 26px;
+  background: linear-gradient(
+    135deg,
+    rgba(79, 124, 255, 0.62),
+    rgba(139, 92, 246, 0.52),
+    rgba(236, 72, 153, 0.46)
+  );
+
+  box-shadow:
+    0 8px 18px rgba(79, 70, 229, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.62);
+}
+
+/* 手機版 */
+@media (max-width: 768px) {
+  .slider-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 26px;
+    line-height: 34px;
+  }
+
+  .slider-prev {
+    left: 10px;
+  }
+
+  .slider-next {
+    right: 10px;
+  }
+
+  .slider-dots {
+    gap: 7px;
+  }
+
+  .slider-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .slider-dot.active {
+    width: 22px;
+  }
+}
+
+
+/* =========================================================
+   房型選擇區
+========================================================= */
+
+.room-type-list {
+  display: grid;
+  gap: 14px;
+  margin: 14px 0 24px;
+}
+
+.room-type-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  align-items: center;
+
+  padding: 18px 20px;
+  border-radius: 22px;
+
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.56);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+
+  cursor: pointer;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    background 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.room-type-card:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.12);
+}
+
+.room-type-card.active {
+  border-color: rgba(79, 124, 255, 0.65);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(219, 234, 254, 0.72),
+      rgba(243, 232, 255, 0.64),
+      rgba(255, 228, 230, 0.52)
+    );
+  box-shadow:
+    0 18px 42px rgba(79, 70, 229, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.68);
+}
+
+.room-type-card h4 {
+  margin-bottom: 6px;
+  color: #111827;
+  font-size: 18px;
+}
+
+.room-type-card p {
+  margin-bottom: 4px;
+  color: #475569;
+}
+
+.room-type-price {
+  min-width: 140px;
+  text-align: right;
+  font-size: 20px;
+  font-weight: 800;
+
+  color: transparent;
+  background: linear-gradient(135deg, #ef4444, #f97316, #ec4899);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* 訂單房型小字 */
+td small {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.order-status {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 999px;
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.76);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.room-reviews {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 18px;
+}
+
+.review-item {
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.52);
+  border: 1px solid var(--glass-border);
+}
+
+.review-item strong {
+  color: #0f172a;
+}
+
+.review-item strong,
+.review-item span {
+  display: block;
+}
+
+.review-item span {
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.review-item p {
+  margin-top: 8px;
+  color: #334155;
+}
+
+.order-action-stack {
+  display: grid;
+  gap: 8px;
+  min-width: 180px;
+}
+
+.order-review-form {
+  display: grid;
+  gap: 8px;
+  min-width: 220px;
+  padding: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.order-review-form.hidden {
+  display: none;
+}
+
+.order-review-form label {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.order-review-form textarea {
+  min-height: 82px;
+  resize: vertical;
+}
+
+.review-submitted-chip,
+.manual-review-note {
+  color: #92400e;
+  font-weight: 900;
+}
+
+.review-submitted-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(254, 243, 199, 0.78);
+}
+
+.back-to-top-btn {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 50;
+  display: none;
+  width: 46px;
+  height: 46px;
+  border: 0;
+  border-radius: 50%;
+  color: white;
+  background: linear-gradient(135deg, #2563eb, #0f766e);
+  box-shadow: 0 16px 38px rgba(15, 23, 42, 0.26);
+  font-size: 22px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.back-to-top-btn.visible {
+  display: grid;
+  place-items: center;
+}
+
+/* 手機版 */
+@media (max-width: 768px) {
+  .room-type-card {
+    grid-template-columns: 1fr;
+  }
+
+  .room-type-price {
+    min-width: auto;
+    text-align: left;
+  }
+}
+

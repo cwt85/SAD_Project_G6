@@ -1,0 +1,897 @@
+/* 04. Components - Toast, Panel, Form, Buttons, Notice, Tags
+   SMACSS Layer: Module (reusable) */
+
+/* ===== Toast 提示 ===== */
+#toastContainer {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.toast {
+  padding: 12px 20px;
+  border-radius: 14px;
+  background: rgba(17, 24, 39, 0.88);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.28);
+  backdrop-filter: blur(10px);
+  max-width: 300px;
+  opacity: 0;
+  transform: translateY(10px) scale(0.97);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.toast.toast-show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.toast.toast-error {
+  background: rgba(185, 28, 28, 0.90);
+}
+
+img {
+  max-width: 100%;
+}
+
+
+/* =========================================================
+   05. Panel / Grid / Summary
+========================================================= */
+
+.panel {
+  margin-bottom: 24px;
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.auth-panel .grid {
+  grid-template-columns: 1fr;
+}
+
+.auth-panel #registerPasswordFields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.auth-panel .actions {
+  flex-direction: column;
+}
+
+.auth-panel .actions button {
+  width: 100%;
+}
+
+.panel h2 {
+  margin-bottom: 16px;
+  color: #111827;
+  font-size: 26px;
+  letter-spacing: 0.5px;
+}
+
+.panel h3 {
+  margin: 22px 0 12px;
+  color: #1f2937;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.10);
+}
+
+.auth-tab {
+  flex: 1;
+  height: 42px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-weight: 900;
+  letter-spacing: 0;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.80);
+  border: 1px solid rgba(148, 163, 184, 0.30);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.auth-tab.active {
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+  border-color: transparent;
+  box-shadow: 0 16px 30px rgba(79, 70, 229, 0.22);
+}
+
+.auth-tab:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 26px rgba(15, 23, 42, 0.12);
+}
+
+.auth-tab:active {
+  transform: translateY(0);
+}
+
+.auth-form {
+  display: none;
+}
+
+.auth-form.active {
+  display: block;
+}
+
+.summary-box {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.auth-summary {
+  width: 84%;
+  margin: -18px auto 0;
+  padding: 0;
+  position: relative;
+  z-index: 25;
+}
+
+.summary-item {
+  padding: 18px;
+  border-radius: 22px;
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.38);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.auth-summary .summary-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.74);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.auth-summary .summary-item span {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.summary-item strong {
+  display: block;
+  font-size: 26px;
+  color: transparent;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.auth-summary .summary-item strong {
+  max-width: 60%;
+  overflow: hidden;
+  font-size: 20px;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   06. Form 表單
+========================================================= */
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  color: #263047;
+  font-weight: 700;
+}
+
+.auth-panel .radio-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--glass-border);
+}
+
+.auth-panel .radio-row label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  margin: 0;
+  font-weight: 800;
+  color: #1f2a44;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.auth-panel .radio-row label:last-child {
+  border-bottom: none;
+}
+
+.auth-panel .radio-row input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--blue);
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 12px 13px;
+  font-size: 15px;
+  color: #1f2937;
+  background: rgba(255, 255, 255, 0.56);
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  border-radius: 16px;
+  outline: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  transition: var(--transition-fast);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  background: rgba(255, 255, 255, 0.76);
+  border-color: rgba(79, 124, 255, 0.65);
+  box-shadow:
+    0 0 0 4px rgba(79, 124, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+
+/* =========================================================
+   07. Buttons 按鈕
+========================================================= */
+
+.primary-btn {
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  box-shadow: 0 10px 24px rgba(79, 70, 229, 0.18);
+}
+
+.secondary-btn {
+  color: #075985;
+  background: linear-gradient(
+    135deg,
+    rgba(224, 242, 254, 0.92),
+    rgba(207, 250, 254, 0.78)
+  );
+  box-shadow: 0 10px 24px rgba(14, 116, 144, 0.10);
+}
+
+.danger-btn {
+  color: white;
+  background: linear-gradient(135deg, #fb7185, var(--red));
+  box-shadow: 0 10px 24px rgba(239, 68, 68, 0.16);
+}
+
+.primary-btn:hover,
+.secondary-btn:hover,
+.danger-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.16);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  padding-right: 76px;
+}
+
+.toggle-pw-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  color: #334155;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.10);
+}
+
+.toggle-pw-btn:hover {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.auth-action-btn {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 28px;
+}
+
+
+/* =========================================================
+   08. Notice 提示訊息
+========================================================= */
+
+.notice {
+  margin: 14px 0;
+  padding: 14px 16px;
+  border-radius: 18px;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.success {
+  color: #166534;
+  background: rgba(220, 252, 231, 0.72);
+}
+
+.warning {
+  color: #92400e;
+  background: rgba(254, 243, 199, 0.76);
+}
+
+.error {
+  color: #991b1b;
+  background: rgba(254, 226, 226, 0.76);
+}
+
+.info {
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.76);
+}
+
+.notice-dialog {
+  width: min(420px, calc(100vw - 32px));
+  padding: 0;
+  color: var(--text-main);
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.notice-dialog::backdrop {
+  background: rgba(15, 23, 42, 0.38);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.notice-dialog-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 16px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.68);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 28px 70px rgba(15, 23, 42, 0.24);
+}
+
+.room-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(79, 124, 255, 0.18),
+    rgba(53, 208, 255, 0.15),
+    rgba(236, 72, 153, 0.14),
+    rgba(249, 115, 22, 0.12)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.notice-dialog-accent {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  box-shadow: 0 14px 30px rgba(79, 124, 255, 0.24);
+}
+
+
+.notice-dialog.success .notice-dialog-accent {
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+}
+
+.notice-dialog.warning .notice-dialog-accent {
+  background: linear-gradient(135deg, #d97706, #f59e0b);
+}
+
+.notice-dialog.error .notice-dialog-accent {
+  background: linear-gradient(135deg, #dc2626, #fb7185);
+}
+
+.notice-dialog-content {
+  min-width: 0;
+  padding-right: 26px;
+}
+
+.notice-dialog-label {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.notice-dialog-title {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.notice-dialog-message {
+  color: var(--text-soft);
+  font-weight: 700;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.notice-dialog-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  color: #475569;
+  font-size: 22px;
+  line-height: 1;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 8px;
+  background: rgba(248, 250, 252, 0.82);
+}
+
+.notice-dialog-action {
+  grid-column: 2;
+  width: fit-content;
+  min-width: 108px;
+  margin-top: 2px;
+}
+
+.order-confirm-dialog {
+  width: min(560px, calc(100vw - 32px));
+  padding: 0;
+  color: var(--text-main);
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.order-confirm-dialog::backdrop {
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.order-confirm-card {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  padding: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(241, 245, 249, 0.92));
+  box-shadow: 0 32px 80px rgba(15, 23, 42, 0.30);
+}
+
+.order-confirm-heading {
+  padding-right: 36px;
+}
+
+.order-confirm-heading span {
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.order-confirm-heading h3 {
+  margin: 6px 0;
+  font-size: 24px;
+}
+
+.order-confirm-heading p {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.order-confirm-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: #475569;
+  font-size: 24px;
+  line-height: 1;
+  border: 1px solid rgba(148, 163, 184, 0.36);
+  border-radius: 8px;
+  background: rgba(248, 250, 252, 0.88);
+}
+
+.order-confirm-stay {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.order-confirm-date-card,
+.order-confirm-detail-grid > div,
+.order-confirm-total {
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.order-confirm-date-card {
+  display: grid;
+  gap: 4px;
+  min-height: 96px;
+  padding: 14px;
+  border-color: rgba(79, 124, 255, 0.22);
+}
+
+.order-confirm-date-card.checkout {
+  border-color: rgba(139, 92, 246, 0.22);
+}
+
+.order-confirm-date-card span,
+.order-confirm-detail-grid span,
+.order-confirm-total span {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.order-confirm-date-card strong {
+  color: #0f172a;
+  font-size: 18px;
+}
+
+.order-confirm-date-card small {
+  color: #2563eb;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.order-confirm-date-divider {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  color: white;
+  font-size: 13px;
+  font-weight: 900;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  box-shadow: 0 10px 22px rgba(79, 70, 229, 0.22);
+}
+
+.order-confirm-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.order-confirm-detail-grid > div {
+  display: grid;
+  gap: 4px;
+  min-height: 72px;
+  padding: 12px 14px;
+}
+
+.order-confirm-detail-grid strong {
+  color: #0f172a;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.order-confirm-total {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 10px;
+  padding: 14px;
+  background: linear-gradient(135deg, rgba(219, 234, 254, 0.82), rgba(224, 242, 254, 0.68));
+}
+
+.order-confirm-total > div {
+  display: grid;
+  gap: 3px;
+}
+
+.order-confirm-total strong {
+  color: #1e3a8a;
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}
+
+.order-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.order-confirm-actions button {
+  min-width: 112px;
+}
+
+.bank-transfer-dialog {
+  width: min(520px, calc(100vw - 32px));
+  padding: 0;
+  color: var(--text-main);
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.bank-transfer-dialog::backdrop {
+  background: rgba(15, 23, 42, 0.44);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.bank-transfer-card {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  padding: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(240, 253, 250, 0.92));
+  box-shadow: 0 32px 80px rgba(15, 23, 42, 0.30);
+}
+
+.bank-transfer-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: #475569;
+  font-size: 24px;
+  line-height: 1;
+  border: 1px solid rgba(148, 163, 184, 0.36);
+  border-radius: 8px;
+  background: rgba(248, 250, 252, 0.88);
+}
+
+.bank-transfer-heading {
+  padding-right: 38px;
+}
+
+.bank-transfer-heading span,
+.bank-transfer-summary span,
+.bank-transfer-account span,
+.bank-transfer-input-label {
+  color: #0f766e;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.bank-transfer-heading h3 {
+  margin: 6px 0;
+  font-size: 24px;
+}
+
+.bank-transfer-heading p,
+.bank-transfer-helper {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.bank-transfer-summary,
+.bank-transfer-account {
+  display: grid;
+  gap: 10px;
+}
+
+.bank-transfer-summary {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+}
+
+.bank-transfer-summary > div,
+.bank-transfer-account > div {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  border: 1px solid rgba(20, 184, 166, 0.22);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.bank-transfer-summary strong {
+  color: #0f172a;
+  font-size: 18px;
+  overflow-wrap: anywhere;
+}
+
+.bank-transfer-summary small {
+  color: var(--text-muted);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.bank-transfer-account {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  padding: 14px;
+  border: 1px solid rgba(15, 118, 110, 0.18);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(204, 251, 241, 0.72), rgba(219, 234, 254, 0.56));
+}
+
+.bank-transfer-account > div {
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.bank-transfer-account strong {
+  color: #134e4a;
+  font-size: 18px;
+  overflow-wrap: anywhere;
+}
+
+.bank-transfer-input-label {
+  display: block;
+  margin-bottom: -8px;
+}
+
+.bank-transfer-input-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(20, 184, 166, 0.28);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.bank-transfer-input-row span {
+  color: #0f766e;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.bank-transfer-input-row input {
+  padding: 6px 0;
+  color: #0f172a;
+  font-size: 22px;
+  font-weight: 900;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.bank-transfer-input-row input:focus {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.bank-transfer-helper {
+  margin-top: -8px;
+  font-size: 13px;
+}
+
+.bank-transfer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.bank-transfer-actions button {
+  min-width: 112px;
+}
+
+
+/* =========================================================
+   11. Tags 詳細頁設備標籤
+   主頁房卡 JS 已不輸出 tag；這裡主要給詳細頁使用
+========================================================= */
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.tag {
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.50);
+  border: 1px solid rgba(255, 255, 255, 0.54);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+}
+
+.tag:nth-child(3n + 1) {
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.70);
+}
+
+.tag:nth-child(3n + 2) {
+  color: #7e22ce;
+  background: rgba(243, 232, 255, 0.70);
+}
+
+.tag:nth-child(3n + 3) {
+  color: #be123c;
+  background: rgba(255, 228, 230, 0.70);
+}
+
+

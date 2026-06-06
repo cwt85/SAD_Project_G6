@@ -1,0 +1,373 @@
+/* 07. Admin - Admin Panel
+   SMACSS Layer: Module */
+
+/* =========================================================
+   13. Admin 後台管理
+========================================================= */
+
+.admin-shell {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.admin-sidebar {
+  position: sticky;
+  top: 92px;
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+}
+
+.admin-sidebar-title {
+  padding: 8px 8px 12px;
+}
+
+.admin-sidebar-title span {
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.admin-sidebar-title h2 {
+  margin: 6px 0;
+  color: #111827;
+  font-size: 24px;
+}
+
+.admin-sidebar-title p {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.admin-nav-btn {
+  width: 100%;
+  min-height: 74px;
+  padding: 14px 16px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 18px;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+  text-align: left;
+}
+
+.admin-nav-btn strong,
+.admin-nav-btn span {
+  display: block;
+}
+
+.admin-nav-btn strong {
+  color: inherit;
+  font-size: 15px;
+}
+
+.admin-nav-btn span {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.admin-nav-btn:hover,
+.admin-nav-btn.active {
+  transform: translateY(-1px);
+}
+
+.admin-nav-btn.active {
+  border-color: transparent;
+  color: white;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  box-shadow: 0 16px 32px rgba(37, 99, 235, 0.22);
+}
+
+.admin-nav-btn.active span {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.admin-workspace {
+  min-width: 0;
+}
+
+.admin-section-panel {
+  display: none;
+}
+
+.admin-section-panel.active {
+  display: grid;
+  gap: 18px;
+  animation: adminPanelIn 0.18s ease-out;
+}
+
+.admin-section-panel > .panel {
+  margin: 0;
+}
+
+@keyframes adminPanelIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.admin-accordion {
+  padding: 0;
+}
+
+.admin-accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 26px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.admin-accordion-header::-webkit-details-marker {
+  display: none;
+}
+
+.admin-accordion-header::after {
+  content: "展開";
+  flex: 0 0 auto;
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.78);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-accordion[open] .admin-accordion-header::after {
+  content: "收合";
+}
+
+.admin-accordion-header span {
+  color: #111827;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.admin-accordion-header small {
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.admin-accordion-body {
+  padding: 0 26px 26px;
+}
+
+.admin-room-summary,
+.admin-chat-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 14px 0 18px;
+}
+
+.admin-room-summary div,
+.admin-chat-stats div {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.54);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.admin-room-summary span,
+.admin-chat-stats span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-room-summary strong,
+.admin-chat-stats strong {
+  display: block;
+  margin-top: 4px;
+  color: #1e3a8a;
+  font-size: 24px;
+}
+
+.admin-room-filter-bar {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.2fr) repeat(3, minmax(140px, 1fr)) auto;
+  gap: 12px;
+  align-items: end;
+  margin: 0 0 18px;
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.46);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+}
+
+.admin-room-filter-bar label {
+  margin-bottom: 6px;
+}
+
+.admin-room-filter-actions {
+  margin: 0;
+}
+
+.admin-room-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-room-card {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 18px;
+  padding: 16px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.10);
+}
+
+.admin-room-cover {
+  min-height: 180px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.48);
+}
+
+.admin-room-cover img {
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.admin-room-content {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-room-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-room-title-row h4 {
+  margin-bottom: 4px;
+  color: #111827;
+  font-size: 20px;
+}
+
+.admin-room-title-row p,
+.admin-room-desc {
+  color: var(--text-muted);
+}
+
+.admin-room-status {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: #047857;
+  background: rgba(209, 250, 229, 0.78);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.admin-room-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.admin-room-meta div,
+.admin-room-type-pill {
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.52);
+  border: 1px solid rgba(255, 255, 255, 0.56);
+}
+
+.admin-room-meta span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.admin-room-meta strong {
+  color: #1f2937;
+}
+
+.admin-room-type-list,
+.admin-room-tags,
+.admin-room-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-room-type-pill strong,
+.admin-room-type-pill span {
+  display: block;
+}
+
+.admin-room-type-pill span {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.admin-room-tags span {
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: #1d4ed8;
+  background: rgba(219, 234, 254, 0.70);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-room-tags.policy span {
+  color: #7e22ce;
+  background: rgba(243, 232, 255, 0.72);
+}
+
+.policy-tag-row .policy-tag {
+  color: #7e22ce;
+  background: rgba(243, 232, 255, 0.72);
+}
+
+.pricing-preview {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.54);
+  border: 1px solid var(--glass-border);
+}
+
+.pricing-preview p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.price-diff {
+  color: #dc2626;
+  font-weight: 800;
+}
+
+

@@ -1,0 +1,659 @@
+/* 08. Chat - Chat Room
+   SMACSS Layer: Module */
+
+/* =========================================================
+   14. Chat 聊天室
+========================================================= */
+
+.chat-box {
+  height: 260px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+  padding: 14px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.36);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+#chat .panel {
+  max-width: 920px;
+  margin-inline: auto;
+  padding: 0;
+  overflow: hidden;
+}
+
+#chat .panel h2 {
+  margin: 0;
+  padding: 22px 26px 4px;
+}
+
+.chat-subtitle {
+  padding: 0 26px 18px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.chat-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 0 22px 18px;
+}
+
+.chat-tab {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 999px;
+  padding: 10px 16px;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.66);
+  font-weight: 900;
+}
+
+.chat-tab.active {
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  border-color: transparent;
+}
+
+.chat-category-panel {
+  display: none;
+}
+
+.chat-category-panel.active {
+  display: block;
+}
+
+.chat-linked-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 22px 16px;
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.56);
+  border: 1px solid var(--glass-border);
+}
+
+.chat-linked-header h3 {
+  margin: 6px 0 2px;
+  font-size: 20px;
+}
+
+.chat-category-panel .itinerary-comment-box,
+.chat-category-panel .itinerary-comments,
+.chat-category-panel .grid,
+.chat-category-panel .actions,
+.chat-category-panel .vote-list {
+  margin: 0 22px 18px;
+}
+
+.chat-category-panel .itinerary-chat-shell {
+  margin: 0;
+}
+
+#chat .itinerary-discussion-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 430px;
+  margin: 0 22px;
+}
+
+#chat .itinerary-discussion-message {
+  margin-bottom: 0;
+}
+
+#chat .itinerary-chat-input-row {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+}
+
+#chat .itinerary-chat-input-row textarea {
+  min-height: 48px;
+  max-height: 120px;
+  resize: vertical;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+#chat .chat-box {
+  height: 430px;
+  margin: 0 22px;
+  padding: 22px;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0.28)),
+    radial-gradient(circle at 0% 0%, rgba(219, 234, 254, 0.72), transparent 36%),
+    radial-gradient(circle at 100% 100%, rgba(243, 232, 255, 0.68), transparent 34%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+#chat .chat-input-row {
+  padding: 18px 22px 22px;
+  background: rgba(255, 255, 255, 0.30);
+  border-top: 1px solid var(--glass-border);
+}
+
+#chat .chat-input-row input {
+  min-height: 48px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+#chat .chat-send-btn {
+  min-width: 96px;
+}
+
+.message {
+  max-width: 78%;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.user-msg {
+  margin-left: auto;
+  color: #1e3a8a;
+  background: linear-gradient(
+    135deg,
+    rgba(219, 234, 254, 0.90),
+    rgba(207, 250, 254, 0.78)
+  );
+}
+
+.admin-msg {
+  color: #475569;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.message-customer {
+  margin-right: auto;
+  color: #1e3a8a;
+  background: linear-gradient(135deg, rgba(219, 234, 254, 0.92), rgba(207, 250, 254, 0.76));
+}
+
+.message-admin {
+  margin-left: auto;
+  color: #475569;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+#chat .message {
+  max-width: min(76%, 560px);
+  padding: 13px 15px;
+  border-radius: 20px;
+}
+
+#chat .message-customer {
+  margin-left: auto;
+  margin-right: 0;
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+}
+
+#chat .message-admin {
+  margin-left: 0;
+  margin-right: auto;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+}
+
+#chat .message-customer .message-time {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.chat-empty-state {
+  display: grid;
+  place-items: center;
+  min-height: 170px;
+  color: var(--text-muted);
+  text-align: center;
+  font-weight: 800;
+}
+
+.chat-empty-icon {
+  margin-bottom: 8px;
+  font-size: 34px;
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.message-time {
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.admin-chat-container {
+  display: grid;
+  grid-template-columns: minmax(280px, 34%) 1fr;
+  gap: 16px;
+}
+
+.admin-chat-users,
+.admin-chat-conversation {
+  min-height: 430px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.40);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.admin-chat-users-header,
+.admin-chat-conv-header {
+  padding: 14px 16px;
+  color: #1e3a8a;
+  background: rgba(219, 234, 254, 0.70);
+  font-weight: 900;
+}
+
+.admin-chat-users-body {
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.admin-chat-user-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.admin-chat-user-item:hover,
+.admin-chat-user-item.active {
+  background: rgba(255, 255, 255, 0.72);
+  transform: translateY(-1px);
+}
+
+.admin-chat-user-info,
+.admin-chat-conv-header-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.admin-chat-user-avatar {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+  font-weight: 900;
+}
+
+.admin-chat-user-avatar.small {
+  width: 34px;
+  height: 34px;
+  font-size: 14px;
+}
+
+.admin-chat-user-detail {
+  min-width: 0;
+}
+
+.admin-chat-user-name,
+.admin-chat-user-account,
+.admin-chat-user-preview,
+.admin-chat-user-footnote {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-chat-user-name {
+  color: #111827;
+  font-weight: 900;
+}
+
+.admin-chat-user-account,
+.admin-chat-user-footnote {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-chat-user-preview {
+  color: #334155;
+  font-size: 13px;
+}
+
+.admin-chat-user-meta {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.unread-badge {
+  display: grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  color: white;
+  background: var(--red);
+}
+
+.admin-chat-conv-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-chat-conv-header-info span {
+  display: block;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-chat-conv-body {
+  height: 360px;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.admin-chat-thread-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.admin-chat-thread-meta span {
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: #475569;
+  background: rgba(255, 255, 255, 0.70);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.admin-chat-conv-input,
+.chat-input-row {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+}
+
+.admin-chat-conv-input input,
+.chat-input-row input {
+  flex: 1;
+}
+
+#search .grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#search .grid > div {
+  width: 100%;
+}
+
+#search label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+#search input,
+#search select {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.booking-search-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+  align-items: start;
+  gap: 22px;
+}
+
+.booking-search-panel {
+  position: sticky;
+  top: 88px;
+  max-height: calc(100vh - 110px);
+  overflow: auto;
+}
+
+.booking-search-heading {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.booking-search-heading span,
+.booking-filter-title {
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.booking-search-heading h2 {
+  margin: 0;
+}
+
+.booking-search-heading p {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.booking-filter-section {
+  padding: 14px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.booking-filter-title {
+  margin-bottom: 12px;
+}
+
+.booking-date-picker {
+  display: grid;
+  gap: 10px;
+}
+
+.date-range-item {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  align-items: stretch;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid rgba(79, 124, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.56);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.66);
+}
+
+.date-range-marker {
+  display: grid;
+  place-items: center;
+  min-height: 76px;
+  color: white;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+}
+
+.date-range-item:nth-of-type(3) .date-range-marker {
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+}
+
+.date-range-fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  min-width: 0;
+}
+
+.date-range-fields label,
+.booking-guests-field label {
+  margin-bottom: 5px;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.date-range-fields input,
+.booking-guests-field input {
+  min-height: 48px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.82);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.date-range-fields input[type="date"],
+.date-range-fields input[type="time"] {
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.date-range-fields input[type="date"]::-webkit-calendar-picker-indicator,
+.date-range-fields input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.72;
+}
+
+.date-range-connector {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.date-range-connector::before,
+.date-range-connector::after {
+  content: "";
+  height: 1px;
+  background: rgba(148, 163, 184, 0.34);
+}
+
+.booking-date-summary {
+  padding: 11px 12px;
+  color: #1e3a8a;
+  font-size: 14px;
+  font-weight: 900;
+  border: 1px solid rgba(79, 124, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(219, 234, 254, 0.62);
+}
+
+.booking-date-summary.is-warning {
+  color: #92400e;
+  border-color: rgba(245, 158, 11, 0.28);
+  background: rgba(254, 243, 199, 0.72);
+}
+
+.booking-guests-field {
+  padding: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 8px;
+  background: rgba(248, 250, 252, 0.72);
+}
+
+.booking-filter-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.booking-filter-grid.two-columns {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.booking-filter-grid .full-width {
+  grid-column: 1 / -1;
+}
+
+.booking-filter-actions {
+  position: sticky;
+  bottom: 0;
+  padding-top: 10px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(248, 250, 252, 0.92) 30%);
+}
+
+.booking-results-panel {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.room-list-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.room-list-toolbar h2 {
+  margin-bottom: 4px;
+}
+
+.room-list-toolbar p {
+  color: var(--text-muted);
+  font-weight: 800;
+}
+
+.room-page-size-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 170px;
+}
+
+.room-page-size-control label {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.room-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.room-page-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}

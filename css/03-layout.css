@@ -1,0 +1,278 @@
+/* 03. Layout - Header, Nav, Main, Sections
+   SMACSS Layer: Layout */
+
+/* =========================================================
+   02. Header 頁首
+========================================================= */
+
+header {
+  position: relative;
+  overflow: hidden;
+  color: white;
+  padding: 42px 8%;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(79, 124, 255, 0.82),
+      rgba(139, 92, 246, 0.72),
+      rgba(236, 72, 153, 0.58)
+    );
+  box-shadow: 0 24px 70px rgba(79, 70, 229, 0.22);
+}
+
+header::before {
+  content: "";
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  right: -90px;
+  top: -140px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.20);
+  filter: blur(4px);
+}
+
+header::after {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  left: 18%;
+  bottom: -120px;
+  border-radius: 50%;
+  background: rgba(53, 208, 255, 0.22);
+  filter: blur(3px);
+}
+
+header h1,
+header p {
+  position: relative;
+  z-index: 1;
+}
+
+header h1 {
+  margin-bottom: 8px;
+  font-size: 38px;
+  letter-spacing: 1px;
+  text-shadow: 0 8px 24px rgba(15, 23, 42, 0.24);
+}
+
+header p {
+  font-size: 16px;
+  opacity: 0.94;
+}
+
+
+/* =========================================================
+   03. Navigation 導覽列
+========================================================= */
+
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 8%;
+  background: rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.10);
+}
+
+nav button,
+.primary-btn,
+.secondary-btn,
+.danger-btn {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+nav button::before,
+.primary-btn::before,
+.secondary-btn::before,
+.danger-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.38),
+    transparent
+  );
+  transform: translateX(-120%);
+  transition: transform 0.5s ease;
+}
+
+nav button:hover::before,
+.primary-btn:hover::before,
+.secondary-btn:hover::before,
+.danger-btn:hover::before {
+  transform: translateX(120%);
+}
+
+nav button {
+  color: #334155;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+nav button:hover,
+nav button.active {
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(79, 70, 229, 0.20);
+}
+
+.bonus-point-bar {
+  padding: 10px 8%;
+  background: rgba(255, 255, 255, 0.64);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.48);
+}
+
+.bonus-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.bonus-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
+}
+
+.bonus-summary span {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.bonus-summary strong {
+  color: #1e3a8a;
+  font-size: 22px;
+}
+
+.bonus-summary small {
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.bonus-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.bonus-history {
+  position: relative;
+}
+
+.bonus-history summary {
+  min-height: 42px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  cursor: pointer;
+  font-weight: 900;
+  list-style: none;
+}
+
+.bonus-history summary::-webkit-details-marker {
+  display: none;
+}
+
+.bonus-history-list {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  z-index: 30;
+  display: grid;
+  gap: 8px;
+  width: min(340px, 86vw);
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.bonus-record {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(241, 245, 249, 0.72);
+}
+
+.bonus-record.add strong {
+  color: #047857;
+}
+
+.bonus-record.deduct strong {
+  color: #b91c1c;
+}
+
+.bonus-record span,
+.bonus-record small,
+.bonus-history-empty {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   04. Main / Section
+========================================================= */
+
+main {
+  width: 84%;
+  margin: 28px auto;
+  position: relative;
+}
+
+section {
+  display: none;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+section.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
