@@ -1075,20 +1075,25 @@ function renderTrainPaymentTab() {
     return;
   }
 
-  const visibleOrders = getTrainOrdersByCurrentFolder();
+  const paymentOrders = trainOrders.filter(order => {
+    const paymentRelevant = order.paymentStatus === "未付款" || order.paymentStatus === "已付款";
+    if (!paymentRelevant) return false;
+    if (isAdmin()) return true;
 
-  const paymentOrders = visibleOrders.filter(order =>
-    order.paymentStatus === "未付款" || order.paymentStatus === "已付款"
-  );
+    const isHolder = String(order.holderUserId || order.userId) === String(currentUser.id);
+    const transferred = isTransferredTrainOrder(order);
+
+    return isHolder && !transferred;
+  });
 
   container.innerHTML = `
     <div class="panel">
       <div class="train-section-header">
         <div>
           <h2>付款與取票</h2>
-          <p>管理您的火車票訂單付款及取票。${getTrainTicketFolderText()}共 ${paymentOrders.length} 筆訂單。</p>
+          <p>管理您的火車票訂單付款及取票，共 ${paymentOrders.length} 筆訂單。</p>
         </div>
-        ${renderTrainTicketFolderSwitcher()}
+
       </div>
       ${paymentOrders.length === 0
         ? `<div class="train-empty-state">
