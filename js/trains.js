@@ -80,6 +80,7 @@ const TRAIN_STEPS = [
 
 let currentTrainStep = 0;
 let currentTrainTab = "booking";
+let currentTrainTicketFolder = "mine";
 let lastCreatedTrainOrderId = null;
 let trainBookingFormData = null;
 
@@ -987,6 +988,9 @@ function createTrainOrder() {
     changedOnce: false,
     transferTo: "",
     ticketFolder: "我的票夾",
+    receivedTransfer: false,
+    originalBuyerUserId: currentUser.id,
+    splitParentId: null,
     paymentDueAt: paymentDueAt.toLocaleString("zh-TW"),
     pickupDueAt: paymentDueAt.toLocaleString("zh-TW"),
     createdAt: new Date().toLocaleString("zh-TW"),
@@ -1010,6 +1014,47 @@ function createTrainOrder() {
   if (typeof renderHomeDashboard === "function") renderHomeDashboard();
 }
 
+
+/* =========================================================
+   票夾分類：我的票夾 / 分票票夾
+========================================================= */
+function setTrainTicketFolder(folder) {
+  currentTrainTicketFolder = folder === "split" ? "split" : "mine";
+  renderTrainPaymentTab();
+  renderTrainSplitTab();
+  renderTrainRefundTab();
+}
+
+function isTransferredTrainOrder(order) {
+  return Boolean(order && (order.receivedTransfer || order.ticketFolder === "分票票夾" || order.ticketFolder === "分票夾" || order.splitParentId));
+}
+
+function getTrainOrdersByCurrentFolder() {
+  if (!currentUser) return [];
+  return trainOrders.filter(order => {
+    if (isAdmin()) return true;
+    const isHolder = String(order.holderUserId || order.userId) === String(currentUser.id);
+    if (!isHolder) return false;
+    const transferred = isTransferredTrainOrder(order);
+    return currentTrainTicketFolder === "split" ? transferred : !transferred;
+  });
+}
+
+function getTrainTicketFolderText() {
+  return currentTrainTicketFolder === "split" ? "目前：分票票夾，" : "目前：我的票夾，";
+}
+
+function renderTrainTicketFolderSwitcher() {
+  const mineClass = currentTrainTicketFolder === "mine" ? "primary-btn" : "secondary-btn";
+  const splitClass = currentTrainTicketFolder === "split" ? "primary-btn" : "secondary-btn";
+  return `
+    <div class="actions train-folder-switcher">
+      <button class="${mineClass}" onclick="setTrainTicketFolder('mine')">我的票夾</button>
+      <button class="${splitClass}" onclick="setTrainTicketFolder('split')">分票票夾</button>
+    </div>
+  `;
+}
+
 /* =========================================================
    付款與取票分頁
 ========================================================= */
@@ -1030,11 +1075,7 @@ function renderTrainPaymentTab() {
     return;
   }
 
-  const visibleOrders = trainOrders.filter(order =>
-    isAdmin() ||
-    String(order.userId) === String(currentUser.id) ||
-    String(order.holderUserId) === String(currentUser.id)
-  );
+  const visibleOrders = getTrainOrdersByCurrentFolder();
 
   const paymentOrders = visibleOrders.filter(order =>
     order.paymentStatus === "未付款" || order.paymentStatus === "已付款"
@@ -1043,8 +1084,11 @@ function renderTrainPaymentTab() {
   container.innerHTML = `
     <div class="panel">
       <div class="train-section-header">
-        <h2>付款與取票</h2>
-        <p>管理您的火車票訂單付款及取票。共 ${paymentOrders.length} 筆訂單。</p>
+        <div>
+          <h2>付款與取票</h2>
+          <p>管理您的火車票訂單付款及取票。${getTrainTicketFolderText()}共 ${paymentOrders.length} 筆訂單。</p>
+        </div>
+        ${renderTrainTicketFolderSwitcher()}
       </div>
       ${paymentOrders.length === 0
         ? `<div class="train-empty-state">
@@ -1080,27 +1124,43 @@ function renderTrainSplitTab() {
     return;
   }
 
-  const visibleOrders = trainOrders.filter(order =>
-    isAdmin() ||
-    String(order.userId) === String(currentUser.id) ||
-    String(order.holderUserId) === String(currentUser.id)
-  );
+  const visibleOrders = getTrainOrdersByCurrentFolder();
 
-  const splitOrders = visibleOrders.filter(order =>
-    order.paymentStatus === "已付款" && order.ticketStatus === "未取票"
-  );
+  // 我的票夾：只列出可以被分出去的訂單。
+  // 分票票夾：列出別人分給我的票券資訊，但不可再次分票。
+  const isSplitFolder = currentTrainTicketFolder === "split";
+  const splitOrders = visibleOrders.filter(order => {
+    if (isSplitFolder) {
+      return order.paymentStatus === "已付款" && order.bookingStatus !== "已退票";
+    }
+    return order.paymentStatus === "已付款"
+      && order.ticketStatus === "未取票"
+      && !isTransferredTrainOrder(order);
+  });
+
+  const splitDescription = isSplitFolder
+    ? `查看別人分給你的票券。${getTrainTicketFolderText()}共 ${splitOrders.length} 筆分票轉入票券。`
+    : `將已付款且未取票的票券分配給同行旅伴。${getTrainTicketFolderText()}共 ${splitOrders.length} 筆可分票訂單。`;
+  const emptyTitle = isSplitFolder ? "尚無分票轉入票券" : "尚無可分票訂單";
+  const emptyText = isSplitFolder
+    ? "別人分給你的票券會顯示在這裡，但不能再次分票。"
+    : "已付款且未取票的訂單可以分票。";
 
   container.innerHTML = `
     <div class="panel">
       <div class="train-section-header">
-        <h2>分票管理</h2>
-        <p>將已付款且未取票的票券分配給同行旅伴。共 ${splitOrders.length} 筆可分票訂單。</p>
+        <div>
+          <h2>分票管理</h2>
+          <p>${splitDescription}</p>
+        </div>
+        ${renderTrainTicketFolderSwitcher()}
       </div>
+      ${isSplitFolder ? `<div class="notice info">分票票夾中的票券僅提供查看與退票，不可再次分票，也不可線上改票。</div>` : ""}
       ${splitOrders.length === 0
         ? `<div class="train-empty-state">
             <span class="train-empty-state-icon">S</span>
-            <h3>尚無可分票訂單</h3>
-            <p>已付款且未取票的訂單可以分票。</p>
+            <h3>${emptyTitle}</h3>
+            <p>${emptyText}</p>
           </div>`
         : `<div class="train-order-list">
             ${splitOrders.map(order => renderTrainOrderCard(order, "split")).join("")}
@@ -1130,11 +1190,7 @@ function renderTrainRefundTab() {
     return;
   }
 
-  const visibleOrders = trainOrders.filter(order =>
-    isAdmin() ||
-    String(order.userId) === String(currentUser.id) ||
-    String(order.holderUserId) === String(currentUser.id)
-  );
+  const visibleOrders = getTrainOrdersByCurrentFolder();
 
   const refundOrders = visibleOrders.filter(order =>
     order.paymentStatus === "已付款" && order.bookingStatus !== "已退票"
@@ -1143,8 +1199,11 @@ function renderTrainRefundTab() {
   container.innerHTML = `
     <div class="panel">
       <div class="train-section-header">
-        <h2>退票/改票</h2>
-        <p>已付款訂單可辦理退票或改票。共 ${refundOrders.length} 筆可處理訂單。</p>
+        <div>
+          <h2>退票/改票</h2>
+          <p>已付款訂單可辦理退票或改票。${getTrainTicketFolderText()}共 ${refundOrders.length} 筆可處理訂單。</p>
+        </div>
+        ${renderTrainTicketFolderSwitcher()}
       </div>
       ${refundOrders.length === 0
         ? `<div class="train-empty-state">
@@ -1166,10 +1225,11 @@ function renderTrainRefundTab() {
 function renderTrainOrderCard(order, tabContext) {
   const canPay = order.paymentStatus === "未付款";
   const canPickup = order.paymentStatus === "已付款" && order.ticketStatus === "未取票";
-  const canSplit = canPickup && String(order.holderUserId) === String(currentUser.id);
-  const canChange = canPickup && !order.changedOnce;
+  const transferredOrder = isTransferredTrainOrder(order);
+  const canSplit = canPickup && !transferredOrder && String(order.holderUserId || order.userId) === String(currentUser.id) && Number(order.quantity || 1) > 1;
+  const canChange = canPickup && !transferredOrder && !order.changedOnce;
   const canRefund = order.paymentStatus === "已付款" && order.bookingStatus !== "已退票";
-  const folder = order.ticketFolder || "我的票夾";
+  const folder = transferredOrder ? "分票票夾" : "我的票夾";
 
   let actionButtons = "";
   if (tabContext === "payment") {
@@ -1178,8 +1238,8 @@ function renderTrainOrderCard(order, tabContext) {
       <button class="secondary-btn" ${canPickup ? "" : "disabled"} onclick="pickupTrainTicket(${order.id})">取票</button>
     `;
   } else if (tabContext === "split") {
-    actionButtons = `
-      <button class="primary-btn" ${canSplit ? "" : "disabled"} onclick="splitTrainTicket(${order.id})">分票</button>
+    actionButtons = canSplit ? renderTrainSplitControls(order) : `
+      <button class="primary-btn" disabled>分票</button>
     `;
   } else if (tabContext === "refund") {
     actionButtons = `
@@ -1219,6 +1279,7 @@ function renderTrainOrderCard(order, tabContext) {
       </div>
       ${order.seatWarning ? `<div class="notice warning">${escapeHtml(order.seatWarning)}</div>` : ""}
       ${order.abnormalNotice ? `<div class="notice error">${escapeHtml(order.abnormalNotice)}</div>` : ""}
+      ${order.transferFromAccount ? `<div class="notice info">此票由 ${escapeHtml(order.transferFromAccount)} 分票轉入；可退票，但不可再次分票或線上改票。</div>` : ""}
       ${order.refundStatus ? `<div class="notice info">${escapeHtml(order.refundStatus)}</div>` : ""}
       <div class="actions">
         ${actionButtons}
@@ -1228,6 +1289,28 @@ function renderTrainOrderCard(order, tabContext) {
         ` : ""}
       </div>
     </article>
+  `;
+}
+
+
+function renderTrainSplitControls(order) {
+  const seats = Array.isArray(order.seats) && order.seats.length > 0
+    ? order.seats
+    : String(order.seatNo || "").split("、").filter(Boolean);
+  const checkboxes = seats.map((seat, index) => `
+    <label class="checkbox-inline">
+      <input type="checkbox" name="splitSeat-${order.id}" value="${escapeAttribute(seat)}" ${index === 0 ? "checked" : ""}>
+      ${escapeHtml(seat)}
+    </label>
+  `).join("");
+
+  return `
+    <div class="train-split-box">
+      <div class="train-split-seat-list">${checkboxes}</div>
+      <input id="splitTarget-${order.id}" class="train-inline-input" type="text" placeholder="輸入對方手機或 Email 帳號">
+      <button class="primary-btn" onclick="splitSelectedTrainTickets(${order.id})">送出分票</button>
+      <p class="muted-text">請勾選要分出去的座位；分出去後，原訂票人剩餘座位仍留在我的票夾。</p>
+    </div>
   `;
 }
 
@@ -1370,21 +1453,55 @@ function pickupTrainTicket(orderId) {
 }
 
 function splitTrainTicket(orderId) {
+  // 保留舊按鈕的相容性：若不是在分票表單中，就提示使用者到分票管理勾選座位。
+  alert("請到分票管理中勾選要分出的座位，並輸入對方手機或 Email 帳號。");
+}
+
+function splitSelectedTrainTickets(orderId) {
   if (!requireCustomer()) return;
   const order = findTrainOrder(orderId);
   if (!canOperateTrainOrder(order)) return;
+
+  if (isTransferredTrainOrder(order)) {
+    alert("分票票夾中的票券不能再次分票。");
+    return;
+  }
 
   if (order.paymentStatus !== "已付款" || order.ticketStatus !== "未取票") {
     alert("只有已付款但尚未取票的票券可以分票。");
     return;
   }
 
-  const account = prompt("請輸入分票對象的手機或 Email 帳號：");
-  if (account === null) return;
-  const target = findUser(account);
+  const originalQuantity = Number(order.quantity || 1);
+  if (originalQuantity <= 1) {
+    alert("此訂單只有 1 張票，不能分票。");
+    return;
+  }
 
+  const selectedSeats = Array.from(document.querySelectorAll(`input[name="splitSeat-${order.id}"]:checked`))
+    .map(input => input.value)
+    .filter(Boolean);
+
+  if (selectedSeats.length === 0) {
+    alert("請至少選擇一張要分出的票。");
+    return;
+  }
+
+  if (selectedSeats.length >= originalQuantity) {
+    alert("不能把整筆訂單全部分出，至少要保留 1 張在我的票夾。若只有 1 張票，則不能分票。");
+    return;
+  }
+
+  const accountInput = document.getElementById(`splitTarget-${order.id}`);
+  const account = accountInput ? accountInput.value.trim() : "";
+  if (!account) {
+    alert("請輸入分票對象的手機或 Email 帳號。");
+    return;
+  }
+
+  const target = findUser(account);
   if (!target || target.role !== "customer" || !target.account) {
-    alert("分票對象必須是已綁定手機或信箱的有效平台帳號。");
+    alert("分票對象必須是已綁定手機或信箱的有效平台帳號。可先請對方註冊/登入後再分票。");
     return;
   }
 
@@ -1393,20 +1510,75 @@ function splitTrainTicket(orderId) {
     return;
   }
 
-  order.holderUserId = target.id;
+  const currentSeats = Array.isArray(order.seats) && order.seats.length > 0
+    ? [...order.seats]
+    : String(order.seatNo || "").split("、").filter(Boolean);
+  const selectedSet = new Set(selectedSeats.map(String));
+  const remainSeats = currentSeats.filter(seat => !selectedSet.has(String(seat)));
+  const transferSeats = currentSeats.filter(seat => selectedSet.has(String(seat)));
+
+  if (transferSeats.length !== selectedSeats.length || remainSeats.length === 0) {
+    alert("分票座位資料異常，請重新整理後再試一次。");
+    return;
+  }
+
+  const unitBasePrice = Number(order.unitBasePrice || Math.round(Number(order.basePrice || 0) / originalQuantity) || 0);
+  const unitFinalPrice = Number(order.unitFinalPrice || Math.round(Number(order.finalPrice || 0) / originalQuantity) || 0);
+  const transferQuantity = transferSeats.length;
+  const remainQuantity = remainSeats.length;
+  const nowText = new Date().toLocaleString("zh-TW");
+
+  const splitOrder = {
+    ...order,
+    id: Date.now() + Math.floor(Math.random() * 1000),
+    bookingNo: `${order.bookingNo}-S${String(Date.now()).slice(-3)}`,
+    holderUserId: target.id,
+    transferTo: target.account,
+    transferFromAccount: currentUser.account,
+    ticketFolder: "分票票夾",
+    receivedTransfer: true,
+    originalBuyerUserId: order.userId,
+    splitParentId: order.id,
+    quantity: transferQuantity,
+    seats: transferSeats,
+    seatNo: transferSeats.join("、"),
+    basePrice: unitBasePrice * transferQuantity,
+    finalPrice: unitFinalPrice * transferQuantity,
+    payableAmount: unitFinalPrice * transferQuantity,
+    usedBonus: 0,
+    status: "分票轉入 / 未取票",
+    splitAt: nowText,
+    createdAt: nowText,
+    createdAtTimestamp: Date.now()
+  };
+
+  order.quantity = remainQuantity;
+  order.seats = remainSeats;
+  order.seatNo = remainSeats.join("、");
+  order.basePrice = unitBasePrice * remainQuantity;
+  order.finalPrice = unitFinalPrice * remainQuantity;
+  order.payableAmount = unitFinalPrice * remainQuantity;
+  order.ticketFolder = "我的票夾";
+  order.receivedTransfer = false;
+  order.status = "已付款 / 未取票";
   order.transferTo = target.account;
-  order.ticketFolder = "分票夾";
-  order.status = "已分票 / 未取票";
-  order.splitAt = new Date().toLocaleString("zh-TW");
+  order.lastSplitAt = nowText;
+
+  trainOrders.unshift(splitOrder);
   saveAppData();
   renderAll();
-  alert(`分票成功，票券已轉移到 ${target.displayName || target.account} 的分票夾。`);
+  alert(`分票成功：${transferSeats.join("、")} 已轉入 ${target.displayName || target.account} 的分票票夾；剩餘 ${remainSeats.join("、")} 仍保留在你的「我的票夾」。`);
 }
 
 function changeTrainTicket(orderId) {
   if (!requireCustomer()) return;
   const order = findTrainOrder(orderId);
   if (!canOperateTrainOrder(order)) return;
+
+  if (isTransferredTrainOrder(order)) {
+    alert("分票票夾中的票券不可線上改票，請洽原訂票人或車站櫃台處理。");
+    return;
+  }
 
   if (order.paymentStatus !== "已付款" || order.ticketStatus !== "未取票") {
     alert("改票限已付款且未取票訂單。");
