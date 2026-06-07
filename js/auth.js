@@ -185,7 +185,8 @@ function completeCustomerLogin() {
   clearLoginForm();
   updateAuthUI();
   renderAll();
-  setTimeout(() => showSection("search"), 300);
+  // 登入成功後導向「旅程首頁」，讓使用者先看到總覽再自行決定下一步要去哪個模組。
+  setTimeout(() => showSection("home"), 300);
 }
 
 function completeRegister() {
@@ -229,7 +230,9 @@ function completeRegister() {
   clearLoginForm();
   updateAuthUI();
   renderAll();
-  setTimeout(() => showSection("search"), 300);
+  // 註冊完成並自動登入後，導向「旅程首頁」而非住宿訂房頁，
+  // 讓新使用者先看到總覽再自行決定下一步要去哪個模組。
+  setTimeout(() => showSection("home"), 300);
 }
 
 function validateRegisterPassword(notice) {

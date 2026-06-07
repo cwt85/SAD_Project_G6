@@ -1045,7 +1045,7 @@ function renderItineraryItemCard(itinerary, day, item) {
         </div>
         <div class="itinerary-item-controls">
           <input${d} type="time" value="${escapeAttribute(item.time || "09:00")}" onchange="updateItineraryItemField(${day.day}, '${item.id}', 'time', this.value)" />
-          ${item.type === "交通" && (item.name || "").includes("車站")
+          ${(item.type === "交通" || item.type === "車站") && (item.name || "").includes("車站")
             ? `<button class="shortcut-btn train-shortcut-btn" onclick="event.stopPropagation(); goToTrainBookingFromItem('${itinerary.id}', ${day.day}, '${item.id}')">訂火車票</button>`
             : ""}
           ${item.type === "住宿"
