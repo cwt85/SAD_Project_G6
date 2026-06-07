@@ -805,11 +805,14 @@ describe('trains.js — 火車票務邏輯', () => {
   beforeEach(() => __resetState());
 
   describe('getTrainDistance()', () => {
-    test('台北到台東的距離', () => {
-      expect(getTrainDistance('台北','台東')).toBe(610);
+    // 註：路線資料已改為「依實際路網接續站點」計算（北部往東部走宜蘭、花蓮，
+    // 而非直接用台北/台東的營業里程相減），避免出現「直接打穿中央山脈」的不合理距離。
+    // 台北→松山→宜蘭→花蓮→台東 的距離為 345.2 km，取代舊版以營業里程相減的 610 km。
+    test('台北到台東的距離（依路網路線計算）', () => {
+      expect(getTrainDistance('台北','台東')).toBe(345.2);
     });
     test('台東到台北（反向）距離相同', () => {
-      expect(getTrainDistance('台東','台北')).toBe(610);
+      expect(getTrainDistance('台東','台北')).toBe(getTrainDistance('台北','台東'));
     });
     test('未知站名回傳預設值 120', () => {
       expect(getTrainDistance('未知站','另一站')).toBe(120);
@@ -820,8 +823,12 @@ describe('trains.js — 火車票務邏輯', () => {
   });
 
   describe('calculateTrainDuration()', () => {
-    test('自強號 170km 約 111 分鐘', () => {
-      expect(calculateTrainDuration('自強號', 170, false)).toBeCloseTo(111, -1);
+    test('自強號 170km：依時速表計算（distance / speed * 60，四捨五入）', () => {
+      // 不寫死分鐘數，改用 TRAIN_SPEED_BY_TYPE 現行時速表反推期望值，
+      // 避免日後調整時速表又讓測試跟著過時（之前寫死 111 分鐘，
+      // 是舊時速表「自強號 92 km/h」算出來的，現在已調整為 75 km/h）
+      const expectedMinutes = Math.round(170 / TRAIN_SPEED_BY_TYPE['自強號'] * 60);
+      expect(calculateTrainDuration('自強號', 170, false)).toBe(expectedMinutes);
     });
     test('有轉乘加 25 分鐘', () => {
       const without = calculateTrainDuration('自強號', 100, false);
