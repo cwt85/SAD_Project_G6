@@ -1,10 +1,11 @@
 /* =========================================================
-   Login / Register (auth.js)
+   Login (auth.js)
 ========================================================= */
 
 const AUTH_STORAGE_KEY = "taitungBookingAuth";
 const DEFAULT_ADMIN_ACCOUNT = "admin@example.com";
 const DEFAULT_ADMIN_PASSWORD = "Admin1234";
+const DEFAULT_ADMIN_DISPLAY_NAME = "系統管理員";
 
 function initAuth() {
   loadAuthState();
@@ -38,7 +39,7 @@ function togglePasswordVisibility(inputId = "passwordInput", button) {
 }
 
 function getSelectedLoginRole() {
-  return document.querySelector('input[name="loginRole"]:checked')?.value || "customer";
+  return getLoginAccount() === DEFAULT_ADMIN_ACCOUNT ? "admin" : "customer";
 }
 
 function getSelectedRegisterRole() {
@@ -82,21 +83,14 @@ function createUser({ account, displayName, role, password = "" }) {
 }
 
 function updateLoginMode() {
-  const role = getSelectedLoginRole();
   const passwordGroup = document.getElementById("passwordGroup");
   const accountInput = document.getElementById("accountInput");
   const passwordInput = document.getElementById("passwordInput");
   const notice = document.getElementById("loginNotice");
 
   if (passwordGroup) passwordGroup.style.display = "block";
-
-  if (role === "admin") {
-    if (accountInput) accountInput.placeholder = DEFAULT_ADMIN_ACCOUNT;
-    if (passwordInput) passwordInput.placeholder = "請輸入管理員密碼";
-  } else {
-    if (accountInput) accountInput.placeholder = "example@mail.com / 0912345678";
-    if (passwordInput) passwordInput.placeholder = "請輸入密碼";
-  }
+  if (accountInput) accountInput.placeholder = "admin@example.com / example@mail.com / 0912345678";
+  if (passwordInput) passwordInput.placeholder = "請輸入密碼";
 
   if (notice) notice.innerHTML = "";
 }
@@ -122,6 +116,11 @@ function loginAdmin() {
 
   if (!account || !password) {
     showNotice(notice, "error", "請輸入管理員帳號與密碼。");
+    return;
+  }
+
+  if (account !== DEFAULT_ADMIN_ACCOUNT) {
+    showNotice(notice, "error", "請使用預設管理員帳號登入。");
     return;
   }
 
@@ -158,7 +157,7 @@ function completeCustomerLogin() {
 
   const user = findUser(account);
   if (!user || user.role !== "customer") {
-    showNotice(notice, "error", "找不到顧客帳號，請先註冊。");
+    showNotice(notice, "error", "找不到使用者帳號，請先註冊。");
     switchAuthTab("register");
     setValue("regAccount", account);
     return;
@@ -194,6 +193,11 @@ function completeRegister() {
 
   if (!validateAccount(account, notice)) return;
 
+  if (account === DEFAULT_ADMIN_ACCOUNT) {
+    showNotice(notice, "error", "預設管理員帳號不可註冊為使用者。");
+    return;
+  }
+
   if (findUser(account)) {
     showNotice(notice, "warning", "此帳號已註冊，請直接登入。");
     return;
@@ -213,7 +217,7 @@ function completeRegister() {
   setLoginState(newUser);
   saveAuthState();
 
-  showNotice(notice, "success", `顧客註冊成功，歡迎 ${displayName}。`);
+  showNotice(notice, "success", `使用者註冊成功，歡迎 ${displayName}。`);
   clearRegisterForm();
   clearLoginForm();
   updateAuthUI();
@@ -300,23 +304,36 @@ function loadAuthState() {
 }
 
 function ensureDefaultAdmin() {
-  const defaultAdmin = findUser(DEFAULT_ADMIN_ACCOUNT);
-  if (defaultAdmin) {
-    defaultAdmin.role = "admin";
-    defaultAdmin.password = defaultAdmin.password || DEFAULT_ADMIN_PASSWORD;
-    defaultAdmin.displayName = defaultAdmin.displayName || "系統管理員";
-    return;
-  }
-
-  users.unshift({
-    id: getNextUserId(),
+  const preservedAdmin = findUser(DEFAULT_ADMIN_ACCOUNT);
+  const defaultAdmin = {
+    id: 1,
     account: DEFAULT_ADMIN_ACCOUNT,
-    displayName: "系統管理員",
+    displayName: DEFAULT_ADMIN_DISPLAY_NAME,
     type: "email",
     role: "admin",
     password: DEFAULT_ADMIN_PASSWORD,
-    createdAt: new Date().toLocaleString("zh-TW")
-  });
+    createdAt: preservedAdmin?.createdAt || new Date().toLocaleString("zh-TW")
+  };
+  const customerUsers = Array.isArray(users)
+    ? users
+      .filter(user => user && normalizeAccount(user.account) !== DEFAULT_ADMIN_ACCOUNT && user.role !== "admin")
+      .map(user => ({ ...user, role: "customer" }))
+    : [];
+
+  users = [defaultAdmin, ...customerUsers];
+
+  if (!isLoggedIn || !currentUser) {
+    isLoggedIn = false;
+    currentUser = null;
+  } else if (normalizeAccount(currentUser.account) === DEFAULT_ADMIN_ACCOUNT) {
+    currentUser = { ...defaultAdmin };
+  } else {
+    const activeCustomer = findUser(currentUser.account);
+    currentUser = activeCustomer && activeCustomer.role === "customer" ? { ...activeCustomer } : null;
+    isLoggedIn = Boolean(currentUser);
+  }
+
+  saveAuthState();
 }
 
 function isAdmin() {

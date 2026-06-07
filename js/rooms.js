@@ -590,7 +590,6 @@ function renderRoomDetail(room) {
         <p><strong>地址：</strong>${escapeHtml(room.address || "未提供地址")}</p>
         <p><strong>價格：</strong>NT$ ${Number(getLowestRoomTypePrice(room)).toLocaleString()} 起 / 晚</p>
         <p><strong>評價：</strong>${Number(room.rating || 0).toFixed(1)} ⭐（${reviews.length} 則評價）</p>
-        <p><strong>可入住人數：</strong>最多 ${room.capacity} 人</p>
         <p><strong>交通距離：</strong>${escapeHtml(room.stationDistance || "未提供")}</p>
         <p><strong>入住 / 退房時間：</strong>${escapeHtml(getRoomCheckInTime(room))} / ${escapeHtml(getRoomCheckOutTime(room))}</p>
         <p><strong>可訂期間：</strong>${escapeHtml(room.bookingStart || "未設定")} ~ ${escapeHtml(room.bookingEnd || "未設定")}</p>
@@ -661,7 +660,7 @@ function renderRoomDetail(room) {
           <button class="secondary-btn" onclick="addCart(${room.id})">
             加入購物車
           </button>
-          <button class="primary-btn" onclick="createOrder(${room.id})">
+          <button class="primary-btn" onclick="event.stopPropagation(); createOrder(${room.id})">
             建立訂單
           </button>
         </div>

@@ -613,6 +613,87 @@ function validateCartBookingInputs(roomId) {
   };
 }
 
+function getDirectOrderBookingInputs(room) {
+  const defaultCheckIn = getDirectOrderDefaultCheckIn(room);
+  const rawCheckIn = getValue("checkIn");
+  const rawCheckOut = getValue("checkOut");
+  let checkIn = isValidDirectOrderDate(rawCheckIn) ? rawCheckIn : defaultCheckIn;
+  let checkOut = isValidDirectOrderDate(rawCheckOut) ? rawCheckOut : "";
+
+  if (!checkOut || checkOut <= checkIn) {
+    checkOut = getCartDateInputOffset(checkIn, 1);
+  }
+
+  const guests = Number(getValue("guests")) || 2;
+  const checkInTime = getValue("checkInTime") || getRoomCheckInTime(room);
+  const checkOutTime = getValue("checkOutTime") || getRoomCheckOutTime(room);
+  const start = new Date(`${checkIn}T${checkInTime}`);
+  const end = new Date(`${checkOut}T${checkOutTime}`);
+  const startDateOnly = new Date(checkIn);
+  const endDateOnly = new Date(checkOut);
+
+  if (!checkIn || !checkOut || Number.isNaN(startDateOnly.getTime()) || Number.isNaN(endDateOnly.getTime()) || Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+    showDialogNotice("error", "日期格式不正確，請重新選擇入住與退房日期。");
+    return { valid: false };
+  }
+
+  if (!Number.isInteger(guests) || guests <= 0) {
+    showDialogNotice("error", "入住人數必須為 1 人以上。");
+    return { valid: false };
+  }
+
+  const nights = getBookingNights(checkIn, checkOut);
+  const hoursBeforeCheckIn = (start - new Date()) / (1000 * 60 * 60);
+
+  if (nights <= 0) {
+    showDialogNotice("error", "退房日期必須晚於入住日期。");
+    return { valid: false };
+  }
+
+  if (hoursBeforeCheckIn < 24) {
+    showDialogNotice("error", "入住時間需至少晚於現在 24 小時。");
+    return { valid: false };
+  }
+
+  if (nights > 30) {
+    showDialogNotice("error", "單筆訂單最多可預訂 30 晚。");
+    return { valid: false };
+  }
+
+  return {
+    valid: true,
+    checkIn,
+    checkInTime,
+    checkOut,
+    checkOutTime,
+    guests,
+    nights
+  };
+}
+
+function getDirectOrderDefaultCheckIn(room) {
+  let checkIn = getCartDateInputOffset(getCartTodayInputValue(), 2);
+
+  if (room && isValidDirectOrderDate(room.bookingStart) && room.bookingStart > checkIn) {
+    checkIn = room.bookingStart;
+  }
+
+  if (room && isValidDirectOrderDate(room.bookingEnd) && checkIn >= room.bookingEnd) {
+    const latestCheckIn = getCartDateInputOffset(room.bookingEnd, -1);
+    if (isValidDirectOrderDate(latestCheckIn)) {
+      checkIn = latestCheckIn;
+    }
+  }
+
+  return checkIn;
+}
+
+function isValidDirectOrderDate(value) {
+  if (!value) return false;
+  const date = new Date(`${value}T00:00:00`);
+  return !Number.isNaN(date.getTime());
+}
+
 function getCartTodayInputValue() {
   const today = new Date();
   const year = today.getFullYear();
@@ -661,7 +742,7 @@ async function createOrder(roomId, source = "search") {
 
     const booking = source === "cart"
       ? validateCartBookingInputs(room.id)
-      : validateBookingInputs(document.getElementById("searchNotice"));
+      : getDirectOrderBookingInputs(room);
     if (!booking.valid) return;
 
     if (!isRoomAvailableForBooking(room, booking.checkIn, booking.checkOut)) {
