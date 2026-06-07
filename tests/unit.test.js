@@ -1577,16 +1577,20 @@ describe('C 模組 — 票價計算 (需求第六節)', () => {
   });
 
   describe('最優惠折扣原則', () => {
-    test('早鳥 (14天以上=0.7) vs 敬老 (0.6) → 選敬老 0.6', () => {
+    // 註：早鳥折扣（依「距出發還有幾天」打折）已被新版「時間折扣」
+    // （依「距發車還有幾小時」打折，需求第六節）取代，getTrainEarlyBirdDiscount
+    // 已不存在。20 天後出發時，時間折扣 factor 為 1（不生效），
+    // 所以以下情境單純比較「票種折扣」之間的最優惠選擇。
+    test('敬老 0.6 比一般票更優惠 → 選敬老 0.6', () => {
       const result = makeTrainResult({ travelDate: daysFromToday(20) });
       const price = ctx.calculateTrainPrice(result, 'senior', false);
       expect(price.discountFactor).toBe(0.6);
     });
 
-    test('學生票 0.88 vs 早鳥 0.7 (14天) → 選早鳥 0.7', () => {
+    test('20 天後出發，時間折扣不生效 → 選學生票 0.88', () => {
       const result = makeTrainResult({ travelDate: daysFromToday(20) });
       const price = ctx.calculateTrainPrice(result, 'student', false);
-      expect(price.discountFactor).toBe(0.7);
+      expect(price.discountFactor).toBe(0.88);
     });
   });
 
@@ -2113,31 +2117,6 @@ describe('trains.js — 火車票務邏輯', () => {
     test('乘車日已過不可退票', () => {
       const result = ctx.calculateTrainRefund(makeTrainOrder(-1));
       expect(result.refundable).toBe(false);
-    });
-  });
-
-  describe('getTrainEarlyBirdDiscount()', () => {
-    const makeResult = (daysAhead) => ({
-      travelDate: daysFromToday(daysAhead),
-      reservedTrain: true
-    });
-
-    test('14 天以上享折扣（factor < 1）', () => {
-      const result = ctx.getTrainEarlyBirdDiscount(makeResult(20));
-      expect(result.factor).toBeLessThan(1);
-    });
-
-    test('3 天內無早鳥折扣（factor = 1）', () => {
-      const result = ctx.getTrainEarlyBirdDiscount(makeResult(1));
-      expect(result.factor).toBe(1);
-    });
-
-    test('非對號列車無早鳥折扣', () => {
-      const result = ctx.getTrainEarlyBirdDiscount({
-        travelDate: daysFromToday(30),
-        reservedTrain: false
-      });
-      expect(result.factor).toBe(1);
     });
   });
 
