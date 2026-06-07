@@ -714,6 +714,13 @@ body.itinerary-share-view #readonlyItineraryPanel::before {
   background: rgba(255, 228, 230, 0.78);
 }
 
+.item-author-tag {
+  margin: 2px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6366f1;
+}
+
 .itinerary-cost-box {
   min-width: 210px;
   padding: 16px;

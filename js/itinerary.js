@@ -1041,6 +1041,7 @@ function renderItineraryItemCard(itinerary, day, item) {
           ${item.mustGo ? `<span class="must-pill">必去候選</span>` : ""}
           <h4>${escapeHtml(item.name)}</h4>
           <p>車站車程 ${formatTravelTime(item.distance)}｜預估 NT$ ${Number(item.estimatedCost || 0).toLocaleString()}</p>
+          ${renderItineraryItemAuthorTag(itinerary, item)}
         </div>
         <div class="itinerary-item-controls">
           <input${d} type="time" value="${escapeAttribute(item.time || "09:00")}" onchange="updateItineraryItemField(${day.day}, '${item.id}', 'time', this.value)" />
@@ -1066,6 +1067,21 @@ function renderItineraryItemCard(itinerary, day, item) {
       </div>
     </article>
   `;
+}
+
+// 顯示「這個行程項目是誰新增的」標籤（協作功能第 4 項：共同編輯，顯示誰新增了甚麼行程）
+// item.addedById / addedByName 在新增當下就已經記錄（見 addPlaceToItinerary 等函式），
+// 這裡只是把既有資料顯示出來，並標註該成員是「主邀約人」還是「旅伴」方便辨識。
+function renderItineraryItemAuthorTag(itinerary, item) {
+  if (!item.addedById && !item.addedByName) return "";
+
+  const name = item.addedByName || "未知成員";
+  const isOwner = String(item.addedById) === String(itinerary.ownerId);
+  const isSelf = currentUser && String(item.addedById) === String(currentUser.id);
+  const roleLabel = isOwner ? "主邀約人" : "旅伴";
+  const display = isSelf ? `你（${roleLabel}）` : `${escapeHtml(name)}（${roleLabel}）`;
+
+  return `<p class="item-author-tag">由 ${display} 新增</p>`;
 }
 
 // ── 從行程項目跳轉至火車訂票並帶入資料 ──────────────────────
