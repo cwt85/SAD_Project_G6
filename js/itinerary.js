@@ -2157,7 +2157,7 @@ function addItineraryExpense(itineraryId) {
     type,
     payerId,
     note,
-    splits: splitExpenseEqually(amount, members.map(member => member.id)),
+    splits: splitExpenseEqually(amount, members.map(member => member.id), payerId),
     createdById: currentUser.id,
     time: nowText()
   };
@@ -2282,7 +2282,7 @@ function saveEditExpense(itineraryId, expenseId) {
   expense.type    = type;
   expense.payerId = payerId;
   expense.note    = note;
-  expense.splits  = splitExpenseEqually(amount, members.map(m => m.id));
+  expense.splits  = splitExpenseEqually(amount, members.map(m => m.id), payerId);
 
   addItineraryLog(itinerary, "編輯費用", `${type} NT$ ${amount.toLocaleString()}。`);
   touchItinerary(itinerary);
@@ -2713,9 +2713,15 @@ function getExpensePaidMap(itinerary) {
 
 function getExpenseSplitMap(itinerary) {
   return (itinerary.expenses || []).reduce((map, expense) => {
-    const splits = Array.isArray(expense.splits) && expense.splits.length > 0
-      ? expense.splits
-      : splitExpenseEqually(Number(expense.amount || 0), getItineraryMembers(itinerary).map(member => member.id));
+    // 一律即時重新計算均分結果（而非採用舊資料中儲存的 splits 快取）。
+    // 原因：本功能目前沒有「自訂分攤金額」，每次都是均分，
+    // 沿用舊快取只會讓修正前產生的資料持續沿用過時的捨入分配邏輯，
+    // 也會在旅伴名單變動後產生不同步的分攤結果。即時重算可同時修復這兩個問題。
+    const splits = splitExpenseEqually(
+      Number(expense.amount || 0),
+      getItineraryMembers(itinerary).map(member => member.id),
+      expense.payerId
+    );
 
     splits.forEach(split => {
       const key = String(split.userId);
@@ -2761,23 +2767,41 @@ function calcSettlement(itinerary) {
   return transactions;
 }
 
-function splitExpenseEqually(amount, userIds) {
+function splitExpenseEqually(amount, userIds, payerId) {
   const ids = Array.isArray(userIds) ? userIds : [];
   if (ids.length === 0) return [];
 
   const share = Math.floor(Number(amount || 0) / ids.length);
   let remainder = Number(amount || 0) - share * ids.length;
 
-  return ids.map(userId => {
+  // 無條件捨去後一定會有餘數（例如 123 / 2 = 61 餘 1），這 1 元一定要有人多負擔。
+  // 為了避免「同一人」每次都被分到較多份額而長期吃虧，
+  // 讓「這筆費用的付款人」優先吸收捨入餘數——
+  // 因為他本來就已經實際付出了完整金額，多扛一點分攤額剛好能讓帳目互相抵銷，
+  // 多筆費用累積下來，每個人付款與分攤的差額會自然趨近於 0。
+  const orderedIds = payerId != null
+    ? [...ids].sort((a, b) => {
+        const aIsPayer = String(a) === String(payerId);
+        const bIsPayer = String(b) === String(payerId);
+        if (aIsPayer === bIsPayer) return 0;
+        return aIsPayer ? -1 : 1;
+      })
+    : ids;
+
+  const splitsByUserId = new Map();
+  orderedIds.forEach(userId => {
     const extra = remainder > 0 ? 1 : 0;
     remainder -= extra;
-    return {
+    splitsByUserId.set(String(userId), {
       id: createItineraryId("split"),
       userId,
       amountOwed: share + extra,
       isSettled: false
-    };
+    });
   });
+
+  // 回傳順序仍依原始成員順序排列，保持顯示與既有行為一致
+  return ids.map(userId => splitsByUserId.get(String(userId)));
 }
 
 function findVote(itinerary, voteId) {
