@@ -825,6 +825,48 @@ body.itinerary-share-view #readonlyItineraryPanel::before {
     rgba(255, 255, 255, 0.50);
 }
 
+/* 已透過訂票/訂房自動整合進行程的項目，加上左側色條 + 淡色底，
+   讓使用者一眼就能分辨「這個已經訂好了」跟「這個還只是手動規劃」。 */
+.itinerary-item-card.integrated-item {
+  border-left: 5px solid transparent;
+}
+
+.itinerary-item-card.integrated-train {
+  border-left-color: rgba(79, 124, 255, 0.65);
+  background:
+    linear-gradient(135deg, rgba(219, 234, 254, 0.55), rgba(255, 255, 255, 0.50)),
+    rgba(255, 255, 255, 0.50);
+  box-shadow: 0 12px 28px rgba(79, 124, 255, 0.16);
+}
+
+.itinerary-item-card.integrated-lodging {
+  border-left-color: rgba(16, 185, 129, 0.65);
+  background:
+    linear-gradient(135deg, rgba(209, 250, 229, 0.55), rgba(255, 255, 255, 0.50)),
+    rgba(255, 255, 255, 0.50);
+  box-shadow: 0 12px 28px rgba(16, 185, 129, 0.16);
+}
+
+/* 「已整合訂單」徽章：與分類標籤並列顯示，補強顏色之外的可辨識度（無障礙考量） */
+.integrated-pill {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 999px;
+  color: #fff;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.integrated-pill.train-pill {
+  background: rgba(79, 124, 255, 0.85);
+}
+
+.integrated-pill.lodging-pill {
+  background: rgba(16, 185, 129, 0.85);
+}
+
 /* 拖曳視覺狀態 */
 .itinerary-item-card {
   transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease, border-color 0.15s ease;

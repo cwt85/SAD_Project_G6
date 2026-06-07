@@ -891,6 +891,15 @@ function renderItineraryDetail() {
   }
 
   normalizeItineraryDays(itinerary);
+
+  // 補跑一次衝突檢查：避免「資料是在衝突檢查邏輯上線/修正之前就已建立」的舊行程，
+  // 永遠不會被檢查到（runItineraryConflictCheck 原本只在新增/更新整合項目當下才會執行）。
+  // runItineraryConflictCheck 內部用 conflictKey 去重，同一筆衝突只會被記錄、提醒一次，
+  // 所以每次重繪都呼叫也不會造成 alert 重複跳出或資料重複寫入。
+  if (typeof runItineraryConflictCheck === "function") {
+    runItineraryConflictCheck(itinerary);
+  }
+
   const day = getItineraryDay(itinerary, activeItineraryDay);
   const totalCost = getItineraryTotalCost(itinerary);
   const overBudget = Number(itinerary.budgetLimit) > 0 && totalCost > Number(itinerary.budgetLimit);
@@ -1025,8 +1034,16 @@ function renderItineraryItemCard(itinerary, day, item) {
   const cancelled = itinerary.status === "已取消";
   const d = cancelled ? " disabled" : "";
 
+  // 已透過訂票/訂房自動整合進行程的項目，特別加上底色與左側色條 highlight，
+  // 讓使用者一眼就能分辨「這個已經訂好了」跟「這個還只是手動規劃、尚待預訂」。
+  const integratedClass = item.sourceModule === "C"
+    ? " integrated-item integrated-train"
+    : item.sourceModule === "B"
+      ? " integrated-item integrated-lodging"
+      : "";
+
   return `
-    <article class="itinerary-item-card ${item.mustGo ? "must-go" : ""}"
+    <article class="itinerary-item-card ${item.mustGo ? "must-go" : ""}${integratedClass}"
       data-item-id="${escapeAttribute(item.id)}"
       draggable="${cancelled ? "false" : "true"}"
       onclick="toggleItineraryItemNotesFromCard(event, '${item.id}')"
@@ -1039,6 +1056,8 @@ function renderItineraryItemCard(itinerary, day, item) {
         <div>
           <span class="type-pill">${escapeHtml(item.type)}</span>
           ${item.mustGo ? `<span class="must-pill">必去候選</span>` : ""}
+          ${item.sourceModule === "C" ? `<span class="integrated-pill train-pill">✓ 已訂火車票</span>` : ""}
+          ${item.sourceModule === "B" ? `<span class="integrated-pill lodging-pill">✓ 已訂住宿</span>` : ""}
           <h4>${escapeHtml(item.name)}</h4>
           <p>車站車程 ${formatTravelTime(item.distance)}｜預估 NT$ ${Number(item.estimatedCost || 0).toLocaleString()}</p>
           ${renderItineraryItemAuthorTag(itinerary, item)}
@@ -2433,8 +2452,37 @@ function addItineraryLog(itinerary, action, details = "", conflictId = "") {
   });
 }
 
+// 根據訂單日期，找出真正應該整合進去的行程。
+// 背景（第一性原理）：原本系統是把訂單整合到「目前作用中的行程」（activeItineraryId），
+// 但 activeItineraryId 是個全域可變狀態，使用者只要點選別張行程卡片、新增/複製行程、
+// 或切換頁面，就會悄悄改變它。如果訂房與訂票剛好發生在 activeItineraryId 不同的時刻，
+// 兩筆資料就會被分別整合到不同的行程物件裡——畫面上各自看起來都「已整合」，
+// 但兩者其實從未存在於同一個 itinerary.dayPlans 陣列中，導致車票/住宿衝突檢查
+// （runItineraryConflictCheck 只比對同一行程、同一天內的項目）永遠不會觸發。
+//
+// 修正方式：改成依「訂單日期是否落在行程的起訖日範圍內」來判斷歸屬，這樣不論
+// 使用者中途切換到哪張行程卡片，訂單都會穩定地被整合進「日期吻合」的那張行程，
+// 而非「畫面上恰好顯示的那張」。若有多筆同時符合（例如使用者規劃了多趟重疊行程），
+// 優先採用目前作用中的行程；否則挑選最近更新的一筆，盡量符合使用者預期。
+function findItineraryForBookingDate(dateText) {
+  if (!currentUser) return null;
+
+  const candidates = itineraries.filter(itinerary => {
+    if (!canAccessItinerary(itinerary) || itinerary.status === "已取消") return false;
+    if (!dateText || !itinerary.startDate || !itinerary.endDate) return true;
+    return dateText >= itinerary.startDate && dateText <= itinerary.endDate;
+  });
+
+  if (candidates.length === 0) return null;
+
+  const active = candidates.find(itinerary => itinerary.id === activeItineraryId);
+  if (active) return active;
+
+  return candidates.slice().sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)))[0];
+}
+
 function addSystemItemToItinerary(data = {}) {
-  const itinerary = getActiveItinerary();
+  const itinerary = findItineraryForBookingDate(data.date) || getActiveItinerary();
   if (!itinerary || !currentUser || !canAccessItinerary(itinerary)) return null;
 
   normalizeItineraryDays(itinerary);
@@ -2535,8 +2583,17 @@ function runItineraryConflictCheck(itinerary) {
   if (!itinerary) return [];
 
   itinerary.conflicts = itinerary.conflicts || [];
-  const existingKeys = new Set(itinerary.conflicts.map(conflict => conflict.conflictKey).filter(Boolean));
+  const existingByKey = new Map(
+    itinerary.conflicts.filter(conflict => conflict.conflictKey).map(conflict => [conflict.conflictKey, conflict])
+  );
   const newConflicts = [];
+  // 「需要跳出 alert 通知」的衝突清單：
+  // 不只包含這次新偵測到、之前完全不存在的衝突，
+  // 也包含「資料庫裡早就存在這筆衝突紀錄、但因為當初還沒做 alert 功能而從未通知過使用者」的情況
+  // （例如：本次上線前就先跑過一次衝突偵測邏輯，靜悄悄地寫入了 conflictKey，
+  //  之後才補上 alert，若只用 existingKeys 判斷「是否為新衝突」，這種舊紀錄會被誤判成「已通知過」而永遠不會再提醒）。
+  // 用獨立的 alerted 旗標來記錄「是否已經跳過 alert」，才能正確地把這種補通知的情境涵蓋進來。
+  const conflictsToAlert = [];
 
   normalizeItineraryDays(itinerary).forEach(day => {
     const trainItems = day.items.filter(item => item.sourceModule === "C" && item.endTime);
@@ -2547,8 +2604,10 @@ function runItineraryConflictCheck(itinerary) {
         const checkInTime = lodgingItem.time || "15:00";
         if (compareTime(trainItem.endTime, checkInTime) > 0) {
           const conflictKey = `train-lodging-${day.day}-${trainItem.id}-${lodgingItem.id}`;
-          if (!existingKeys.has(conflictKey)) {
-            newConflicts.push({
+          const existing = existingByKey.get(conflictKey);
+
+          if (!existing) {
+            const conflict = {
               id: createItineraryId("conflict"),
               conflictKey,
               type: "schedule-conflict",
@@ -2558,8 +2617,15 @@ function runItineraryConflictCheck(itinerary) {
               userId: "system",
               userName: "系統",
               time: nowText(),
-              resolved: false
-            });
+              resolved: false,
+              alerted: true
+            };
+            newConflicts.push(conflict);
+            conflictsToAlert.push(conflict);
+          } else if (!existing.resolved && !existing.alerted) {
+            // 補上「過去偵測到、但從未跳出過 alert」的通知，並標記成已通知避免下次重複跳出。
+            existing.alerted = true;
+            conflictsToAlert.push(existing);
           }
         }
       });
@@ -2568,14 +2634,61 @@ function runItineraryConflictCheck(itinerary) {
 
   if (newConflicts.length > 0) {
     itinerary.conflicts.unshift(...newConflicts);
+  }
 
+  if (conflictsToAlert.length > 0) {
     // 主動以 alert 提醒使用者車票與住宿時間有衝突（例如列車抵達時間晚於飯店 Check-in 時間），
-    // 讓使用者在訂票/訂房當下就能立刻發現並調整行程，而不是事後才在行程頁面看到提示。
-    const summary = newConflicts.map(conflict => `第 ${conflict.dayNumber} 天：${conflict.details}`).join("\n");
+    // 讓使用者在訂票/訂房當下，或下次打開行程頁面時，都能立刻發現並調整行程。
+    const summary = conflictsToAlert.map(conflict => `第 ${conflict.dayNumber} 天：${conflict.details}`).join("\n");
     alert(`⚠ 偵測到行程時間衝突，請確認您的安排：\n${summary}`);
   }
 
   return newConflicts;
+}
+
+// 「預訂前」的衝突預警：
+// 在使用者真正完成下單（建立住宿訂單／確認車票付款）之前，
+// 趁早依「即將預訂的日期、時間」對照行程中既有的另一種項目（住宿 ↔ 車票）做檢查，
+// 讓使用者在按下「建立訂單」「選定班次」當下就能看到提醒，而不是等到整個訂購流程跑完才知道有衝突。
+//
+// 注意：這裡只是「預警」，並不會寫入 itinerary.conflicts（真正寫入與正式記錄，
+// 仍交由 addSystemItemToItinerary -> runItineraryConflictCheck 在訂單真正成立、
+// 項目整合進行程之後負責），避免重複記錄或把「使用者後來取消、沒有真的下單」的情境也算進衝突清單。
+function checkProspectiveBookingConflict({ date, type, time, endTime, label }) {
+  if (!currentUser || typeof findItineraryForBookingDate !== "function") return;
+
+  const itinerary = findItineraryForBookingDate(date);
+  if (!itinerary) return;
+
+  const dayNumber = getDayNumberByDate(itinerary, date);
+  const day = getItineraryDay(itinerary, dayNumber);
+  if (!day) return;
+
+  if (type === "train") {
+    // 即將預訂的是火車票：檢查「抵達時間」是否晚於行程裡既有住宿的 Check-in 時間
+    const conflictLodgings = (day.items || [])
+      .filter(item => item.sourceModule === "B" || item.type === "住宿")
+      .filter(item => compareTime(endTime, item.time || "15:00") > 0);
+
+    if (conflictLodgings.length > 0) {
+      const detail = conflictLodgings
+        .map(item => `住宿「${item.name}」的 Check-in 時間為 ${item.time || "15:00"}`)
+        .join("\n");
+      alert(`⚠ 行程衝突提醒：\n您即將預訂的車次「${label}」抵達時間為 ${endTime}，可能晚於行程中已安排的入住時間：\n${detail}\n請確認後再繼續訂票。`);
+    }
+  } else if (type === "lodging") {
+    // 即將預訂的是住宿：檢查行程裡既有火車票的「抵達時間」是否晚於這個 Check-in 時間
+    const conflictTrains = (day.items || [])
+      .filter(item => item.sourceModule === "C" && item.endTime)
+      .filter(item => compareTime(item.endTime, time) > 0);
+
+    if (conflictTrains.length > 0) {
+      const detail = conflictTrains
+        .map(item => `列車「${item.name}」抵達時間為 ${item.endTime}`)
+        .join("\n");
+      alert(`⚠ 行程衝突提醒：\n您即將預訂的住宿「${label}」Check-in 時間為 ${time}，行程中已安排的車次可能晚於此時間才抵達：\n${detail}\n請確認後再繼續訂房。`);
+    }
+  }
 }
 
 function compareTime(a, b) {

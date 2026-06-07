@@ -745,6 +745,17 @@ async function createOrder(roomId, source = "search") {
       : getDirectOrderBookingInputs(room);
     if (!booking.valid) return;
 
+    // 按下「建立訂單」當下，先針對「即將入住的日期 / Check-in 時間」與行程中已安排的車票做衝突預警，
+    // 讓使用者在訂單真正成立之前就能注意到（不影響後續下單流程，純粹是提早提醒）。
+    if (typeof checkProspectiveBookingConflict === "function") {
+      checkProspectiveBookingConflict({
+        date: booking.checkIn,
+        type: "lodging",
+        time: booking.checkInTime,
+        label: room.name
+      });
+    }
+
     if (!isRoomAvailableForBooking(room, booking.checkIn, booking.checkOut)) {
       showDialogNotice("warning", "此房源不在可訂期間內或目前無可售房型。");
       return;

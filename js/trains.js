@@ -585,6 +585,19 @@ function renderTrainStationTimeline(result) {
 ========================================================= */
 function selectTrainResult(resultId) {
   selectedTrainResultId = resultId;
+
+  // 按下「選定班次」當下，先針對「這班車的抵達時間」與行程中已安排的住宿 Check-in 時間做衝突預警，
+  // 讓使用者在進入訂票流程（選票種、付款）之前就能注意到，及早決定是否要換班次。
+  const selectedResult = typeof getSelectedTrainResult === "function" ? getSelectedTrainResult() : null;
+  if (selectedResult && typeof checkProspectiveBookingConflict === "function") {
+    checkProspectiveBookingConflict({
+      date: selectedResult.travelDate,
+      type: "train",
+      endTime: selectedResult.arriveTime,
+      label: `${selectedResult.trainType || ""} ${selectedResult.trainNo || ""}`.trim()
+    });
+  }
+
   saveAppData();
   currentTrainStep = 1;
   renderTrainStepper();
