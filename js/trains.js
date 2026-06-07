@@ -5,19 +5,48 @@
    - 功能分頁 + 步驟式訂票流程
 ========================================================= */
 
+// 里程採臺鐵「營業里程」概念整理成原型用的大站節點。
+// 西部以臺北為 0，西部往東部走屏東線、南迴線、臺東線；北部往東部走宜蘭線、北迴線。
 const TRAIN_STATIONS = [
   { name: "台北", km: 0 },
-  { name: "松山", km: 8 },
-  { name: "桃園", km: 42 },
-  { name: "新竹", km: 78 },
-  { name: "台中", km: 170 },
-  { name: "彰化", km: 190 },
-  { name: "嘉義", km: 260 },
-  { name: "台南", km: 314 },
-  { name: "高雄", km: 360 },
-  { name: "花蓮", km: 420 },
-  { name: "玉里", km: 505 },
-  { name: "台東", km: 610 }
+  { name: "松山", km: 6.4 },
+  { name: "桃園", km: 29.1 },
+  { name: "新竹", km: 78.1 },
+  { name: "台中", km: 164.6 },
+  { name: "彰化", km: 182.4 },
+  { name: "嘉義", km: 263.3 },
+  { name: "台南", km: 324.7 },
+  { name: "高雄", km: 371.4 },
+  { name: "屏東", km: 392.3 },
+  { name: "台東", km: 530.7 },
+  { name: "花蓮", km: 681.6 },
+  { name: "宜蘭", km: 780.0 }
+];
+
+// 路線不能只用一條直線串起來，否則會出現「嘉義下一站花蓮」這種穿越中央山脈的錯誤。
+// 西部到東部改走南迴線；北部到東部則走宜蘭、北迴線。
+const TRAIN_WEST_SOUTH_EAST_ROUTE = [
+  { name: "松山", km: -6.4 },
+  { name: "台北", km: 0 },
+  { name: "桃園", km: 29.1 },
+  { name: "新竹", km: 78.1 },
+  { name: "台中", km: 164.6 },
+  { name: "彰化", km: 182.4 },
+  { name: "嘉義", km: 263.3 },
+  { name: "台南", km: 324.7 },
+  { name: "高雄", km: 371.4 },
+  { name: "屏東", km: 392.3 },
+  { name: "台東", km: 530.7 },
+  { name: "花蓮", km: 681.6 },
+  { name: "宜蘭", km: 780.0 }
+];
+
+const TRAIN_NORTH_EAST_ROUTE = [
+  { name: "台北", km: 0 },
+  { name: "松山", km: 6.4 },
+  { name: "宜蘭", km: 95.9 },
+  { name: "花蓮", km: 194.3 },
+  { name: "台東", km: 345.2 }
 ];
 
 const TRAIN_RATE_BY_TYPE = {
@@ -28,12 +57,13 @@ const TRAIN_RATE_BY_TYPE = {
   "普悠瑪": 3
 };
 
+// 時間仍為原型預估值：實際行車時間需依臺鐵車次時刻查詢。
 const TRAIN_SPEED_BY_TYPE = {
-  "區間車": 58,
-  "莒光號": 75,
-  "自強號": 92,
-  "太魯閣": 102,
-  "普悠瑪": 105
+  "區間車": 45,
+  "莒光號": 60,
+  "自強號": 75,
+  "太魯閣": 80,
+  "普悠瑪": 80
 };
 
 const TRAIN_TICKET_TYPES = {
@@ -83,8 +113,6 @@ let currentTrainTab = "booking";
 let currentTrainTicketFolder = "mine";
 let lastCreatedTrainOrderId = null;
 let trainBookingFormData = null;
-// 記錄上次查詢條件，供 _restoreTrainSearchState 在重繪後還原
-let lastTrainSearchCriteria = null;
 
 /* =========================================================
    主要渲染入口
@@ -318,29 +346,10 @@ function renderStep1_SearchTrains(container) {
 }
 
 function _restoreTrainSearchState() {
-  const c = lastTrainSearchCriteria;
-
-  // 還原出發/抵達站
   const fromSelect = document.getElementById("trainFromStation");
-  const toSelect   = document.getElementById("trainToStation");
-  if (fromSelect) fromSelect.value = c ? c.fromStation : (fromSelect.querySelector('option[value="台北"]') ? "台北" : "");
-  if (toSelect)   toSelect.value   = c ? c.toStation   : (toSelect.querySelector('option[value="台東"]')   ? "台東" : "");
-
-  // 還原日期
-  const dateInput = document.getElementById("trainDate");
-  if (dateInput && c && c.travelDate) dateInput.value = c.travelDate;
-
-  // 還原時段
-  const periodSelect = document.getElementById("trainPeriod");
-  if (periodSelect && c && c.period) periodSelect.value = c.period;
-
-  // 還原車廂（這是 Bug 所在：未還原導致重繪後車廂被重設為標準車廂）
-  const cabinSelect = document.getElementById("trainCabinFilter");
-  if (cabinSelect && c && c.cabin) cabinSelect.value = c.cabin;
-
-  // 還原含轉乘核取方塊
-  const transferCheck = document.getElementById("trainAllowTransfer");
-  if (transferCheck && c) transferCheck.checked = Boolean(c.allowTransfer);
+  const toSelect = document.getElementById("trainToStation");
+  if (fromSelect) fromSelect.value = fromSelect.querySelector(`option[value="台北"]`) ? "台北" : "";
+  if (toSelect) toSelect.value = toSelect.querySelector(`option[value="台東"]`) ? "台東" : "";
 }
 
 function populateTrainStationSelects() {
@@ -389,9 +398,6 @@ function searchTrains() {
     showNotice(notice, "error", "出發站與抵達站不可相同。");
     return;
   }
-
-  // 儲存本次搜尋條件，讓 _restoreTrainSearchState 在重繪後能還原所有欄位
-  lastTrainSearchCriteria = { fromStation, toStation, travelDate, period, cabin, allowTransfer };
 
   lastTrainSearchResults = buildTrainSearchResults({
     fromStation,
@@ -487,30 +493,18 @@ function renderTrainResultCard(result) {
    站間時間表
 ========================================================= */
 function renderTrainStationTimeline(result) {
-  const fromIdx = TRAIN_STATIONS.findIndex(s => s.name === result.fromStation);
-  const toIdx = TRAIN_STATIONS.findIndex(s => s.name === result.toStation);
-  if (fromIdx < 0 || toIdx < 0) return "";
+  // 依實際路線產生停靠站：北東走宜蘭/北迴，西部到東部走南迴，並保留屏東等縣市節點，避免嘉義直接接花蓮。
+  const stops = getTrainRouteStops(result.fromStation, result.toStation);
+  if (stops.length < 2) return "";
 
-  const startIdx = Math.min(fromIdx, toIdx);
-  const endIdx = Math.max(fromIdx, toIdx);
-  const isReverse = fromIdx > toIdx;
-
-  // 建立途經站列表
-  const stops = [];
-  if (isReverse) {
-    for (let i = fromIdx; i >= toIdx; i--) stops.push(TRAIN_STATIONS[i]);
-  } else {
-    for (let i = fromIdx; i <= toIdx; i++) stops.push(TRAIN_STATIONS[i]);
-  }
-
-  // 如果途經站數太多，只保留出發/中間大站/抵達
+  // 如果途經站數太多，只保留出發/中間大站/抵達，但仍然依照同一路線順序顯示。
   let displayStops = stops;
   if (stops.length > 6) {
     const mid = Math.floor(stops.length / 2);
     displayStops = [stops[0], stops[Math.floor(mid / 2)], stops[mid], stops[Math.floor((mid + stops.length) / 2)], stops[stops.length - 1]];
   }
 
-  const totalDistance = Math.abs(TRAIN_STATIONS[toIdx].km - TRAIN_STATIONS[fromIdx].km);
+  const originStop = stops[0];
   const speed = TRAIN_SPEED_BY_TYPE[result.trainType] || 80;
 
   let html = `<div class="train-station-timeline">`;
@@ -520,7 +514,7 @@ function renderTrainStationTimeline(result) {
     const isDestination = idx === displayStops.length - 1;
 
     // 計算該站的預估時間
-    const distFromStart = Math.abs(stop.km - TRAIN_STATIONS[fromIdx].km);
+    const distFromStart = Math.abs(stop.km - originStop.km);
     const minutesFromStart = Math.round((distFromStart / speed) * 60);
     const stopTime = addMinutesToTime(result.departTime, minutesFromStart);
 
@@ -548,7 +542,7 @@ function renderTrainStationTimeline(result) {
       const segmentMin = Math.round((segmentDist / speed) * 60);
       html += `
         <div class="train-timeline-duration">
-          ${segmentMin} 分鐘 / ${segmentDist} km
+          約 ${segmentMin} 分鐘 / ${formatTrainDistance(segmentDist)}
         </div>
       `;
     }
@@ -1024,6 +1018,10 @@ function createTrainOrder() {
   trainOrders.unshift(order);
   lastCreatedTrainOrderId = order.id;
   saveAppData();
+
+  if (typeof showToast === "function") {
+    showToast(`訂票成功！訂票編號：${order.bookingNo}`, "success", 3000);
+  }
 
   // 進入步驟 4
   currentTrainStep = 3;
@@ -1799,10 +1797,6 @@ function calculateTrainPrice(result, ticketType = "general", useLodgingDiscount 
   const earlyBird = getTrainEarlyBirdDiscount(result);
   if (earlyBird.factor < 1) candidates.push(earlyBird);
 
-  // 時間折扣（需求第六節）：距發車越近折扣越大，與早鳥折扣取最優惠
-  const timeDiscount = getTrainTimeDiscount(result);
-  if (timeDiscount.factor < 1) candidates.push(timeDiscount);
-
   const lodgingDiscount = getTrainLodgingDiscountInfo();
   if (useLodgingDiscount && lodgingDiscount.eligible) {
     candidates.push({ label: lodgingDiscount.label, factor: lodgingDiscount.factor });
@@ -1827,26 +1821,6 @@ function getTrainEarlyBirdDiscount(result) {
   if (days >= 7) return { label: "早鳥優惠", factor: 0.8 };
   if (days >= 3) return { label: "早鳥優惠", factor: 0.9 };
   return { label: "早鳥折扣", factor: 1 };
-}
-
-/**
- * 時間折扣（需求第六節）：距發車越近折扣越大，僅限對號列車。
- * 與早鳥折扣並存，calculateTrainPrice 取兩者中最優惠者。
- * - 1-3 天內：95折
- * - 12-24 小時：88折
- * - 6-12 小時：85折
- * - 6 小時內：70折
- */
-function getTrainTimeDiscount(result) {
-  if (!result.reservedTrain) return { label: "時間折扣", factor: 1 };
-  const departAt = getTrainDateTime(result.travelDate, result.departTime);
-  const hoursUntilDepart = (departAt - Date.now()) / (1000 * 60 * 60);
-  if (hoursUntilDepart <= 0) return { label: "時間折扣", factor: 1 };
-  if (hoursUntilDepart <= 6)  return { label: "時間折扣（6小時內）", factor: 0.70 };
-  if (hoursUntilDepart <= 12) return { label: "時間折扣（6-12小時）", factor: 0.85 };
-  if (hoursUntilDepart <= 24) return { label: "時間折扣（12-24小時）", factor: 0.88 };
-  if (hoursUntilDepart <= 72) return { label: "時間折扣（1-3天）", factor: 0.95 };
-  return { label: "時間折扣", factor: 1 };
 }
 
 function getTrainLodgingDiscountInfo() {
@@ -1924,6 +1898,27 @@ function assignTrainSeat(result, preference) {
   };
 }
 
+function getTrainRouteStops(fromStation, toStation) {
+  const eastRouteNames = TRAIN_NORTH_EAST_ROUTE.map(station => station.name);
+  const westRouteNames = TRAIN_WEST_SOUTH_EAST_ROUTE.map(station => station.name);
+  const westOnlyStations = ["桃園", "新竹", "台中", "彰化", "嘉義", "台南", "高雄"];
+
+  const useNorthEastRoute =
+    eastRouteNames.includes(fromStation) &&
+    eastRouteNames.includes(toStation) &&
+    !westOnlyStations.includes(fromStation) &&
+    !westOnlyStations.includes(toStation);
+
+  const route = useNorthEastRoute ? TRAIN_NORTH_EAST_ROUTE : TRAIN_WEST_SOUTH_EAST_ROUTE;
+  const fromIdx = route.findIndex(station => station.name === fromStation);
+  const toIdx = route.findIndex(station => station.name === toStation);
+
+  if (fromIdx < 0 || toIdx < 0) return [];
+
+  if (fromIdx <= toIdx) return route.slice(fromIdx, toIdx + 1);
+  return route.slice(toIdx, fromIdx + 1).reverse();
+}
+
 function getTrainAvailability(result) {
   if (result.status === "停駛") {
     return { reservable: false, unavailableReason: "停駛不可訂" };
@@ -1954,10 +1949,21 @@ function getRemainingTrainSeats(result) {
 }
 
 function getTrainDistance(fromStation, toStation) {
+  const routeStops = getTrainRouteStops(fromStation, toStation);
+  if (routeStops.length >= 2) {
+    return Math.max(20, Number(Math.abs(routeStops[routeStops.length - 1].km - routeStops[0].km).toFixed(1)));
+  }
+
   const from = TRAIN_STATIONS.find(station => station.name === fromStation);
   const to = TRAIN_STATIONS.find(station => station.name === toStation);
   if (!from || !to) return 120;
-  return Math.max(20, Math.abs(to.km - from.km));
+  return Math.max(20, Number(Math.abs(to.km - from.km).toFixed(1)));
+}
+
+function formatTrainDistance(distance) {
+  const value = Number(distance || 0);
+  if (Number.isInteger(value)) return `${value} km`;
+  return `${value.toFixed(1).replace(/\.0$/, "")} km`;
 }
 
 function calculateTrainDuration(trainType, distance, transfer) {
