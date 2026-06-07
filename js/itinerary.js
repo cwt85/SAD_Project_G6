@@ -1045,10 +1045,10 @@ function renderItineraryItemCard(itinerary, day, item) {
         </div>
         <div class="itinerary-item-controls">
           <input${d} type="time" value="${escapeAttribute(item.time || "09:00")}" onchange="updateItineraryItemField(${day.day}, '${item.id}', 'time', this.value)" />
-          ${(item.type === "交通" || item.type === "車站") && (item.name || "").includes("車站")
+          ${(item.type === "交通" || item.type === "車站") && (item.name || "").includes("車站") && item.sourceModule !== "C"
             ? `<button class="shortcut-btn train-shortcut-btn" onclick="event.stopPropagation(); goToTrainBookingFromItem('${itinerary.id}', ${day.day}, '${item.id}')">訂火車票</button>`
             : ""}
-          ${item.type === "住宿"
+          ${item.type === "住宿" && item.sourceModule !== "B"
             ? `<button class="shortcut-btn lodging-shortcut-btn" onclick="event.stopPropagation(); goToLodgingBookingFromItem('${itinerary.id}', ${day.day}, '${item.id}')">訂住宿</button>`
             : ""}
           <button${d} class="secondary-btn" onclick="toggleItineraryItemNotes('${item.id}')">${expanded ? "收合" : "備註"}</button>
@@ -2568,6 +2568,11 @@ function runItineraryConflictCheck(itinerary) {
 
   if (newConflicts.length > 0) {
     itinerary.conflicts.unshift(...newConflicts);
+
+    // 主動以 alert 提醒使用者車票與住宿時間有衝突（例如列車抵達時間晚於飯店 Check-in 時間），
+    // 讓使用者在訂票/訂房當下就能立刻發現並調整行程，而不是事後才在行程頁面看到提示。
+    const summary = newConflicts.map(conflict => `第 ${conflict.dayNumber} 天：${conflict.details}`).join("\n");
+    alert(`⚠ 偵測到行程時間衝突，請確認您的安排：\n${summary}`);
   }
 
   return newConflicts;
