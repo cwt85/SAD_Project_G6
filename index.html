@@ -52,9 +52,9 @@
     <section id="home" class="active">
       <div class="home-hero panel">
         <div>
-          <span class="status-pill">A+B+C 整合流程</span>
+          <span class="status-pill">旅遊整合平台</span>
           <h2>從排行程開始，接著訂住宿與車票</h2>
-          <p>住宿與車票成功後會自動回寫到行程，系統也會檢查列車抵達時間與住宿 Check-in 是否衝突。</p>
+         
         </div>
         <div class="home-actions">
           <button class="primary-btn" onclick="showSection('itinerary')">開始排行程</button>
@@ -281,59 +281,42 @@
     </section>
 
     <section id="train">
-      <div class="panel train-panel">
-        <div class="itinerary-panel-title">
-          <div>
-            <h2>火車票務查詢與訂票</h2>
-            <p>查詢車次、票種優惠、座位偏好、付款取票、分票、改票與退票都在這裡處理。</p>
-          </div>
-          <button class="secondary-btn" onclick="prefillTrainToday()">帶入今天</button>
-        </div>
-
-        <div class="train-search-grid">
-          <div>
-            <label for="trainFromStation">出發站</label>
-            <select id="trainFromStation"></select>
-          </div>
-          <div>
-            <label for="trainToStation">抵達站</label>
-            <select id="trainToStation"></select>
-          </div>
-          <div>
-            <label for="trainDate">乘車日期</label>
-            <input id="trainDate" type="date" />
-          </div>
-          <div>
-            <label for="trainPeriod">時段</label>
-            <select id="trainPeriod">
-              <option value="all">全天</option>
-              <option value="morning">上午</option>
-              <option value="afternoon">下午</option>
-              <option value="night">晚上</option>
-            </select>
-          </div>
-          <div>
-            <label for="trainCabinFilter">車廂類型</label>
-            <select id="trainCabinFilter">
-              <option value="standard">標準車廂</option>
-              <option value="business">商務車廂</option>
-            </select>
-          </div>
-          <label class="check-row">
-            <input id="trainAllowTransfer" type="checkbox" />
-            接受轉車
-          </label>
-        </div>
-        <div class="actions">
-          <button class="primary-btn" onclick="searchTrains()">查詢車次</button>
-          <button class="secondary-btn" onclick="resetTrainSearch()">重設</button>
-        </div>
-        <div id="trainNotice"></div>
+      <!-- 功能分頁 -->
+      <div class="train-tabs">
+        <button class="train-tab active" data-train-tab="booking" onclick="switchTrainTab('booking')">
+          <span class="train-tab-icon">T</span> 車次查詢與訂票系統
+        </button>
+        <button class="train-tab" data-train-tab="payment" onclick="switchTrainTab('payment')">
+          <span class="train-tab-icon">P</span> 付款與取票
+        </button>
+        <button class="train-tab" data-train-tab="split" onclick="switchTrainTab('split')">
+          <span class="train-tab-icon">S</span> 分票管理
+        </button>
+        <button class="train-tab" data-train-tab="refund" onclick="switchTrainTab('refund')">
+          <span class="train-tab-icon">R</span> 退票/改票
+        </button>
       </div>
 
-      <div id="trainResults"></div>
-      <div id="trainBookingPanel"></div>
-      <div id="trainOrdersPanel"></div>
+      <!-- 訂票步驟流程 -->
+      <div id="trainTabBooking" class="train-tab-content active">
+        <div id="trainStepper" class="train-stepper"></div>
+        <div id="trainStepContent"></div>
+      </div>
+
+      <!-- 付款與取票分頁 -->
+      <div id="trainTabPayment" class="train-tab-content">
+        <div id="trainPaymentTabContent"></div>
+      </div>
+
+      <!-- 分票管理分頁 -->
+      <div id="trainTabSplit" class="train-tab-content">
+        <div id="trainSplitTabContent"></div>
+      </div>
+
+      <!-- 退票/改票分頁 -->
+      <div id="trainTabRefund" class="train-tab-content">
+        <div id="trainRefundTabContent"></div>
+      </div>
     </section>
 
     <section id="search">

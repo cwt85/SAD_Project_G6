@@ -83,14 +83,21 @@ function createUser({ account, displayName, role, password = "" }) {
 }
 
 function updateLoginMode() {
+  const role = getSelectedLoginRole();
   const passwordGroup = document.getElementById("passwordGroup");
   const accountInput = document.getElementById("accountInput");
   const passwordInput = document.getElementById("passwordInput");
   const notice = document.getElementById("loginNotice");
 
   if (passwordGroup) passwordGroup.style.display = "block";
-  if (accountInput) accountInput.placeholder = "admin@example.com / example@mail.com / 0912345678";
-  if (passwordInput) passwordInput.placeholder = "請輸入密碼";
+
+  if (role === "admin") {
+    if (accountInput) accountInput.placeholder = DEFAULT_ADMIN_ACCOUNT;
+    if (passwordInput) passwordInput.placeholder = "請輸入管理員密碼";
+  } else {
+    if (accountInput) accountInput.placeholder = "admin@example.com / example@mail.com / 0912345678";
+    if (passwordInput) passwordInput.placeholder = "請輸入密碼";
+  }
 
   if (notice) notice.innerHTML = "";
 }
@@ -286,6 +293,27 @@ function saveAuthState() {
     currentUser,
     users
   }));
+}
+
+// 跨分頁同步「已註冊使用者名單」。
+// 背景：users 只會在分頁載入當下從 localStorage 讀進記憶體一次，之後就不會主動再讀取。
+// 如果在分頁 A 註冊了帳號，分頁 B 並不會自動知道，導致 findUser() 在邀請旅伴等
+// 情境中找不到剛在別的分頁註冊好的使用者（在本機用 Live Server 因為有 Live Reload
+// 會自動整頁重新整理而剛好把這個 bug 蓋掉，部署到 GitHub Pages 等沒有自動重整的
+// 環境就會原形畢露）。這裡只同步「使用者名單」，刻意不去動 currentUser / isLoggedIn，
+// 避免因為別的分頁登入/登出而連帶改變了本分頁目前的登入狀態。
+function syncUsersFromStorage() {
+  try {
+    const savedState = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!savedState) return;
+
+    const state = JSON.parse(savedState);
+    if (Array.isArray(state.users) && state.users.length > 0) {
+      users = state.users;
+    }
+  } catch (error) {
+    console.error("使用者名單同步失敗：", error);
+  }
 }
 
 function loadAuthState() {

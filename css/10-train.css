@@ -1,0 +1,674 @@
+/* 10. Train - Train Module (seat map, stepper, tabs, timeline)
+   SMACSS Layer: Module */
+
+/* =========================================================
+   手動選座位系統
+========================================================= */
+
+.train-seat-map-section {
+  grid-column: 1 / -1;
+  padding: 14px 0 4px;
+}
+
+.train-seat-map {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  background: rgba(255,255,255,0.45);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+}
+
+.train-seat-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.train-seat {
+  width: 44px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(79,124,255,0.35);
+  background: rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+  user-select: none;
+}
+
+.train-seat:hover:not(.booked) {
+  background: rgba(79,124,255,0.15);
+  border-color: var(--blue);
+}
+
+.train-seat.selected {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+
+.train-seat.booked {
+  background: rgba(0,0,0,0.08);
+  border-color: rgba(0,0,0,0.12);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.train-seat-aisle {
+  width: 20px;
+}
+
+.train-seat-selected-text {
+  font-size: 13px;
+  font-weight: 500;
+  margin-left: 8px;
+  color: var(--text-muted);
+}
+
+/* =========================================================
+   17. 火車票務 — 功能分頁列 & 步驟列
+========================================================= */
+
+/* --- 功能分頁 Tab Bar --- */
+.train-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  margin-bottom: 20px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  overflow-x: auto;
+}
+
+.train-tab {
+  flex: 1;
+  min-width: 0;
+  padding: 13px 16px;
+  border: none;
+  border-radius: 14px;
+  background: transparent;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.15s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.train-tab:hover:not(.active) {
+  background: rgba(79, 124, 255, 0.08);
+  color: #334155;
+}
+
+.train-tab.active {
+  color: white;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  box-shadow: 0 6px 20px rgba(79, 124, 255, 0.28);
+  transform: translateY(-1px);
+}
+
+.train-tab-icon {
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.18);
+  flex-shrink: 0;
+}
+
+.train-tab.active .train-tab-icon {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* --- 分頁內容區 --- */
+.train-tab-content {
+  display: none;
+}
+
+.train-tab-content.active {
+  display: block;
+  animation: trainFadeIn 0.3s ease;
+}
+
+@keyframes trainFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* --- 步驟列 Stepper --- */
+.train-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  overflow-x: auto;
+}
+
+.train-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: default;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.train-step.clickable {
+  cursor: pointer;
+}
+
+.train-step-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 900;
+  border: 2.5px solid #cbd5e1;
+  background: rgba(255, 255, 255, 0.72);
+  color: #94a3b8;
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.train-step-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: #94a3b8;
+  transition: color 0.3s ease;
+}
+
+/* Active step */
+.train-step.active .train-step-circle {
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 14px rgba(79, 124, 255, 0.38);
+  transform: scale(1.08);
+}
+
+.train-step.active .train-step-label {
+  color: #1e3a8a;
+}
+
+/* Done step */
+.train-step.done .train-step-circle {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.28);
+}
+
+.train-step.done .train-step-label {
+  color: #047857;
+}
+
+/* Connector line */
+.train-step-connector {
+  flex-shrink: 0;
+  width: 48px;
+  height: 3px;
+  margin: 0 6px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  transition: background 0.3s ease;
+}
+
+.train-step-connector.done {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.train-step-connector.active {
+  background: linear-gradient(90deg, #10b981, var(--blue));
+}
+
+/* --- 步驟導航 --- */
+.train-step-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.train-step-nav .spacer {
+  flex: 1;
+}
+
+/* --- 站間時間表 --- */
+.train-station-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 16px 18px;
+  margin-top: 10px;
+  border-radius: 16px;
+  background: rgba(248, 250, 252, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.train-timeline-stop {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  padding: 8px 0;
+}
+
+.train-timeline-dot-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 24px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.train-timeline-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  border: 2.5px solid white;
+  box-shadow: 0 0 0 2px #cbd5e1;
+  z-index: 1;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.train-timeline-stop.origin .train-timeline-dot {
+  background: var(--blue);
+  box-shadow: 0 0 0 2px var(--blue), 0 0 8px rgba(79, 124, 255, 0.35);
+}
+
+.train-timeline-stop.destination .train-timeline-dot {
+  background: #ec4899;
+  box-shadow: 0 0 0 2px #ec4899, 0 0 8px rgba(236, 72, 153, 0.35);
+}
+
+.train-timeline-stop.transfer-stop .train-timeline-dot {
+  background: #f59e0b;
+  box-shadow: 0 0 0 2px #f59e0b, 0 0 8px rgba(245, 158, 11, 0.35);
+}
+
+.train-timeline-line {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2.5px;
+  height: calc(100% + 16px);
+  background: #e2e8f0;
+  z-index: 0;
+}
+
+.train-timeline-stop:last-child .train-timeline-line {
+  display: none;
+}
+
+.train-timeline-info {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+.train-timeline-station {
+  font-weight: 800;
+  font-size: 14px;
+  color: #172033;
+}
+
+.train-timeline-time {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.train-timeline-duration {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 28px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.train-timeline-duration::before {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 1px;
+  background: #cbd5e1;
+}
+
+/* 轉乘標記 */
+.train-transfer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  color: #92400e;
+  background: rgba(254, 243, 199, 0.82);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* --- 訂單確認頁面 --- */
+.train-order-confirm {
+  display: grid;
+  gap: 20px;
+}
+
+.train-confirm-card {
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.train-confirm-card h3 {
+  margin-bottom: 14px;
+  color: #172033;
+  font-size: 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.train-confirm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.train-confirm-item {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(248, 250, 252, 0.72);
+}
+
+.train-confirm-item span {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.train-confirm-item strong {
+  font-size: 15px;
+  color: #172033;
+}
+
+.train-confirm-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(219, 234, 254, 0.72), rgba(243, 232, 255, 0.58)),
+    rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(79, 124, 255, 0.22);
+}
+
+.train-confirm-total span {
+  font-size: 16px;
+  font-weight: 800;
+  color: #334155;
+}
+
+.train-confirm-total strong {
+  font-size: 28px;
+  color: transparent;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* --- 步驟內容面板 --- */
+.train-step-panel {
+  animation: trainFadeIn 0.35s ease;
+}
+
+.train-step-panel .panel {
+  margin-bottom: 16px;
+}
+
+/* --- 付款成功提示 --- */
+.train-payment-success {
+  text-align: center;
+  padding: 40px 24px;
+}
+
+.train-payment-success-icon {
+  font-size: 56px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.train-payment-success h3 {
+  font-size: 24px;
+  color: #172033;
+  margin-bottom: 8px;
+}
+
+.train-payment-success p {
+  color: var(--text-soft);
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* --- 空狀態提示 --- */
+.train-empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-muted);
+}
+
+.train-empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  display: block;
+  opacity: 0.5;
+}
+
+.train-empty-state h3 {
+  font-size: 18px;
+  color: #475569;
+  margin-bottom: 6px;
+}
+
+.train-empty-state p {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+/* --- 分頁內容面板標題 --- */
+.train-section-header {
+  margin-bottom: 16px;
+}
+
+.train-section-header h2 {
+  color: #172033;
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.train-section-header p {
+  color: var(--text-soft);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* --- 響應式 --- */
+@media (max-width: 768px) {
+  .train-tabs {
+    gap: 4px;
+    padding: 6px;
+    border-radius: 14px;
+  }
+
+  .train-tab {
+    padding: 10px 10px;
+    font-size: 12px;
+    gap: 4px;
+  }
+
+  .train-tab-icon {
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+
+  .train-stepper {
+    padding: 14px 12px;
+    gap: 0;
+    border-radius: 14px;
+  }
+
+  .train-step-circle {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+
+  .train-step-label {
+    font-size: 11px;
+  }
+
+  .train-step-connector {
+    width: 24px;
+    margin: 0 3px;
+  }
+
+  .train-step-nav {
+    flex-wrap: wrap;
+  }
+
+  .train-confirm-total strong {
+    font-size: 22px;
+  }
+
+  .train-station-timeline {
+    padding: 12px 14px;
+  }
+}
+
+/* --- 票夾切換與逐張分票 --- */
+.train-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.train-folder-switcher {
+  margin-top: 0;
+  flex-shrink: 0;
+}
+
+.train-split-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px;
+  border: 1px dashed rgba(37, 99, 235, 0.35);
+  border-radius: 14px;
+  background: rgba(37, 99, 235, 0.05);
+}
+
+.train-split-seat-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.checkbox-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  color: #334155;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.train-inline-input {
+  min-width: 220px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  font-weight: 700;
+}
+
+.muted-text {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .train-section-header {
+    flex-direction: column;
+  }
+
+  .train-folder-switcher,
+  .train-inline-input {
+    width: 100%;
+  }
+}

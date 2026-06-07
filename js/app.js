@@ -12,6 +12,8 @@ async function initializeApp() {
   await loadRooms();
   loadAppData();
 
+  initCrossTabSync();
+
   renderAll();
 
   if (location.hash.includes("itineraryShare=")) {
@@ -27,6 +29,34 @@ async function initializeApp() {
   if (homeBtn) {
     homeBtn.click();
   }
+}
+
+// ===== 跨分頁資料同步 =====
+// 背景：本應用的共用資料（已註冊使用者名單、行程、訂單等）都存在 localStorage，
+// 但 localStorage 只是「儲存層」會在分頁之間共享，JS 記憶體中的變數
+//（let users / let itineraries ...）卻是「每個分頁各自獨立」的，
+// 只有在該分頁載入當下才會從 localStorage 讀進記憶體一次，之後不會自動更新。
+//
+// 因此會出現：分頁 A 註冊了「小美」、分頁 B 註冊了「小明」之後，
+// 回到分頁 A 邀請「小明」當旅伴時，分頁 A 記憶體中過時的 users 名單裡根本沒有
+// 「小明」，因而顯示「找不到使用者」。
+//
+// 監聽瀏覽器原生的 storage 事件——當「其他分頁」修改了 localStorage 時，
+// 目前分頁就會收到通知，藉此把記憶體同步成最新內容並重新渲染畫面。
+// 注意：對於使用者名單（AUTH_STORAGE_KEY）只同步 users 陣列本身，
+// 刻意不呼叫會一併覆寫 currentUser / isLoggedIn 的 loadAuthState()，
+// 避免別的分頁登入/登出而連帶影響到本分頁目前的登入狀態。
+function initCrossTabSync() {
+  window.addEventListener("storage", (event) => {
+    // event.key 為 null 代表整個 storage 被清空（例如呼叫了 localStorage.clear()）
+    if (event.key === null || event.key === AUTH_STORAGE_KEY) {
+      syncUsersFromStorage();
+    }
+    if (event.key === null || event.key === APP_STORAGE_KEY) {
+      loadAppData();
+      renderAll();
+    }
+  });
 }
 
 // ===== 全域 UI 重新渲染 =====

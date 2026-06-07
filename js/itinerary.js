@@ -227,8 +227,17 @@ function renderItineraryModule() {
   section.classList.toggle("readonly-mode", isReadonlyMode);
   renderReadonlyItineraryShare(readonlyItinerary);
 
-  // 唯讀分享模式：不渲染任何編輯介面，直接結束
-  if (isReadonlyMode) return;
+  // 唯讀分享模式：隱藏全部 UI，只顯示行程內容
+  if (isReadonlyMode) {
+    document.body.classList.add("itinerary-share-view");
+    // 強制讓 itinerary section 顯示，其餘全隱藏
+    document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
+    section.classList.add("active");
+    return;
+  }
+
+  // 非分享模式：移除全螢幕 class
+  document.body.classList.remove("itinerary-share-view");
 
   if (!isLoggedIn || !currentUser) {
     renderLoggedOutItineraryState(null);
@@ -844,7 +853,7 @@ function renderItineraryCard(itinerary) {
             ? `<span class="itinerary-card-status done">已完成</span>`
             : `<select onchange="updateItineraryStatus('${itinerary.id}', this.value)">
                 <option value="規劃中" ${itinerary.status === "規劃中" ? "selected" : ""}>規劃中</option>
-                <option value="已取消" ${itinerary.status === "已取消" ? "selected" : ""}>已取消</option>
+                <option value="已取消" ${itinerary.status === "已取消" ? "selected" : ""}>取消</option>
               </select>`
           }
           <button class="danger-btn" onclick="deleteItinerary('${itinerary.id}')">刪除</button>
@@ -1035,6 +1044,12 @@ function renderItineraryItemCard(itinerary, day, item) {
         </div>
         <div class="itinerary-item-controls">
           <input${d} type="time" value="${escapeAttribute(item.time || "09:00")}" onchange="updateItineraryItemField(${day.day}, '${item.id}', 'time', this.value)" />
+          ${item.type === "交通" && (item.name || "").includes("車站")
+            ? `<button class="shortcut-btn train-shortcut-btn" onclick="event.stopPropagation(); goToTrainBookingFromItem('${itinerary.id}', ${day.day}, '${item.id}')">訂火車票</button>`
+            : ""}
+          ${item.type === "住宿"
+            ? `<button class="shortcut-btn lodging-shortcut-btn" onclick="event.stopPropagation(); goToLodgingBookingFromItem('${itinerary.id}', ${day.day}, '${item.id}')">訂住宿</button>`
+            : ""}
           <button${d} class="secondary-btn" onclick="toggleItineraryItemNotes('${item.id}')">${expanded ? "收合" : "備註"}</button>
           <button${d} class="danger-btn" onclick="removeItineraryItem(${day.day}, '${item.id}')">刪除</button>
         </div>
@@ -1051,6 +1066,85 @@ function renderItineraryItemCard(itinerary, day, item) {
       </div>
     </article>
   `;
+}
+
+// ── 從行程項目跳轉至火車訂票並帶入資料 ──────────────────────
+function goToTrainBookingFromItem(itineraryId, dayNumber, itemId) {
+  const itinerary = findItinerary(itineraryId);
+  if (!itinerary) return;
+
+  // 使用既有的 helper 取得 day 與 item
+  const item = findItineraryItem(itinerary, dayNumber, itemId);
+
+  // 計算該天對應的日曆日期（startDate + dayNumber - 1）
+  const travelDate = itinerary.startDate
+    ? addDays(itinerary.startDate, Number(dayNumber) - 1)
+    : "";
+
+  // 從目的地或項目名稱推測抵達站
+  const dest          = itinerary.destination || "";
+  const knownStations = ["台北","松山","桃園","新竹","台中","彰化","嘉義","台南","高雄","花蓮","玉里","台東"];
+  const toStation     = knownStations.find(s => dest.includes(s) || (item?.name || "").includes(s)) || "台東";
+  const fromStation   = toStation === "台北" ? "台東" : "台北";
+
+  // 切換頁面 → 火車票務
+  showSection("train");
+
+  // 等 DOM 渲染後再帶入資料
+  setTimeout(() => {
+    // 切回訂票分頁（Step 1）
+    if (typeof switchTrainTab === "function") switchTrainTab("booking");
+    if (typeof goToTrainStep  === "function") goToTrainStep(0);
+
+    // 帶入搜尋條件
+    const fromEl   = document.getElementById("trainFromStation");
+    const toEl     = document.getElementById("trainToStation");
+    const dateEl   = document.getElementById("trainDate");
+    const periodEl = document.getElementById("trainPeriod");
+
+    if (fromEl)              fromEl.value   = fromStation;
+    if (toEl)                toEl.value     = toStation;
+    if (dateEl && travelDate) dateEl.value  = travelDate;
+    if (periodEl)            periodEl.value = "all";
+
+    // 自動觸發查詢
+    if (typeof searchTrains === "function") searchTrains();
+  }, 150);
+}
+
+// ── 從行程項目跳轉至住宿訂房並帶入資料 ──────────────────────
+function goToLodgingBookingFromItem(itineraryId, dayNumber, itemId) {
+  const itinerary = findItinerary(itineraryId);
+  if (!itinerary) return;
+
+  // 使用既有的 helper 取得 item
+  const item = findItineraryItem(itinerary, dayNumber, itemId);
+
+  // 計算入住日（該天）和退房日（下一天）
+  const checkIn  = itinerary.startDate
+    ? addDays(itinerary.startDate, Number(dayNumber) - 1)
+    : "";
+  const checkOut = checkIn ? addDays(checkIn, 1) : "";
+
+  // 切換頁面 → 住宿搜尋
+  showSection("search");
+
+  setTimeout(() => {
+    // 帶入搜尋日期
+    const ciEl = document.getElementById("checkIn");
+    const coEl = document.getElementById("checkOut");
+    if (ciEl && checkIn)  ciEl.value  = checkIn;
+    if (coEl && checkOut) coEl.value  = checkOut;
+
+    // 如果項目有綁定特定房源 → 直接開啟房源詳情
+    if (item && item.roomId && typeof showRoomDetail === "function") {
+      showRoomDetail(item.roomId);
+    }
+
+    // 更新日期摘要顯示
+    if (typeof syncBookingDateConstraints  === "function") syncBookingDateConstraints();
+    if (typeof updateBookingDateSummary    === "function") updateBookingDateSummary();
+  }, 150);
 }
 
 function renderCollaborationPanel(itinerary) {
@@ -1161,7 +1255,7 @@ function renderVotingPanel(itinerary) {
                   <div class="inline-control compact">
                     <input id="voteNewOption-${vote.id}" placeholder="新增選項" />
                     <button class="secondary-btn" onclick="addVoteOption('${itinerary.id}', '${vote.id}')">加入</button>
-                    ${isOwner ? `<button class="danger-btn" onclick="closeItineraryVote('${itinerary.id}', '${vote.id}')">結束投票</button>` : ""}
+                    ${isVoteCreator(vote) ? `<button class="danger-btn" onclick="closeItineraryVote('${itinerary.id}', '${vote.id}')">結束投票</button>` : ""}
                   </div>
                 ` : ""}
               </div>
@@ -1187,7 +1281,7 @@ function renderVotingPanel(itinerary) {
                       ${!ended ? `
                         <div class="actions">
                           <button class="${hasVoted ? "danger-btn" : "secondary-btn"}" onclick="toggleVoteOption('${itinerary.id}', '${vote.id}', '${option.id}')">${hasVoted ? "取消" : "投票"}</button>
-                          ${isOwner ? `<button class="danger-btn" onclick="deleteVoteOption('${itinerary.id}', '${vote.id}', '${option.id}')">刪除</button>` : ""}
+                          ${isVoteCreator(vote) ? `<button class="danger-btn" onclick="deleteVoteOption('${itinerary.id}', '${vote.id}', '${option.id}')">刪除</button>` : ""}
                         </div>
                       ` : ""}
                     </div>
@@ -1331,10 +1425,16 @@ function renderBudgetPanel(itinerary) {
     <h3>費用紀錄</h3>
     <div class="expense-list">
       ${(itinerary.expenses || []).length === 0 ? `<div class="notice warning">尚無費用紀錄。</div>` : (itinerary.expenses || []).map(expense => `
-        <div class="expense-item">
-          <strong>${escapeHtml(expense.type)}｜NT$ ${Number(expense.amount || 0).toLocaleString()}</strong>
-          <span>付款人：${escapeHtml(getUserNameById(expense.payerId))}｜${escapeHtml(expense.time || "")}</span>
-          <p>${escapeHtml(expense.note || "")}</p>
+        <div class="expense-item" id="expense-item-${expense.id}">
+          <div class="expense-item-info">
+            <strong>${escapeHtml(expense.type)}｜NT$ ${Number(expense.amount || 0).toLocaleString()}</strong>
+            <span>付款人：${escapeHtml(getUserNameById(expense.payerId))}｜${escapeHtml(expense.time || "")}</span>
+            ${expense.note ? `<p>${escapeHtml(expense.note)}</p>` : ""}
+          </div>
+          <div class="expense-item-actions">
+            <button class="secondary-btn small-btn" onclick="startEditExpense('${itinerary.id}', '${expense.id}')">編輯</button>
+            <button class="danger-btn small-btn" onclick="deleteItineraryExpense('${itinerary.id}', '${expense.id}')">刪除</button>
+          </div>
         </div>
       `).join("")}
     </div>
@@ -1807,6 +1907,7 @@ function createItineraryVote(itineraryId) {
     title,
     options: [{ id: createItineraryId("opt"), name: optionName, voterIds: [] }],
     createdById: currentUser.id,
+    createdByAccount: currentUser.account,  // 用 account 比對更穩定
     createdAt: nowText(),
     ...(deadline ? { deadline } : {})
   };
@@ -1876,13 +1977,13 @@ function toggleVoteOption(itineraryId, voteId, optionId) {
 
 function deleteVoteOption(itineraryId, voteId, optionId) {
   const itinerary = findItinerary(itineraryId);
-  if (!itinerary || !isItineraryOwner(itinerary)) {
-    alert("只有主邀約人可以刪除投票選項。");
-    return;
-  }
+  if (!itinerary) return;
 
   const vote = findVote(itinerary, voteId);
-  if (!vote) return;
+  if (!isVoteCreator(vote)) {
+    alert("只有建立投票的人可以刪除投票選項。");
+    return;
+  }
 
   const option = vote.options.find(item => item.id === optionId);
   vote.options = vote.options.filter(item => item.id !== optionId);
@@ -1900,6 +2001,13 @@ function isVoteEnded(vote) {
   return false;
 }
 
+// 判斷目前登入者是否為投票建立者（account 優先，id 為備援）
+function isVoteCreator(vote) {
+  if (!currentUser || !vote) return false;
+  if (vote.createdByAccount && currentUser.account === vote.createdByAccount) return true;
+  return String(currentUser.id) === String(vote.createdById);
+}
+
 // 取得票數最多的勝出選項，平手時回傳第一個，無人投票回傳 null
 function getVoteWinner(vote) {
   const options = vote.options || [];
@@ -1909,15 +2017,15 @@ function getVoteWinner(vote) {
   return options.find(opt => (opt.voterIds || []).length === maxVotes) || null;
 }
 
-// 發起人手動結束投票
+// 建立投票的人可以手動結束投票
 function closeItineraryVote(itineraryId, voteId) {
   const itinerary = findItinerary(itineraryId);
-  if (!itinerary || !isItineraryOwner(itinerary)) {
-    alert("只有發起人可以結束投票。");
+  if (!itinerary) return;
+  const vote = findVote(itinerary, voteId);
+  if (!isVoteCreator(vote)) {
+    alert("只有建立投票的人可以結束投票。");
     return;
   }
-  const vote = findVote(itinerary, voteId);
-  if (!vote) return;
 
   if (!confirm(`確定要結束投票「${vote.title}」嗎？結束後將無法繼續投票。`)) return;
 
@@ -2049,7 +2157,7 @@ function addItineraryExpense(itineraryId) {
     type,
     payerId,
     note,
-    splits: splitExpenseEqually(amount, members.map(member => member.id)),
+    splits: splitExpenseEqually(amount, members.map(member => member.id), payerId),
     createdById: currentUser.id,
     time: nowText()
   };
@@ -2077,6 +2185,109 @@ function addItineraryExpense(itineraryId) {
 
   renderAll();
   ItineraryEventBus.emit("expense:added", { itinerary, expense });
+}
+
+// ── 刪除費用紀錄 ──────────────────────────────────────────
+function deleteItineraryExpense(itineraryId, expenseId) {
+  const itinerary = findItinerary(itineraryId);
+  if (!itinerary) return;
+
+  const expense = (itinerary.expenses || []).find(e => e.id === expenseId);
+  if (!expense) return;
+
+  if (!confirm(`確定要刪除這筆費用嗎？\n${expense.type}｜NT$ ${Number(expense.amount || 0).toLocaleString()}`)) return;
+
+  itinerary.expenses = itinerary.expenses.filter(e => e.id !== expenseId);
+
+  addItineraryLog(itinerary, "刪除費用", `${expense.type} NT$ ${Number(expense.amount || 0).toLocaleString()}。`);
+  touchItinerary(itinerary);
+  saveAppData();
+  renderAll();
+}
+
+// ── 開始編輯費用（展開行內表單）──────────────────────────────
+function startEditExpense(itineraryId, expenseId) {
+  const itinerary = findItinerary(itineraryId);
+  if (!itinerary) return;
+
+  const expense = (itinerary.expenses || []).find(e => e.id === expenseId);
+  if (!expense) return;
+
+  const members = getItineraryMembers(itinerary);
+  const container = document.getElementById(`expense-item-${expenseId}`);
+  if (!container) return;
+
+  const typeOptions = ["餐飲", "交通", "住宿", "門票", "其他"]
+    .map(t => `<option value="${t}" ${t === expense.type ? "selected" : ""}>${t}</option>`)
+    .join("");
+
+  const payerOptions = members
+    .map(m => `<option value="${escapeAttribute(m.id)}" ${String(m.id) === String(expense.payerId) ? "selected" : ""}>${escapeHtml(m.displayName || m.account)}</option>`)
+    .join("");
+
+  // 將該筆紀錄替換成可編輯的行內表單
+  container.innerHTML = `
+    <div class="expense-edit-form">
+      <div class="expense-edit-grid">
+        <div>
+          <label>費用金額</label>
+          <input id="edit-expense-amount-${expenseId}" type="number" min="0" value="${Number(expense.amount || 0)}" />
+        </div>
+        <div>
+          <label>費用類型</label>
+          <select id="edit-expense-type-${expenseId}">${typeOptions}</select>
+        </div>
+        <div>
+          <label>付款人</label>
+          <select id="edit-expense-payer-${expenseId}">${payerOptions}</select>
+        </div>
+        <div>
+          <label>費用備註</label>
+          <input id="edit-expense-note-${expenseId}" type="text" value="${escapeAttribute(expense.note || "")}" placeholder="例如 午餐、包車訂金" />
+        </div>
+      </div>
+      <div class="expense-edit-actions">
+        <button class="primary-btn small-btn" onclick="saveEditExpense('${itineraryId}', '${expenseId}')">儲存</button>
+        <button class="secondary-btn small-btn" onclick="renderAll()">取消</button>
+      </div>
+    </div>
+  `;
+}
+
+// ── 儲存編輯結果 ──────────────────────────────────────────
+function saveEditExpense(itineraryId, expenseId) {
+  const itinerary = findItinerary(itineraryId);
+  if (!itinerary) return;
+
+  const expense = (itinerary.expenses || []).find(e => e.id === expenseId);
+  if (!expense) return;
+
+  const amount  = Number(document.getElementById(`edit-expense-amount-${expenseId}`)?.value || 0);
+  const type    = document.getElementById(`edit-expense-type-${expenseId}`)?.value || expense.type;
+  const payerId = document.getElementById(`edit-expense-payer-${expenseId}`)?.value || expense.payerId;
+  const note    = (document.getElementById(`edit-expense-note-${expenseId}`)?.value || "").trim();
+
+  if (!amount || amount <= 0) {
+    alert("費用金額必須大於 0。");
+    return;
+  }
+  if (!payerId) {
+    alert("請選擇付款人。");
+    return;
+  }
+
+  // 重新計算均分
+  const members = getItineraryMembers(itinerary);
+  expense.amount  = amount;
+  expense.type    = type;
+  expense.payerId = payerId;
+  expense.note    = note;
+  expense.splits  = splitExpenseEqually(amount, members.map(m => m.id), payerId);
+
+  addItineraryLog(itinerary, "編輯費用", `${type} NT$ ${amount.toLocaleString()}。`);
+  touchItinerary(itinerary);
+  saveAppData();
+  renderAll();
 }
 
 // 產生唯讀連結並直接複製（不觸發 renderAll 避免頁面跳動）
@@ -2502,9 +2713,15 @@ function getExpensePaidMap(itinerary) {
 
 function getExpenseSplitMap(itinerary) {
   return (itinerary.expenses || []).reduce((map, expense) => {
-    const splits = Array.isArray(expense.splits) && expense.splits.length > 0
-      ? expense.splits
-      : splitExpenseEqually(Number(expense.amount || 0), getItineraryMembers(itinerary).map(member => member.id));
+    // 一律即時重新計算均分結果（而非採用舊資料中儲存的 splits 快取）。
+    // 原因：本功能目前沒有「自訂分攤金額」，每次都是均分，
+    // 沿用舊快取只會讓修正前產生的資料持續沿用過時的捨入分配邏輯，
+    // 也會在旅伴名單變動後產生不同步的分攤結果。即時重算可同時修復這兩個問題。
+    const splits = splitExpenseEqually(
+      Number(expense.amount || 0),
+      getItineraryMembers(itinerary).map(member => member.id),
+      expense.payerId
+    );
 
     splits.forEach(split => {
       const key = String(split.userId);
@@ -2550,23 +2767,41 @@ function calcSettlement(itinerary) {
   return transactions;
 }
 
-function splitExpenseEqually(amount, userIds) {
+function splitExpenseEqually(amount, userIds, payerId) {
   const ids = Array.isArray(userIds) ? userIds : [];
   if (ids.length === 0) return [];
 
   const share = Math.floor(Number(amount || 0) / ids.length);
   let remainder = Number(amount || 0) - share * ids.length;
 
-  return ids.map(userId => {
+  // 無條件捨去後一定會有餘數（例如 123 / 2 = 61 餘 1），這 1 元一定要有人多負擔。
+  // 為了避免「同一人」每次都被分到較多份額而長期吃虧，
+  // 讓「這筆費用的付款人」優先吸收捨入餘數——
+  // 因為他本來就已經實際付出了完整金額，多扛一點分攤額剛好能讓帳目互相抵銷，
+  // 多筆費用累積下來，每個人付款與分攤的差額會自然趨近於 0。
+  const orderedIds = payerId != null
+    ? [...ids].sort((a, b) => {
+        const aIsPayer = String(a) === String(payerId);
+        const bIsPayer = String(b) === String(payerId);
+        if (aIsPayer === bIsPayer) return 0;
+        return aIsPayer ? -1 : 1;
+      })
+    : ids;
+
+  const splitsByUserId = new Map();
+  orderedIds.forEach(userId => {
     const extra = remainder > 0 ? 1 : 0;
     remainder -= extra;
-    return {
+    splitsByUserId.set(String(userId), {
       id: createItineraryId("split"),
       userId,
       amountOwed: share + extra,
       isSettled: false
-    };
+    });
   });
+
+  // 回傳順序仍依原始成員順序排列，保持顯示與既有行為一致
+  return ids.map(userId => splitsByUserId.get(String(userId)));
 }
 
 function findVote(itinerary, voteId) {

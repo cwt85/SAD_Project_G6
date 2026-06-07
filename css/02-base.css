@@ -1,0 +1,37 @@
+/* 02. Base - Reset, Scrollbar
+   SMACSS Layer: Base */
+
+/* =========================================================
+   15. Footer / Helper
+========================================================= */
+
+.hidden {
+  display: none;
+}
+
+footer {
+  padding: 24px;
+  text-align: center;
+  color: #475569;
+}
+
+
+/* =========================================================
+   16. Scrollbar
+========================================================= */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+}
+
+
