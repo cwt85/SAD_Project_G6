@@ -83,6 +83,8 @@ let currentTrainTab = "booking";
 let currentTrainTicketFolder = "mine";
 let lastCreatedTrainOrderId = null;
 let trainBookingFormData = null;
+// 記錄上次查詢條件，供 _restoreTrainSearchState 在重繪後還原
+let lastTrainSearchCriteria = null;
 
 /* =========================================================
    主要渲染入口
@@ -316,10 +318,29 @@ function renderStep1_SearchTrains(container) {
 }
 
 function _restoreTrainSearchState() {
+  const c = lastTrainSearchCriteria;
+
+  // 還原出發/抵達站
   const fromSelect = document.getElementById("trainFromStation");
-  const toSelect = document.getElementById("trainToStation");
-  if (fromSelect) fromSelect.value = fromSelect.querySelector(`option[value="台北"]`) ? "台北" : "";
-  if (toSelect) toSelect.value = toSelect.querySelector(`option[value="台東"]`) ? "台東" : "";
+  const toSelect   = document.getElementById("trainToStation");
+  if (fromSelect) fromSelect.value = c ? c.fromStation : (fromSelect.querySelector('option[value="台北"]') ? "台北" : "");
+  if (toSelect)   toSelect.value   = c ? c.toStation   : (toSelect.querySelector('option[value="台東"]')   ? "台東" : "");
+
+  // 還原日期
+  const dateInput = document.getElementById("trainDate");
+  if (dateInput && c && c.travelDate) dateInput.value = c.travelDate;
+
+  // 還原時段
+  const periodSelect = document.getElementById("trainPeriod");
+  if (periodSelect && c && c.period) periodSelect.value = c.period;
+
+  // 還原車廂（這是 Bug 所在：未還原導致重繪後車廂被重設為標準車廂）
+  const cabinSelect = document.getElementById("trainCabinFilter");
+  if (cabinSelect && c && c.cabin) cabinSelect.value = c.cabin;
+
+  // 還原含轉乘核取方塊
+  const transferCheck = document.getElementById("trainAllowTransfer");
+  if (transferCheck && c) transferCheck.checked = Boolean(c.allowTransfer);
 }
 
 function populateTrainStationSelects() {
@@ -368,6 +389,9 @@ function searchTrains() {
     showNotice(notice, "error", "出發站與抵達站不可相同。");
     return;
   }
+
+  // 儲存本次搜尋條件，讓 _restoreTrainSearchState 在重繪後能還原所有欄位
+  lastTrainSearchCriteria = { fromStation, toStation, travelDate, period, cabin, allowTransfer };
 
   lastTrainSearchResults = buildTrainSearchResults({
     fromStation,
@@ -1775,6 +1799,10 @@ function calculateTrainPrice(result, ticketType = "general", useLodgingDiscount 
   const earlyBird = getTrainEarlyBirdDiscount(result);
   if (earlyBird.factor < 1) candidates.push(earlyBird);
 
+  // 時間折扣（需求第六節）：距發車越近折扣越大，與早鳥折扣取最優惠
+  const timeDiscount = getTrainTimeDiscount(result);
+  if (timeDiscount.factor < 1) candidates.push(timeDiscount);
+
   const lodgingDiscount = getTrainLodgingDiscountInfo();
   if (useLodgingDiscount && lodgingDiscount.eligible) {
     candidates.push({ label: lodgingDiscount.label, factor: lodgingDiscount.factor });
@@ -1799,6 +1827,26 @@ function getTrainEarlyBirdDiscount(result) {
   if (days >= 7) return { label: "早鳥優惠", factor: 0.8 };
   if (days >= 3) return { label: "早鳥優惠", factor: 0.9 };
   return { label: "早鳥折扣", factor: 1 };
+}
+
+/**
+ * 時間折扣（需求第六節）：距發車越近折扣越大，僅限對號列車。
+ * 與早鳥折扣並存，calculateTrainPrice 取兩者中最優惠者。
+ * - 1-3 天內：95折
+ * - 12-24 小時：88折
+ * - 6-12 小時：85折
+ * - 6 小時內：70折
+ */
+function getTrainTimeDiscount(result) {
+  if (!result.reservedTrain) return { label: "時間折扣", factor: 1 };
+  const departAt = getTrainDateTime(result.travelDate, result.departTime);
+  const hoursUntilDepart = (departAt - Date.now()) / (1000 * 60 * 60);
+  if (hoursUntilDepart <= 0) return { label: "時間折扣", factor: 1 };
+  if (hoursUntilDepart <= 6)  return { label: "時間折扣（6小時內）", factor: 0.70 };
+  if (hoursUntilDepart <= 12) return { label: "時間折扣（6-12小時）", factor: 0.85 };
+  if (hoursUntilDepart <= 24) return { label: "時間折扣（12-24小時）", factor: 0.88 };
+  if (hoursUntilDepart <= 72) return { label: "時間折扣（1-3天）", factor: 0.95 };
+  return { label: "時間折扣", factor: 1 };
 }
 
 function getTrainLodgingDiscountInfo() {
