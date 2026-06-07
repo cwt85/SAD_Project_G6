@@ -91,7 +91,7 @@ function updateLoginMode() {
   if (passwordGroup) passwordGroup.style.display = "block";
 
   if (role === "admin") {
-    if (accountInput) accountInput.placeholder = DEFAULT_ADMIN_ACCOUNT;
+    if (accountInput) accountInput.placeholder = "請輸入管理員帳號";
     if (passwordInput) passwordInput.placeholder = "請輸入管理員密碼";
   } else {
     if (accountInput) accountInput.placeholder = "example@mail.com / 0912345678";
