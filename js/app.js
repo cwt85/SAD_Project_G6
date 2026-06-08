@@ -201,6 +201,9 @@ function renderHomeDashboard() {
   const dashboard = document.getElementById("homeDashboard");
   if (!dashboard) return;
 
+  const isAdminUser = typeof isAdmin === "function"
+    ? isAdmin()
+    : Boolean(isLoggedIn && currentUser && currentUser.role === "admin");
   const visibleTrips = isLoggedIn && currentUser && typeof getVisibleItineraries === "function"
     ? getVisibleItineraries()
     : [];
@@ -211,7 +214,15 @@ function renderHomeDashboard() {
   const userTrainOrders = isLoggedIn && currentUser
     ? trainOrders.filter(order => isAdmin() || String(order.userId) === String(currentUser.id) || String(order.holderUserId || "") === String(currentUser.id))
     : [];
-  const totalPoints = typeof getCurrentBonusPoints === "function" ? getCurrentBonusPoints() : Number(trainBonusPoints || 0);
+  const totalPoints = !isAdminUser && typeof getCurrentBonusPoints === "function"
+    ? getCurrentBonusPoints()
+    : Number(trainBonusPoints || 0);
+  const bonusSummaryHtml = isLoggedIn && currentUser && !isAdminUser ? `
+      <div class="summary-item">
+        <span>紅利點數</span>
+        <strong id="summaryBonusPointsText">${Number(totalPoints || 0).toLocaleString()} 點</strong>
+      </div>
+  ` : "";
 
   dashboard.innerHTML = `
     <div class="home-dashboard-grid">
@@ -231,10 +242,8 @@ function renderHomeDashboard() {
         <span>車票訂單</span>
         <strong>${userTrainOrders.length}</strong>
       </div>
-<div class="summary-item">
-  <span>紅利點數</span>
-  <strong id="summaryBonusPointsText">${Number(totalPoints || 0).toLocaleString()} 點</strong>
-</div>
+      ${bonusSummaryHtml}
+    </div>
   `;
 }
 

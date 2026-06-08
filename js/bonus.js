@@ -5,9 +5,15 @@
 ========================================================= */
 
 function getCurrentBonusPoints() {
-  if (!currentUser) return 0;
+  if (!currentUser || isAdminBonusUser()) return 0;
   syncLegacyBonusPoints();
   return getUserBonusPoints(currentUser.id);
+}
+
+function isAdminBonusUser() {
+  return typeof isAdmin === "function"
+    ? isAdmin()
+    : Boolean(isLoggedIn && currentUser && currentUser.role === "admin");
 }
 
 function getUserBonusPoints(userId) {
@@ -23,7 +29,7 @@ function getUserBonusPoints(userId) {
 }
 
 function syncLegacyBonusPoints() {
-  if (!currentUser) return;
+  if (!currentUser || isAdminBonusUser()) return;
 
   const userId = String(currentUser.id);
 
@@ -180,16 +186,18 @@ function recordBonusPointChange({ userId, type, amount, reason, source, balance 
 }
 
 function getVisibleBonusRecords(limit = 5) {
-  if (!isLoggedIn || !currentUser) return [];
+  if (!isLoggedIn || !currentUser || isAdminBonusUser()) return [];
 
   return bonusPointRecords
-    .filter(record => isAdmin() || String(record.userId) === String(currentUser.id))
+    .filter(record => String(record.userId) === String(currentUser.id))
     .slice(0, limit);
 }
 
 function renderBonusPointBar() {
   const bar = document.getElementById("bonusPointBar");
   if (!bar) return;
+
+  bar.style.display = "";
 
   if (!isLoggedIn || !currentUser) {
     bar.innerHTML = `
@@ -200,6 +208,12 @@ function renderBonusPointBar() {
         </div>
       </div>
     `;
+    return;
+  }
+
+  if (isAdminBonusUser()) {
+    bar.innerHTML = "";
+    bar.style.display = "none";
     return;
   }
 

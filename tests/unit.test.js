@@ -2258,6 +2258,25 @@ describe('bonus.js — 紅利點數管理', () => {
     });
   });
 
+  describe('管理員紅利點數', () => {
+    test('管理員登入時目前紅利點數固定為 0', () => {
+      const admin = { id: 1, account: 'admin@example.com', role: 'admin', displayName: '系統管理員' };
+      ctx.__setUserBonusPoint('1', 500);
+      ctx.__setLoginState(true, admin);
+
+      expect(ctx.getUserBonusPoints(1)).toBe(500);
+      expect(ctx.getCurrentBonusPoints()).toBe(0);
+    });
+
+    test('管理員不顯示紅利紀錄', () => {
+      ctx.addBonusPoints(100, '測試核發', 'system', 2);
+      const admin = { id: 1, account: 'admin@example.com', role: 'admin', displayName: '系統管理員' };
+      ctx.__setLoginState(true, admin);
+
+      expect(ctx.getVisibleBonusRecords()).toEqual([]);
+    });
+  });
+
   describe('addBonusPoints()', () => {
     test('成功新增點數並回傳 true', () => {
       const result = ctx.addBonusPoints(100, '測試核發', 'system', 2);
