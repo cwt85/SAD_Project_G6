@@ -83,6 +83,7 @@ function updateNavigation() {
   const favoriteBtn = document.querySelector("nav button[onclick*=\"favorite\"]");
   const cartBtn = document.querySelector("nav button[onclick*=\"cart\"]");
   const orderBtn = document.querySelector("nav button[onclick*=\"order\"]");
+  const orderTitle = document.querySelector("#orders h2");
   const itineraryBtn = document.querySelector('nav button[data-section="itinerary"]');
   const trainBtn = document.querySelector('nav button[data-section="train"]');
   const homeBtn = document.querySelector('nav button[data-section="home"]');
@@ -105,6 +106,11 @@ function updateNavigation() {
 
   if (orderBtn) {
     orderBtn.style.display = !isLoggedIn ? "none" : "block";
+    orderBtn.innerHTML = isAdminUser ? "訂單管理" : "歷史訂單";
+  }
+
+  if (orderTitle) {
+    orderTitle.textContent = isAdminUser ? "訂單管理" : "歷史訂單";
   }
 
   if (itineraryBtn) {
