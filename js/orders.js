@@ -2,6 +2,10 @@
    購物車、訂單、付款、退款與評價功能 (orders.js)
 ========================================================= */
 
+const LODGING_LONG_STAY_DISCOUNT_MIN_NIGHTS = 2;
+const LODGING_LONG_STAY_DISCOUNT_RATE = 0.8;
+const LODGING_LONG_STAY_DISCOUNT_LABEL = "訂房兩晚以上八折優惠";
+
 // ===== 收藏功能 =====
 function addFavorite(roomId) {
   if (!requireCustomer()) return;
@@ -131,6 +135,26 @@ function getUserSavedItems(items) {
   return items.filter(item =>
     String(item.userId || currentUser.id) === String(currentUser.id)
   );
+}
+
+function getLodgingOrderPricing(pricePerNight, nights) {
+  const unitPrice = Number(pricePerNight) || 0;
+  const stayNights = Number(nights) || 0;
+  const originalAmount = unitPrice * stayNights;
+  const discountEligible = stayNights >= LODGING_LONG_STAY_DISCOUNT_MIN_NIGHTS && originalAmount > 0;
+  const finalAmount = discountEligible
+    ? Math.round(originalAmount * LODGING_LONG_STAY_DISCOUNT_RATE)
+    : originalAmount;
+  const discountAmount = Math.max(0, originalAmount - finalAmount);
+
+  return {
+    originalAmount,
+    amount: finalAmount,
+    discountEligible,
+    discountAmount,
+    discountRate: discountEligible ? LODGING_LONG_STAY_DISCOUNT_RATE : 1,
+    discountLabel: discountEligible ? LODGING_LONG_STAY_DISCOUNT_LABEL : ""
+  };
 }
 
 // ===== 建立收藏 / 購物車表格 =====
@@ -785,7 +809,8 @@ async function createOrder(roomId, source = "search") {
     }
 
     const pricePerNight = Number(selectedType.price) || Number(room.price) || 0;
-    const totalAmount = pricePerNight * booking.nights;
+    const pricing = getLodgingOrderPricing(pricePerNight, booking.nights);
+    const totalAmount = pricing.amount;
 
     if (totalAmount <= 0) {
       showDialogNotice("error", "價格計算失敗，請重新操作。");
@@ -797,7 +822,7 @@ async function createOrder(roomId, source = "search") {
       selectedType,
       booking,
       pricePerNight,
-      totalAmount
+      pricing
     });
 
     if (!confirmed) return;
@@ -824,7 +849,13 @@ async function createOrder(roomId, source = "search") {
       nights: booking.nights,
       people: booking.guests,
       pricePerNight,
-      amount: totalAmount,
+      originalAmount: pricing.originalAmount,
+      amount: pricing.amount,
+      discountEligible: pricing.discountEligible,
+      discountRate: pricing.discountRate,
+      discountAmount: pricing.discountAmount,
+      discountLabel: pricing.discountLabel,
+      discountStatus: pricing.discountEligible ? "付款成功後套用" : "",
       bookingStatus: "已確認",
       paymentStatus: "未付款",
       status: "已確認 / 未付款",
@@ -865,7 +896,7 @@ async function createOrder(roomId, source = "search") {
   }
 }
 
-function showOrderConfirmDialog({ room, selectedType, booking, pricePerNight, totalAmount }) {
+function showOrderConfirmDialog({ room, selectedType, booking, pricePerNight, pricing }) {
   if (typeof document === "undefined" || !document.body) {
     return Promise.resolve(false);
   }
@@ -877,7 +908,16 @@ function showOrderConfirmDialog({ room, selectedType, booking, pricePerNight, to
     const checkInLabel = escapeHtml(getOrderDialogDateLabel(booking.checkIn));
     const checkOutLabel = escapeHtml(getOrderDialogDateLabel(booking.checkOut));
     const priceText = Number(pricePerNight || 0).toLocaleString();
-    const totalText = Number(totalAmount || 0).toLocaleString();
+    const priceSummary = pricing || getLodgingOrderPricing(pricePerNight, booking.nights);
+    const originalText = Number(priceSummary.originalAmount || 0).toLocaleString();
+    const discountText = Number(priceSummary.discountAmount || 0).toLocaleString();
+    const totalText = Number(priceSummary.amount || 0).toLocaleString();
+    const discountRow = priceSummary.discountEligible ? `
+          <div>
+            <span>${escapeHtml(priceSummary.discountLabel)}</span>
+            <strong>- NT$ ${discountText}</strong>
+          </div>
+    ` : "";
 
     dialog.className = "order-confirm-dialog";
     dialog.innerHTML = `
@@ -927,6 +967,11 @@ function showOrderConfirmDialog({ room, selectedType, booking, pricePerNight, to
             <span>單晚房價</span>
             <strong>NT$ ${priceText}</strong>
           </div>
+          <div>
+            <span>原始總額</span>
+            <strong>NT$ ${originalText}</strong>
+          </div>
+          ${discountRow}
           <div>
             <span>應付總金額</span>
             <strong>NT$ ${totalText}</strong>
@@ -1042,9 +1087,7 @@ function renderOrders() {
               <small>${Number(order.people || 0)} 人｜${Number(order.nights || 1)} 晚</small>
             </td>
             <td>
-              NT$ ${Number(order.amount || 0).toLocaleString()}
-              <br>
-              <small>NT$ ${Number(order.pricePerNight || order.amount || 0).toLocaleString()} / 晚</small>
+              ${renderOrderPriceDetails(order)}
             </td>
             <td>
               <span class="order-status">${escapeHtml(getOrderStatusText(order))}</span>
@@ -1123,6 +1166,25 @@ function formatOrderStayPeriod(order) {
   const checkInTime = order.checkInTime ? ` ${order.checkInTime}` : "";
   const checkOutTime = order.checkOutTime ? ` ${order.checkOutTime}` : "";
   return `${order.checkIn || "未指定"}${checkInTime} ~ ${order.checkOut || "未指定"}${checkOutTime}`;
+}
+
+function renderOrderPriceDetails(order) {
+  const amount = Number(order.amount || 0);
+  const pricePerNight = Number(order.pricePerNight || order.amount || 0);
+  const originalAmount = Number(order.originalAmount || amount);
+  const discountAmount = Number(order.discountAmount || 0);
+  const discountLabel = order.discountLabel || "";
+  const hasDiscount = discountAmount > 0 && originalAmount > amount;
+
+  return `
+    NT$ ${amount.toLocaleString()}
+    <br>
+    <small>NT$ ${pricePerNight.toLocaleString()} / 晚</small>
+    ${hasDiscount ? `
+      <br>
+      <small>${escapeHtml(discountLabel)}：原價 NT$ ${originalAmount.toLocaleString()}，折抵 NT$ ${discountAmount.toLocaleString()}</small>
+    ` : ""}
+  `;
 }
 
 function queueManualReview(type, error, payload = {}) {
@@ -1282,6 +1344,10 @@ async function payOrder(orderId) {
     order.bookingStatus = "已確認";
     order.status = "已付款";
     order.paidAt = new Date().toLocaleString("zh-TW");
+    if (Number(order.discountAmount || 0) > 0) {
+      order.discountStatus = "已套用";
+      order.discountAppliedAt = order.paidAt;
+    }
 
     if (typeof integrateLodgingOrderToItinerary === "function") {
       integrateLodgingOrderToItinerary(order);
@@ -1316,6 +1382,11 @@ function showBankTransferDialog(order) {
     const dueAtText = escapeHtml(order.bankDueAt || "未指定");
     const orderName = escapeHtml(order.roomName || "住宿訂單");
     const stayPeriod = escapeHtml(formatOrderStayPeriod(order));
+    const discountAmount = Number(order.discountAmount || 0);
+    const originalAmount = Number(order.originalAmount || order.amount || 0);
+    const discountNote = discountAmount > 0 ? `
+            <small>${escapeHtml(order.discountLabel || LODGING_LONG_STAY_DISCOUNT_LABEL)}：原價 NT$ ${originalAmount.toLocaleString()}，折抵 NT$ ${discountAmount.toLocaleString()}</small>
+    ` : "";
 
     dialog.className = "bank-transfer-dialog";
     dialog.innerHTML = `
@@ -1337,6 +1408,7 @@ function showBankTransferDialog(order) {
           <div>
             <span>應付金額</span>
             <strong>NT$ ${amountText}</strong>
+            ${discountNote}
             <small>付款期限：${dueAtText}</small>
           </div>
         </div>

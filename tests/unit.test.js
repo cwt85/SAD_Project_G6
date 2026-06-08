@@ -651,6 +651,28 @@ describe('orders.js — 訂單相關邏輯', () => {
     });
   });
 
+  describe('getLodgingOrderPricing()', () => {
+    test('訂房兩晚以上套用八折優惠', () => {
+      const pricing = ctx.getLodgingOrderPricing(3000, 2);
+
+      expect(pricing.originalAmount).toBe(6000);
+      expect(pricing.amount).toBe(4800);
+      expect(pricing.discountEligible).toBe(true);
+      expect(pricing.discountAmount).toBe(1200);
+      expect(pricing.discountRate).toBe(0.8);
+    });
+
+    test('訂房一晚不套用八折優惠', () => {
+      const pricing = ctx.getLodgingOrderPricing(3000, 1);
+
+      expect(pricing.originalAmount).toBe(3000);
+      expect(pricing.amount).toBe(3000);
+      expect(pricing.discountEligible).toBe(false);
+      expect(pricing.discountAmount).toBe(0);
+      expect(pricing.discountRate).toBe(1);
+    });
+  });
+
   describe('calculateRoomRating()', () => {
     test('無評價時回傳原始評分', () => {
       expect(ctx.calculateRoomRating(makeRoom({ rating: 4.2, reviews: [] }))).toBe(4.2);
@@ -1349,6 +1371,31 @@ describe('B 模組 — 訂房業務邏輯', () => {
 
       const updated = ctx.__getOrders().find(o => o.id === 1001);
       expect(updated.paymentStatus).toBe('已付款');
+    });
+
+    test('兩晚以上訂單以折後金額付款成功後標記優惠已套用', async () => {
+      loginAsCustomer(ctx, 2);
+      const order = makeOrder({
+        paymentStatus: '未付款',
+        originalAmount: 6000,
+        amount: 4800,
+        discountEligible: true,
+        discountRate: 0.8,
+        discountAmount: 1200,
+        discountLabel: '訂房兩晚以上八折優惠',
+        discountStatus: '付款成功後套用',
+        bankDueAtTimestamp: Date.now() + 24 * 60 * 60 * 1000
+      });
+      ctx.__setOrders([order]);
+
+      ctx.showBankTransferDialog = jest.fn(() => Promise.resolve('4800'));
+
+      await ctx.payOrder(1001);
+
+      const updated = ctx.__getOrders().find(o => o.id === 1001);
+      expect(updated.paymentStatus).toBe('已付款');
+      expect(updated.discountStatus).toBe('已套用');
+      expect(updated.discountAppliedAt).toBeTruthy();
     });
 
     test('付款金額錯誤時標記為異常', async () => {

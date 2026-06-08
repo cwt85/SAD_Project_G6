@@ -18,6 +18,7 @@ function savePricingSettings() {
   const discountValue = Number(getValue("pricingDiscountValue")) || 0;
   const discountStart = getValue("pricingDiscountStart");
   const discountEnd = getValue("pricingDiscountEnd");
+  const reason = getValue("pricingChangeReason").trim();
   const notice = document.getElementById("pricingResult");
 
   const room = findRoom(selectedRoomId);
@@ -67,9 +68,8 @@ function savePricingSettings() {
   }
 
   const beforePrice = Number(roomType.price) || Number(room.price) || 0;
-  const reason = prompt("請輸入本次修改定價原因：");
 
-  if (!reason || !reason.trim()) {
+  if (!reason) {
     showNotice(notice, "error", "請填寫修改原因，方便日後查詢歷史定價紀錄。");
     return;
   }
@@ -95,12 +95,13 @@ function savePricingSettings() {
     discountStart,
     discountEnd,
     modifiedBy: currentUser.account,
-    reason: reason.trim(),
+    reason,
     createdAt: new Date().toLocaleString("zh-TW"),
     createdAtTimestamp: Date.now()
   };
 
   pricingRecords.unshift(record);
+  setValue("pricingChangeReason", "");
 
   showNotice(notice, "success", "定價設定已保存，房型平日價格已同步更新。");
   saveAppData();
