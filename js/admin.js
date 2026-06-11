@@ -46,7 +46,6 @@ function saveRoomByAdmin() {
   const imageUrls = getValue("adminImageUrls").trim();
   const price = Number(getValue("adminPrice"));
   const stock = Number(getValue("adminStock"));
-  const capacity = Number(getValue("adminCapacity"));
   const stationDistance = getValue("adminStationDistance").trim();
   const checkInTime = getValue("adminCheckInTime").trim();
   const checkOutTime = getValue("adminCheckOutTime").trim();
@@ -57,8 +56,16 @@ function saveRoomByAdmin() {
   const desc = getValue("adminDesc").trim();
 
   const notice = document.getElementById("adminNotice");
+  const isEditing = editingRoomId !== null;
+  const editingRoom = isEditing ? findRoom(editingRoomId) : null;
+  const capacity = getAdminRoomCapacityValue(editingRoom);
 
-  if (!name || !location || !price || !stock || !capacity || !checkInTime || !checkOutTime || !bookingStart || !bookingEnd || !desc) {
+  if (isEditing && !editingRoom) {
+    showNotice(notice, "error", "找不到要修改的房源。");
+    return;
+  }
+
+  if (!name || !location || !price || !stock || !checkInTime || !checkOutTime || !bookingStart || !bookingEnd || !desc) {
     showNotice(notice, "error", "必填資料未完整填寫，請補齊房源名稱、地點、價格、庫存、人數、入住/退房時間、訂房期間與描述。");
     return;
   }
@@ -87,25 +94,22 @@ function saveRoomByAdmin() {
     return;
   }
 
-  let selectedTypes = adminRoomTypes.length > 0 ? adminRoomTypes.map(type => ({...type})) : generateDefaultRoomTypes({
-    id: getNextRoomId(),
-    price,
-    capacity
-  });
-
   // 修改模式
-  if (editingRoomId !== null) {
-    const room = findRoom(editingRoomId);
-
-    if (!room) {
-      showNotice(notice, "error", "找不到要修改的房源。");
-      return;
-    }
+  if (isEditing) {
+    const room = editingRoom;
+    const selectedTypes = getAdminSelectedRoomTypes({
+      roomId: room.id,
+      price,
+      stock,
+      capacity,
+      existingRoom: room
+    });
 
     room.name = name;
     room.location = location;
     room.address = address || room.address;
-    room.price = price;
+    room.price = getLowestRoomTypePrice({ ...room, roomTypes: selectedTypes }) || price;
+    room.stock = stock;
     room.capacity = capacity;
     room.stationDistance = stationDistance || room.stationDistance || "未設定";
     room.checkInTime = checkInTime;
@@ -116,6 +120,7 @@ function saveRoomByAdmin() {
     room.policies = policyList.length ? policyList : room.policies;
     room.desc = desc;
     room.images = images.length ? images : room.images;
+    room.image = images[0] || room.image || (Array.isArray(room.images) ? room.images[0] : "") || getRoomCoverImage(room.id);
     room.roomTypes = selectedTypes;
     room.status = room.status || "active";
     room.updatedAt = new Date().toLocaleString("zh-TW");
@@ -133,13 +138,20 @@ function saveRoomByAdmin() {
 
   // 新增模式
   const newRoomId = getNextRoomId();
+  const selectedTypes = getAdminSelectedRoomTypes({
+    roomId: newRoomId,
+    price,
+    stock,
+    capacity
+  });
 
   const newRoom = {
     id: newRoomId,
     name,
     location,
     address: address || "管理員尚未設定",
-    price,
+    price: getLowestRoomTypePrice({ price, roomTypes: selectedTypes }) || price,
+    stock,
     rating: 4.5,
     capacity,
     stationDistance: stationDistance || "未設定",
@@ -176,6 +188,145 @@ function saveRoomByAdmin() {
 
 function isValidTimeString(value) {
   return /^([01]\d|2[0-3]):[0-5]\d$/.test(String(value || ""));
+}
+
+function getAdminRoomCapacityValue(existingRoom = null) {
+  const explicitCapacity = Number(getValue("adminCapacity"));
+  if (explicitCapacity > 0) return explicitCapacity;
+
+  const typeCapacity = getAdminRoomTypesMaxCapacity(adminRoomTypes);
+  if (typeCapacity > 0) return typeCapacity;
+
+  const existingCapacity = Number(existingRoom && existingRoom.capacity);
+  if (existingCapacity > 0) return existingCapacity;
+
+  return 2;
+}
+
+function getAdminRoomTypesMaxCapacity(types) {
+  if (!Array.isArray(types) || types.length === 0) return 0;
+
+  return types.reduce((max, type) => {
+    const capacity = Number(type && type.capacity) || 0;
+    return Math.max(max, capacity);
+  }, 0);
+}
+
+function getAdminSelectedRoomTypes({ roomId, price, stock, capacity, existingRoom = null }) {
+  const selectedTypes = adminRoomTypes.length > 0
+    ? adminRoomTypes.map((type, index) => normalizeAdminRoomType(type, {
+        roomId,
+        index,
+        price,
+        stock,
+        capacity
+      }))
+    : generateDefaultRoomTypes({ id: roomId, price, capacity });
+
+  const pricedTypes = syncAdminRoomTypePrices(selectedTypes, price, existingRoom);
+  return syncAdminRoomTypeStocks(pricedTypes, stock);
+}
+
+function normalizeAdminRoomType(type, { roomId, index, price, stock, capacity }) {
+  return {
+    ...type,
+    id: type.id || `type-${roomId}-${index + 1}`,
+    name: type.name || `房型 ${index + 1}`,
+    price: Number(type.price) > 0 ? Number(type.price) : price,
+    capacity: Number(type.capacity) > 0 ? Number(type.capacity) : capacity,
+    stock: Number(type.stock) >= 0 ? Number(type.stock) : stock,
+    bedType: type.bedType || "無",
+    desc: type.desc || "無"
+  };
+}
+
+function syncAdminRoomTypePrices(types, price, existingRoom = null) {
+  const basePrice = Number(price);
+  if (!Array.isArray(types) || types.length === 0 || basePrice <= 0) return types;
+
+  if (!existingRoom) {
+    const baseIndex = getAdminBaseRoomTypeIndex(types);
+    if (baseIndex < 0) return types;
+
+    return types.map((type, index) => index === baseIndex ? { ...type, price: basePrice } : type);
+  }
+
+  const previousBasePrice = Number(existingRoom.price) || getLowestRoomTypePrice(existingRoom) || 0;
+  if (previousBasePrice <= 0 || Number(previousBasePrice) === basePrice) return types;
+
+  const previousTypeIds = new Set(
+    Array.isArray(existingRoom.roomTypes)
+      ? existingRoom.roomTypes.map(type => String(type.id))
+      : []
+  );
+  const priceRatio = basePrice / previousBasePrice;
+
+  return types.map(type => {
+    if (!previousTypeIds.has(String(type.id))) return type;
+
+    const previousPrice = Number(type.price) || previousBasePrice;
+    return {
+      ...type,
+      price: Math.max(1, Math.round(previousPrice * priceRatio))
+    };
+  });
+}
+
+function getAdminBaseRoomTypeIndex(types) {
+  return types.findIndex(type => {
+    const id = String(type.id || "").toLowerCase();
+    const name = String(type.name || "");
+    return id.includes("standard") || name.includes("標準");
+  });
+}
+
+function syncAdminRoomTypeStocks(types, stock) {
+  const totalStock = Math.max(0, Math.round(Number(stock) || 0));
+  if (!Array.isArray(types) || types.length === 0) return types;
+
+  if (types.length === 1) {
+    return [{ ...types[0], stock: totalStock }];
+  }
+
+  const currentStocks = types.map(type => Math.max(0, Math.round(Number(type.stock) || 0)));
+  const currentTotal = currentStocks.reduce((sum, value) => sum + value, 0);
+
+  if (currentTotal === totalStock) return types;
+
+  if (currentTotal <= 0) {
+    const baseStock = Math.floor(totalStock / types.length);
+    let remainder = totalStock % types.length;
+
+    return types.map(type => {
+      const nextStock = baseStock + (remainder > 0 ? 1 : 0);
+      remainder -= 1;
+      return { ...type, stock: nextStock };
+    });
+  }
+
+  const distributed = currentStocks.map((value, index) => {
+    const raw = (value / currentTotal) * totalStock;
+    return {
+      index,
+      stock: Math.floor(raw),
+      remainder: raw - Math.floor(raw)
+    };
+  });
+  let remaining = totalStock - distributed.reduce((sum, item) => sum + item.stock, 0);
+
+  distributed
+    .slice()
+    .sort((a, b) => b.remainder - a.remainder || a.index - b.index)
+    .forEach(item => {
+      if (remaining <= 0) return;
+      distributed[item.index].stock += 1;
+      remaining -= 1;
+    });
+
+  return types.map((type, index) => ({
+    ...type,
+    stock: distributed[index].stock
+  }));
 }
 
 // ===== 房源管理列表 =====
@@ -448,13 +599,18 @@ function editRoomByAdmin(roomId) {
 
   editingRoomId = room.id;
   adminRoomTypes = Array.isArray(room.roomTypes) ? room.roomTypes.map(type => ({...type})) : [];
+  const roomImages = Array.isArray(room.images) && room.images.length > 0
+    ? room.images
+    : (room.image ? [room.image] : []);
 
   setValue("adminName", room.name);
   setValue("adminLocation", room.location);
   setValue("adminAddress", room.address || "");
-  setValue("adminImageUrls", room.images ? room.images.join(", ") : "");
+  setValue("adminImageUrls", roomImages.join(", "));
   setValue("adminPrice", room.price);
-  setValue("adminStock", room.roomTypes ? room.roomTypes.reduce((sum, type) => sum + (Number(type.stock) || 0), 0) : 1);
+  setValue("adminStock", Array.isArray(room.roomTypes) && room.roomTypes.length > 0
+    ? room.roomTypes.reduce((sum, type) => sum + (Number(type.stock) || 0), 0)
+    : (Number(room.stock) || 1));
   setValue("adminCapacity", room.capacity || 2);
   setValue("adminStationDistance", room.stationDistance || "");
   setValue("adminCheckInTime", room.checkInTime || "15:00");
