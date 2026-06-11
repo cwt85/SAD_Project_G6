@@ -27,6 +27,7 @@ const SOURCE_FILES = [
   'auth.js',
   'rooms.js',
   'orders.js',
+  'admin.js',
   'pricing.js',
   'trains.js',
   'bonus.js',
@@ -60,6 +61,10 @@ function __getCart()                  { return cart; }
 function __setSelectedRoomType(rid, tid) { selectedRoomTypes[rid] = tid; }
 // 直接設定腳本內部 let 變數（讓 isAdmin/isCustomer/requireCustomer 等函式讀到正確狀態）
 function __setLoginState(loggedIn, user) { isLoggedIn = loggedIn; currentUser = user ? Object.assign({}, user) : null; }
+function __setEditingRoomId(id)       { editingRoomId = id; }
+function __getEditingRoomId()         { return editingRoomId; }
+function __setAdminRoomTypes(arr)     { adminRoomTypes = arr; }
+function __getAdminRoomTypes()        { return adminRoomTypes; }
 // 讓測試存取腳本內部 chatConversations（let 變數，不在 ctx 屬性上）
 function __getChatConversations()     { return chatConversations; }
 // 讓測試讀取腳本內部 rooms 陣列（let 變數，不在 ctx 屬性上）
@@ -170,7 +175,7 @@ function createContext() {
   };
 
   const ctx = {
-    Date, Math, Number, String, Boolean, Array, Object, RegExp, Error,
+    Date, Math, Number, String, Boolean, Array, Object, RegExp, Error, URL,
     JSON, parseInt, parseFloat, isNaN, isFinite, Symbol, Promise,
     NaN, Infinity, undefined,
 
@@ -197,6 +202,10 @@ function createContext() {
     window: null,
     location: { hash: '' },
     fetch: jest.fn(() => Promise.reject(new Error('fetch not mocked'))),
+    requestAnimationFrame: jest.fn((fn) => {
+      if (typeof fn === 'function') fn();
+      return 1;
+    }),
     setTimeout: jest.fn((fn) => { /* 不實際執行，避免副作用 */ }),
   };
 
@@ -593,7 +602,78 @@ describe('utils.js — 共用工具函式', () => {
 });
 
 // ============================================================
-// 三、orders.js 測試
+// 三、admin.js 測試
+// ============================================================
+describe('admin.js — 房源管理', () => {
+  let ctx;
+
+  beforeEach(() => {
+    ctx = createContext();
+    ctx.__setLoginState(true, { id: 1, account: 'admin@example.com', role: 'admin' });
+  });
+
+  function bindAdminForm(values) {
+    const elements = Object.entries(values).reduce((map, [id, value]) => {
+      map[id] = { value };
+      return map;
+    }, {
+      adminNotice: { innerHTML: '' },
+      adminRoomTypeList: { innerHTML: '' }
+    });
+
+    ctx.document.getElementById = jest.fn((id) => elements[id] || null);
+    return elements;
+  }
+
+  test('編輯房源時即使缺少 adminCapacity 欄位也能更新資料', () => {
+    const originalRoom = makeRoom();
+    ctx.__setRooms([originalRoom]);
+    ctx.__setEditingRoomId(originalRoom.id);
+    ctx.__setAdminRoomTypes(originalRoom.roomTypes.map(type => ({ ...type })));
+
+    bindAdminForm({
+      adminName: '更新後民宿',
+      adminLocation: '關山鎮',
+      adminAddress: '台東縣關山鎮新地址 8 號',
+      adminImageUrls: 'https://example.com/cover.jpg, https://example.com/room.jpg',
+      adminPrice: '3600',
+      adminStock: '10',
+      adminStationDistance: '10 分鐘',
+      adminCheckInTime: '16:00',
+      adminCheckOutTime: '12:00',
+      adminBookingStart: daysFromToday(-1),
+      adminBookingEnd: daysFromToday(30),
+      adminFacilities: 'Wi-Fi, 停車場',
+      adminPolicies: '禁煙',
+      adminDesc: '更新後的房源描述',
+      adminTypeName: '',
+      adminTypePrice: '',
+      adminTypeCapacity: '2',
+      adminTypeStock: '1',
+      adminTypeBed: '',
+      adminTypeDesc: ''
+    });
+
+    ctx.saveRoomByAdmin();
+
+    const updated = ctx.__getRooms()[0];
+    expect(updated.name).toBe('更新後民宿');
+    expect(updated.location).toBe('關山鎮');
+    expect(updated.image).toBe('https://example.com/cover.jpg');
+    expect(updated.images[0]).toBe('https://example.com/cover.jpg');
+    expect(updated.price).toBe(3600);
+    expect(updated.stock).toBe(10);
+    expect(updated.capacity).toBe(3);
+    expect(updated.roomTypes.reduce((sum, type) => sum + type.stock, 0)).toBe(10);
+    expect(updated.roomTypes[0].price).toBe(3600);
+    expect(ctx.saveAppData).toHaveBeenCalled();
+    expect(ctx.renderAll).toHaveBeenCalled();
+    expect(ctx.__getEditingRoomId()).toBeNull();
+  });
+});
+
+// ============================================================
+// 四、orders.js 測試
 // ============================================================
 describe('orders.js — 訂單相關邏輯', () => {
   let ctx;
